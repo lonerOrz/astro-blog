@@ -1,0 +1,136 @@
+/* terminal.css - Final Layout Polish v2 */
+.terminal {
+  background-color: #282c34;
+  font-family: "Fira Mono", monospace;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid #3a3f4c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 12px rgba(97, 175, 239, 0.15);
+  min-height: 450px;
+  max-width: 960px; /* Set a max width for the terminal */
+  margin: 40px auto; /* Center the terminal on the page */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr auto; /* Right column shrinks to fit content */
+  grid-template-rows: auto auto;
+  gap: 10px 10px; /* Further reduced column gap */
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #3a3f4c;
+  margin-bottom: 15px;
+}
+
+.grid-item {
+  min-height: 50px;
+  border: none !important;
+  padding: 0;
+  margin: 0;
+  overflow-wrap: break-word; /* Ensure wrapping for all grid items */
+  word-wrap: break-word; /* Legacy support */
+}
+
+.top-left { grid-column: 1 / 2; grid-row: 1 / 2; }
+.top-right { grid-column: 2 / 3; grid-row: 1 / 2; }
+.bottom-left { 
+  grid-column: 1 / 2; 
+  grid-row: 2 / 3; 
+  align-self: end;
+}
+.bottom-right { 
+  grid-column: 2 / 3; 
+  grid-row: 2 / 3; 
+  align-self: end;
+}
+
+.ascii-art {
+  color: #61afef;
+  font-size: 1.4em;
+  font-weight: bold;
+  white-space: pre;
+  line-height: 1.1;
+}
+
+.system-info {
+  color: #abb2bf;
+  font-size: 1em;
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.about-box {
+  padding: 10px;
+  font-size: 0.9em;
+}
+
+.about-box h3,
+.contact-links h3 {
+  margin: 0 0 8px 0;
+  color: #98c379;
+  font-size: 1em;
+}
+
+.about-box p {
+  margin: 0;
+  color: #abb2bf;
+}
+
+.contact-links {
+  text-align: left;
+  padding: 10px;
+  font-size: 0.9em;
+}
+
+.contact-grid p {
+  margin: 0 0 4px 0;
+}
+
+.contact-grid span {
+  display: inline-block;
+  width: 75px;
+  color: #abb2bf;
+}
+
+.contact-links a {
+  color: #61afef;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.contact-links a:hover {
+  text-decoration: underline;
+}
+
+.animation-container {
+  white-space: pre-wrap;
+}
+
+.terminal-command,
+.terminal-output {
+  display: block;
+  line-height: 1.4;
+}
+
+.terminal-command {
+  color: #61afef;
+}
+
+.terminal-output {
+  color: #abb2bf;
+}
+
+.cursor {
+  display: inline-block;
+  width: 9px;
+  height: 1.2em;
+  vertical-align: bottom;
+  margin-left: 2px;
+  background: #98c379;
+  animation: blink 1.2s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
