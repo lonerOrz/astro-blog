@@ -1,0 +1,26 @@
+---
+import Layout from "@layouts/Layout.astro";
+import Container from "@components/Container.astro";
+import { ABOUT } from "@consts";
+---
+
+<Layout title={ABOUT.TITLE} description={ABOUT.DESCRIPTION}>
+  <Container>
+    <div class="animate space-y-4">
+      <h1 class="text-2xl font-semibold text-black dark:text-white">About Me</h1>
+      <article class="prose dark:prose-invert max-w-none">
+        <p>
+          Hello! I'm lonerOrz, a developer passionate about creating beautiful and functional websites.
+        </p>
+        <p>
+          This website is my personal blog and portfolio where I share my thoughts on technology, programming, and other interests.
+        </p>
+        <img src="/png/cat.png" alt="A picture of a cat" class="mx-auto rounded-lg shadow-lg" />
+        <p class="text-center text-sm">This is my cat, a lovely companion.</p>
+        <p>
+          Feel free to explore my blog posts and projects. If you'd like to get in touch, you can find my social media links on the homepage.
+        </p>
+      </article>
+    </div>
+  </Container>
+</Layout>
