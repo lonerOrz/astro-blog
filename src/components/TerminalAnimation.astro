@@ -118,4 +118,5 @@ const { commands = null } = Astro.props as { commands?: Command[] };
   } else {
     initializeTerminal();
   }
+  document.addEventListener("astro:after-swap", initializeTerminal);
 </script>
