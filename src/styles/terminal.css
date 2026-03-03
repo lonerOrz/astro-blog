@@ -1,23 +1,47 @@
 /* terminal.css - Final Layout Polish v2 */
+:root {
+  --terminal-bg: #f5f5f5;
+  --terminal-border: #e5e5e5;
+  --terminal-ascii: #1a73e8;
+  --terminal-text: #333333;
+  --terminal-accent: #0f9d58;
+  --terminal-link: #1a73e8;
+  --terminal-dim: #666666;
+  --terminal-shadow: rgba(0, 0, 0, 0.1);
+}
+
+.dark {
+  --terminal-bg: #282c34;
+  --terminal-border: #3a3f4c;
+  --terminal-ascii: #61afef;
+  --terminal-text: #abb2bf;
+  --terminal-accent: #98c379;
+  --terminal-link: #61afef;
+  --terminal-dim: #abb2bf;
+  --terminal-shadow: rgba(0, 0, 0, 0.15);
+}
+
 .terminal {
-  background-color: #282c34;
+  background-color: var(--terminal-bg);
   font-family: "Fira Mono", monospace;
   padding: 20px;
   border-radius: 6px;
-  border: 1px solid #3a3f4c;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 0 12px rgba(97, 175, 239, 0.15);
+  border: 1px solid var(--terminal-border);
+  box-shadow: 0 4px 12px var(--terminal-shadow), 0 0 12px var(--terminal-shadow);
   min-height: 450px;
-  max-width: 960px; /* Set a max width for the terminal */
-  margin: 40px auto; /* Center the terminal on the page */
+  max-width: 960px;
+  margin: 40px auto;
+  color: var(--terminal-text);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
 }
 
 .grid-container {
   display: grid;
-  grid-template-columns: 1fr auto; /* Right column shrinks to fit content */
+  grid-template-columns: 1fr auto;
   grid-template-rows: auto auto;
-  gap: 10px 10px; /* Further reduced column gap */
+  gap: 10px 10px;
   padding-bottom: 15px;
-  border-bottom: 1px dashed #3a3f4c;
+  border-bottom: 1px dashed var(--terminal-border);
   margin-bottom: 15px;
 }
 
@@ -44,7 +68,7 @@
 }
 
 .ascii-art {
-  color: #61afef;
+  color: var(--terminal-ascii);
   font-size: 1.4em;
   font-weight: bold;
   white-space: pre;
@@ -52,7 +76,7 @@
 }
 
 .system-info {
-  color: #abb2bf;
+  color: var(--terminal-dim);
   font-size: 1em;
   white-space: pre-wrap;
   text-align: left;
@@ -66,13 +90,13 @@
 .about-box h3,
 .contact-links h3 {
   margin: 0 0 8px 0;
-  color: #98c379;
+  color: var(--terminal-accent);
   font-size: 1em;
 }
 
 .about-box p {
   margin: 0;
-  color: #abb2bf;
+  color: var(--terminal-dim);
 }
 
 .contact-links {
@@ -88,11 +112,11 @@
 .contact-grid span {
   display: inline-block;
   width: 75px;
-  color: #abb2bf;
+  color: var(--terminal-dim);
 }
 
 .contact-links a {
-  color: #61afef;
+  color: var(--terminal-link);
   text-decoration: none;
   word-break: break-all;
 }
@@ -112,11 +136,11 @@
 }
 
 .terminal-command {
-  color: #61afef;
+  color: var(--terminal-link);
 }
 
 .terminal-output {
-  color: #abb2bf;
+  color: var(--terminal-dim);
 }
 
 .cursor {
@@ -125,7 +149,7 @@
   height: 1.2em;
   vertical-align: bottom;
   margin-left: 2px;
-  background: #98c379;
+  background: var(--terminal-accent);
   animation: blink 1.2s steps(1) infinite;
 }
 
