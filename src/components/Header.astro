@@ -4,27 +4,21 @@ import Link from "@components/Link.astro";
 import { SITE } from "@consts";
 ---
 
-<header transition:persist>
+<header transition:persist class="py-3">
   <Container>
-    <div class="flex flex-wrap justify-between gap-y-2">
+    <div class="flex items-center justify-between">
       <Link href="/" underline={false}>
-        <div class="font-semibold">
-          {SITE.TITLE}&nbsp;
+        <div class="font-semibold text-sm">
+          {SITE.TITLE}
         </div>
       </Link>
-      <nav class="flex items-center gap-1 text-sm">
-        <Link href="/blog">blog</Link>
-        <span>
-          {`/`}
-        </span>
-        <Link href="/projects">projects</Link>
-        <span>
-          {`/`}
-        </span>
-        <Link href="/about">about</Link>
-        <span>
-          {`/`}
-        </span>
+      <nav class="flex items-center gap-0.5 text-sm">
+        <Link href="/blog" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">blog</Link>
+        <span class="text-black/20 dark:text-white/20">/</span>
+        <Link href="/projects" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">projects</Link>
+        <span class="text-black/20 dark:text-white/20">/</span>
+        <Link href="/about" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">about</Link>
+        <span class="text-black/20 dark:text-white/20 mx-1">/</span>
         <button
           id="magnifying-glass"
           aria-label="Search"
