@@ -1,41 +1,31 @@
 ---
 import "../styles/terminal.css";
+import { TERMINAL } from "@consts";
 import type { Command } from "../lib/terminal.ts";
 
 const { commands = null } = Astro.props as { commands?: Command[] };
+
+const terminalContent = JSON.stringify(TERMINAL);
 ---
 
-<div class="terminal" id="main-terminal"></div>
+<div class="terminal" id="main-terminal" data-terminal={terminalContent}></div>
 
 <script define:vars={{ commands }}>
   function initializeTerminal() {
     const terminalContainer = document.getElementById("main-terminal");
     if (!terminalContainer) return;
 
-    const staticTypeDelay = 5; // A bit faster for the initial boot sequence
-    const commandTypeDelay = 50;
+    const commandTypeDelay = 40;
 
-    const asciiArt = `
-██╗  ██╗███████╗██╗     ██╗      ██████╗
-██║  ██║██╔════╝██║     ██║     ██╔═══██╗
-███████║█████╗  ██║     ██║     ██║   ██║
-██╔══██║██╔══╝  ██║     ██║     ██║   ██║
-██║  ██║███████╗███████╗███████╗╚██████╔╝
-╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝ ╚═════╝
-`;
-
-    const staticContent = {
-      systemInfo: `SYSTEM STATUS: ONLINE\nVERSION: 1.0.2\nLAST UPDATE: 2024-07-31`,
-      about: `<h3>[ ABOUT ]</h3><p>Astro-Blog is a multi-purpose, accessible, and SEO-friendly theme for Astro blogs.</p>`,
-      contact: `<h3>[ CONTACT ]</h3><div class="contact-grid"><p><span>GitHub:</span> <a href="https://github.com/your-username" target="_blank">https://github.com/your-username</a></p><p><span>Twitter:</span> <a href="https://twitter.com/your-handle" target="_blank">https://twitter.com/your-handle</a></p><p><span>Email:</span> <a href="mailto:your-email@example.com">your-email@example.com</a></p></div>`,
-    };
+    // Get terminal content from data attribute
+    const terminalData = JSON.parse(terminalContainer.dataset.terminal || '{}');
+    const { asciiArt, systemInfo, about, contact } = terminalData;
 
     const dynamicCommands = commands && commands.length > 0 ? commands : [
-        { cmd: "ls -a", output: "projects/  about.txt  contact.md\n" },
-        { cmd: "cat README.md", output: "Hello! Welcome to the portfolio.\n" },
+      { cmd: "ls -a", output: "projects/  about.txt  contact.md\n" },
+      { cmd: "cat README.md", output: "Hello! Welcome to the portfolio.\n" },
     ];
 
-    // New, robust typeText function that correctly handles HTML tags.
     function typeText(target, text, delay, callback) {
       let i = 0;
       target.innerHTML = "";
@@ -47,7 +37,7 @@ const { commands = null } = Astro.props as { commands?: Command[] };
             if (tagEnd !== -1) {
               target.innerHTML += text.substring(i, tagEnd + 1);
               i = tagEnd + 1;
-              setTimeout(next, delay); // Still use delay for tags to pace rendering
+              setTimeout(next, delay);
               return;
             }
           }
@@ -61,7 +51,18 @@ const { commands = null } = Astro.props as { commands?: Command[] };
       next();
     }
 
-    // Create structure
+    // Build text content
+    const systemInfoText = systemInfo.join('\n');
+
+    // Build HTML for about section
+    const aboutHtml = `<h3>${about.title}</h3><p>${about.content}</p>`;
+    
+    // Build HTML for contact section
+    const contactLinksHtml = contact.links.map(link => 
+      `<p><span>${link.label}:</span> <a href="${link.url}" target="_blank">${link.url}</a></p>`
+    ).join('');
+    const contactHtml = `<h3>${contact.title}</h3><div class="contact-grid">${contactLinksHtml}</div>`;
+
     terminalContainer.innerHTML = `
       <div class="grid-container">
         <pre class="grid-item top-left ascii-art"></pre>
@@ -78,39 +79,39 @@ const { commands = null } = Astro.props as { commands?: Command[] };
     const contactEl = terminalContainer.querySelector(".contact-links");
     const animationEl = terminalContainer.querySelector(".animation-container");
 
-    // Unified Animation Sequence
-    typeText(asciiEl, asciiArt, 1, () => {
-      typeText(systemEl, staticContent.systemInfo, staticTypeDelay, () => {
-        typeText(aboutEl, staticContent.about, staticTypeDelay, () => {
-          typeText(contactEl, staticContent.contact, staticTypeDelay, () => {
-            const logContainer = document.createElement("div");
-            const cursor = document.createElement("span");
-            cursor.className = "cursor";
-            animationEl.appendChild(logContainer);
-            animationEl.appendChild(cursor);
+    // Type all content
+    typeText(asciiEl, asciiArt, 2, null);
+    typeText(systemEl, systemInfoText, 2, null);
+    typeText(aboutEl, aboutHtml, 2, null);
+    
+    setTimeout(() => {
+      typeText(contactEl, contactHtml, 3, () => {
+        const logContainer = document.createElement("div");
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        animationEl.appendChild(logContainer);
+        animationEl.appendChild(cursor);
 
-            function runCommand(index) {
-              if (index >= dynamicCommands.length) {
-                setTimeout(() => { logContainer.innerHTML = ""; runCommand(0); }, 3000);
-                return;
-              }
-              const cmdLine = "$ " + dynamicCommands[index].cmd;
-              const outputText = dynamicCommands[index].output;
-              const cmdElement = document.createElement("span");
-              cmdElement.className = "terminal-command";
-              logContainer.appendChild(cmdElement);
-              typeText(cmdElement, cmdLine, commandTypeDelay, () => {
-                const outputElement = document.createElement("span");
-                outputElement.className = "terminal-output";
-                logContainer.appendChild(outputElement);
-                typeText(outputElement, outputText, commandTypeDelay, () => runCommand(index + 1));
-              });
-            }
-            runCommand(0);
+        function runCommand(index) {
+          if (index >= dynamicCommands.length) {
+            setTimeout(() => { logContainer.innerHTML = ""; runCommand(0); }, 3000);
+            return;
+          }
+          const cmdLine = "$ " + dynamicCommands[index].cmd;
+          const outputText = dynamicCommands[index].output;
+          const cmdElement = document.createElement("span");
+          cmdElement.className = "terminal-command";
+          logContainer.appendChild(cmdElement);
+          typeText(cmdElement, cmdLine, commandTypeDelay, () => {
+            const outputElement = document.createElement("span");
+            outputElement.className = "terminal-output";
+            logContainer.appendChild(outputElement);
+            typeText(outputElement, outputText, commandTypeDelay, () => runCommand(index + 1));
           });
-        });
+        }
+        runCommand(0);
       });
-    });
+    }, 300);
   }
 
   if (document.readyState === "loading") {
