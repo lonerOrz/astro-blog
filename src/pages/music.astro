@@ -7,20 +7,19 @@ import { MUSIC, SITE } from "@consts";
 <Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION}>
   <!-- 动态虚化背景 -->
   <div id="an_music_bg"></div>
-  
+
   <Container>
     <main id="anMusic-page">
       <meting-js
-        id="2842079283" 
-        server="netease" 
-        type="playlist" 
-        order="list" 
-        fixed="false" 
-        list-folded="false" 
-        autoplay="false" 
+        id="2842079283"
+        server="netease"
+        type="playlist"
+        order="list"
+        fixed="false"
+        list-folded="false"
+        autoplay="false"
         mutex="true"
-        theme="#fff"
-      ></meting-js>
+        theme="#fff"></meting-js>
     </main>
   </Container>
 </Layout>
@@ -44,14 +43,20 @@ import { MUSIC, SITE } from "@consts";
 
 <style is:global>
   /* 沉浸式页面基础配置 */
-  #anMusic-page { margin-top: 2rem; }
-  
+  main {
+    margin: 0 !important;
+  }
+
   /* 隐藏原有的博客干扰元素 */
-  header, footer, #back-to-top { 
-    opacity: 0.3; 
+  header,
+  footer,
+  #back-to-top {
+    opacity: 0.3;
     transition: opacity 0.3s;
   }
-  header:hover { opacity: 1; }
+  header:hover {
+    opacity: 1;
+  }
 
   #an_music_bg {
     display: block;
@@ -69,6 +74,11 @@ import { MUSIC, SITE } from "@consts";
   }
 
   /* APlayer 结构重组 (安知鱼风格) */
+  #anMusic-page {
+    margin-top: 0rem;
+    padding-top: 0 !important;
+  }
+
   #anMusic-page .aplayer {
     display: flex !important;
     flex-direction: row-reverse !important;
@@ -87,28 +97,17 @@ import { MUSIC, SITE } from "@consts";
     border-right: none !important;
   }
 
-  /* 歌单区 (左侧 60%) */
-  #anMusic-page .aplayer {
-    display: flex !important;
-    flex-direction: row-reverse !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    height: 75vh !important;
-    margin: 0 !important;
-  }
-
-  /* 歌单区 (左侧 60%) */
+  /* 歌单区 (左侧 35% - 调窄) */
   #anMusic-page .aplayer-list {
-    width: 60% !important;
+    width: 35% !important;
     display: block !important;
     height: 100% !important;
     max-height: none !important;
-    padding-right: 20px !important;
+    padding-right: 15px !important;
   }
 
   #anMusic-page .aplayer-list ol {
-    max-height: 70vh !important;
+    max-height: 100% !important; /* 修复溢出 */
   }
 
   #anMusic-page .aplayer-list ol li {
@@ -128,12 +127,47 @@ import { MUSIC, SITE } from "@consts";
     background: rgba(255, 255, 255, 0.2) !important;
   }
 
-  /* 封面歌词区 (右侧 40%) */
+  /* 封面歌词区 (右侧 65% - 调宽) */
   #anMusic-page .aplayer-body {
-    width: 40% !important;
+    width: 65% !important; /* 修复宽度冲突 */
     height: 100% !important;
     flex-direction: column !important;
     display: flex !important;
+    padding-left: 30px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 修复歌曲名称只显示一半的问题 */
+  #anMusic-page .aplayer-info {
+    margin: 0 !important;
+    padding: 10px 20px !important;
+    height: auto !important;
+    text-align: center !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+  }
+
+  #anMusic-page .aplayer-info .aplayer-music {
+    margin-bottom: 15px !important;
+    height: auto !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    line-height: 1.4 !important;
+  }
+
+  #anMusic-page .aplayer-info .aplayer-music .aplayer-title {
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+    color: #fff !important;
+    display: block !important;
+    width: 100% !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+  }
+
+  #anMusic-page .aplayer-info .aplayer-music .aplayer-author {
+    color: rgba(255, 255, 255, 0.6) !important;
+    margin-top: 5px !important;
   }
 
   #anMusic-page .aplayer-pic {
@@ -142,7 +176,7 @@ import { MUSIC, SITE } from "@consts";
     height: 250px !important;
     border-radius: 20px !important;
     margin: 0 auto 30px auto !important;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
   }
 
   #anMusic-page .aplayer-info {
@@ -162,32 +196,49 @@ import { MUSIC, SITE } from "@consts";
     color: #fff !important;
   }
 
-  /* 歌词美化 - 彻底消除遮挡 */
+  /* 歌词区域优化 */
   #anMusic-page .aplayer-lrc {
-    height: 400px !important;
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
-    overflow: visible !important;
+    height: 280px !important; /* 保留渐变效果 */
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    ) !important;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    ) !important;
+    overflow: hidden !important;
+    margin-top: 10px !important;
   }
-  
-  /* 关键：去掉 APlayer 默认的伪元素阴影/渐变 */
+
+  #anMusic-page .aplayer-lrc-contents {
+    padding-top: 30px !important;
+  }
+
   #anMusic-page .aplayer-lrc:before,
   #anMusic-page .aplayer-lrc:after {
     display: none !important;
-    background: none !important;
-    content: none !important;
   }
 
   #anMusic-page .aplayer-lrc p {
     font-size: 1.1rem !important;
-    color: rgba(255,255,255,0.5) !important;
+    color: rgba(255, 255, 255, 0.5) !important;
     font-weight: 500 !important;
+    line-height: 1rem !important; /* 非当前歌词行间距 */
+    margin: 10px 0 !important; /* 每行留点空隙 */
   }
 
   #anMusic-page .aplayer-lrc p.aplayer-lrc-current {
     color: #fff !important;
     font-size: 1.3rem !important;
     transform: scale(1.1) !important;
+    line-height: 3.2rem !important; /* 当前行稍大，配合 scale */
   }
 
   /* 控制器固定到底部 */
@@ -196,19 +247,37 @@ import { MUSIC, SITE } from "@consts";
     bottom: 40px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    width: 100% !important;
+    width: calc(100% - 40px) !important; /* 两边留 20px 空间 */
     max-width: 800px !important;
-    background: rgba(255,255,255,0.1) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: blur(20px) !important;
-    padding: 15px 30px !important;
+    padding: 10px 20px !important; /* 缩小 padding 给按钮空间 */
     border-radius: 50px !important;
+    display: flex !important; /* 确保内部按钮 flex 布局 */
+    align-items: center !important;
     z-index: 100 !important;
   }
-  
+
+  #anMusic-page .aplayer-bar-wrap {
+    margin: 0 10px !important; /* 给时间轴留出空间，可拖动 */
+    flex: 1 1 auto !important;
+  }
+
   /* 调整进度条和按钮颜色 */
-  #anMusic-page .aplayer-bar-wrap { margin: 0 100px !important; }
-  #anMusic-page .aplayer-played { background: #fff !important; }
-  #anMusic-page .aplayer-thumb { background: #fff !important; }
-  #anMusic-page .aplayer-time { color: #fff !important; }
-  #anMusic-page .aplayer-icon path { fill: #fff !important; opacity: 0.8; }
+  #anMusic-page .aplayer-bar-wrap {
+    margin: 0 100px !important;
+  }
+  #anMusic-page .aplayer-played {
+    background: #fff !important;
+  }
+  #anMusic-page .aplayer-thumb {
+    background: #fff !important;
+  }
+  #anMusic-page .aplayer-time {
+    color: #fff !important;
+  }
+  #anMusic-page .aplayer-icon path {
+    fill: #fff !important;
+    opacity: 0.8;
+  }
 </style>
