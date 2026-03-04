@@ -6,7 +6,7 @@ demoURL: "https://astro-micro.vercel.app"
 repoURL: "https://github.com/trevortylerlee/astro-micro"
 ---
 
-![Astro Micro](/astro-micro.jpg)
+![Astro Micro](/projects/project-3-astro-micro/astro-micro.jpg)
 
 Astro Micro is an accessible theme for Astro. It's a fork of Mark Horn's popular theme Astro Nano. Like Nano, Micro comes with zero frameworks installed.
 
@@ -20,10 +20,10 @@ Visit [Astro Micro on Github](https://github.com/trevortylerlee/astro-micro) to 
 
 <div class="flex gap-2">
   <a target="_blank" aria-label="Deploy with Vercel" href="https://vercel.com/new/clone?repository-url=https://github.com/trevortylerlee/astro-micro">
-    <img src="/deploy_vercel.svg" />
+    <img src="/site/deploy_vercel.svg" />
   </a>
   <a target="_blank" aria-label="Deploy with Netlify" href="https://app.netlify.com/start/deploy?repository=https://github.com/trevortylerlee/astro-micro">
-    <img src="/deploy_netlify.svg" />
+    <img src="/site/deploy_netlify.svg" />
   </a>
 </div>
 
@@ -42,4 +42,4 @@ and [more](/blog/00-micro-changelog).
 
 ## 💯 Lighthouse score
 
-![Astro Nano Lighthouse Score](/astro-nano-lighthouse.jpg)
+![Astro Micro Lighthouse Score](/projects/project-3-astro-micro/astro-micro-lighthouse.jpg)

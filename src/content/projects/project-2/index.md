@@ -6,7 +6,7 @@ demoURL: "https://astro-nano-demo.vercel.app"
 repoURL: "https://github.com/markhorn-dev/astro-nano"
 ---
 
-![Astro Nano](/astro-nano.png)
+![Astro Nano](/projects/project-2-astro-nano/astro-nano.png)
 
 Astro Nano is a static, minimalist, lightweight, lightning fast portfolio and blog theme.
 
@@ -18,10 +18,10 @@ It was designed as an even more minimal theme than Mark Horn's popular theme [As
 
 <div class="flex gap-2">
   <a target="_blank" aria-label="Deploy with Vercel" href="https://vercel.com/new/clone?repository-url=https://github.com/markhorn-dev/astro-nano">
-    <img src="/deploy_vercel.svg" />
+    <img src="/site/deploy_vercel.svg" />
   </a>
   <a target="_blank" aria-label="Deploy with Netlify" href="https://app.netlify.com/start/deploy?repository=https://github.com/markhorn-dev/astro-nano">
-    <img src="/deploy_netlify.svg" />
+    <img src="/site/deploy_netlify.svg" />
   </a>
 </div>
 
@@ -43,7 +43,7 @@ It was designed as an even more minimal theme than Mark Horn's popular theme [As
 
 ## 💯 Lighthouse score
 
-![Astro Nano Lighthouse Score](/astro-nano-lighthouse.jpg)
+![Astro Nano Lighthouse Score](/projects/project-2-astro-nano/astro-nano-lighthouse.jpg)
 
 ## 🕊️ Lightweight
 

@@ -9,20 +9,22 @@ import { SITE } from "@consts";
     <div class="flex items-center justify-between">
       <Link href="/" underline={false}>
         <div class="flex items-center font-semibold text-sm">
-          <img src="/png/hero.png" alt="logo" class="h-5 w-5 mr-1" />
+          <img src="/site/hero.png" alt="logo" class="h-5 w-5 mr-1" />
           {SITE.TITLE}
         </div>
       </Link>
       <nav class="flex items-center gap-0.5 text-sm">
+        <Link href="/" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">home</Link>
+        <span class="text-black/20 dark:text-white/20">/</span>
         <Link href="/blog" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">blog</Link>
         <span class="text-black/20 dark:text-white/20">/</span>
         <Link href="/projects" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">projects</Link>
         <span class="text-black/20 dark:text-white/20">/</span>
-        <Link href="/about" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">about</Link>
+        <Link href="/music" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">music</Link>
         <span class="text-black/20 dark:text-white/20">/</span>
         <Link href="/friends" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">friends</Link>
         <span class="text-black/20 dark:text-white/20">/</span>
-        <Link href="/music" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">music</Link>
+        <Link href="/about" class="px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 transition-colors">about</Link>
         <span class="text-black/20 dark:text-white/20 mx-1">/</span>
         <button
           id="magnifying-glass"

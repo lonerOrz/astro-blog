@@ -108,10 +108,10 @@ To set up RSS and Giscus, it's easier if the site is deployed and has a URL for 
 
 <div class="flex gap-2">
   <a target="_blank" aria-label="Deploy with Vercel" href="https://vercel.com/new/clone?repository-url=https://github.com/trevortylerlee/astro-micro">
-    <img src="/deploy_vercel.svg" />
+    <img src="/site/deploy_vercel.svg" />
   </a>
   <a target="_blank" aria-label="Deploy with Netlify" href="https://app.netlify.com/start/deploy?repository=https://github.com/trevortylerlee/astro-micro">
-    <img src="/deploy_netlify.svg" />
+    <img src="/site/deploy_netlify.svg" />
   </a>
 </div>
 
