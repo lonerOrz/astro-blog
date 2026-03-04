@@ -29,6 +29,11 @@ export const ABOUT: Metadata = {
   DESCRIPTION: "About lonerOrz.",
 };
 
+export const FRIENDS: Metadata = {
+  TITLE: "Friends",
+  DESCRIPTION: "A collection of links to my friends and other cool websites.",
+};
+
 export const SOCIALS: Socials = [
   {
     NAME: "X (formerly Twitter)",
