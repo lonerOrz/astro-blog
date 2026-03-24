@@ -5,11 +5,11 @@ import { MUSIC, SITE } from "@consts";
 ---
 
 <Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION}>
-  <!-- 动态虚化背景 -->
-  <div id="an_music_bg"></div>
-
   <Container>
     <main id="anMusic-page">
+      <!-- 动态虚化背景 -->
+      <div id="an_music_bg"></div>
+      
       <meting-js
         id="2842079283"
         server="netease"
@@ -26,53 +26,24 @@ import { MUSIC, SITE } from "@consts";
 </Layout>
 
 <script is:inline>
-  // 忽略 APlayer 内部错误
-  window.addEventListener("error", (e) => {
-    if (e.message?.includes("classList") && e.filename?.includes("APlayer")) {
-      e.preventDefault();
-    }
-  });
+  // 设置 body 背景透明
+  document.body.style.setProperty("background-color", "transparent", "important");
+  document.body.style.setProperty("background-image", "none", "important");
 
-  function syncPlayerUI() {
+  // 同步背景图
+  function syncBg() {
     const bg = document.getElementById("an_music_bg");
-    if (!bg) return;
-
-    document.body.style.backgroundColor = "transparent";
-
-    const check = setInterval(() => {
-      const pic = document.querySelector(".aplayer-pic");
-      if (pic) {
-        const imgUrl = window.getComputedStyle(pic).backgroundImage;
-        if (imgUrl && imgUrl !== "none") {
-          bg.style.backgroundImage = imgUrl;
-          clearInterval(check);
-        }
-      }
-    }, 200);
-
-    setTimeout(() => clearInterval(check), 10000);
-
-    // 持续监听背景变化（切歌时）
-    setInterval(() => {
-      const pic = document.querySelector(".aplayer-pic");
-      if (pic) {
-        const imgUrl = window.getComputedStyle(pic).backgroundImage;
-        if (
-          imgUrl &&
-          imgUrl !== "none" &&
-          bg.style.backgroundImage !== imgUrl
-        ) {
-          bg.style.backgroundImage = imgUrl;
-        }
-      }
-    }, 1000);
+    const pic = document.querySelector(".aplayer-pic");
+    if (bg && pic) {
+      bg.style.backgroundImage = pic.style.backgroundImage;
+    }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", syncPlayerUI);
-  } else {
-    syncPlayerUI();
-  }
+  // 初始同步
+  setTimeout(syncBg, 500);
+  
+  // 持续监听变化
+  setInterval(syncBg, 1000);
 </script>
 
 <style is:global>
@@ -92,15 +63,20 @@ import { MUSIC, SITE } from "@consts";
     opacity: 1;
   }
 
+  /* 音乐页面背景 */
+  #an_music_bg_wrapper {
+    display: none !important;
+  }
+
   #an_music_bg {
     display: block;
     filter: blur(80px);
-    opacity: 0.4;
+    opacity: 0.7;
     position: fixed;
     inset: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 0;
+    z-index: -1;
     background-position: center;
     background-size: cover;
     transition: background-image 1s ease-in-out;
