@@ -5,11 +5,11 @@ import { MUSIC, SITE } from "@consts";
 ---
 
 <Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION}>
-  <!-- 动态虚化背景 -->
-  <div id="an_music_bg"></div>
-
-  <main id="anMusic-page">
-    <Container>
+  <Container>
+    <main id="anMusic-page">
+      <!-- 动态虚化背景 -->
+      <div id="an_music_bg"></div>
+      
       <meting-js
         id="2842079283"
         server="netease"
@@ -35,39 +35,33 @@ import { MUSIC, SITE } from "@consts";
     const bg = document.getElementById("an_music_bg");
     const pic = document.querySelector(".aplayer-pic");
     if (bg && pic) {
-      const bgImage = pic.style.backgroundImage;
-      if (bgImage && bgImage !== "none") {
-        bg.style.backgroundImage = bgImage;
+      let imgUrl = pic.style.backgroundImage;
+      // 转换 Meting API 链接为网易云 HTTPS 直链
+      if (imgUrl && imgUrl.includes("api.i-meto.com")) {
+        const match = imgUrl.match(/id=(\d+)/);
+        if (match) {
+          imgUrl = `url("https://p3.music.126.net/iC4aAc5boxLPYyw5_sjl6Q==/${match[1]}.jpg?param=500y500")`;
+        }
+      }
+      // 强制使用 HTTPS
+      imgUrl = imgUrl.replace(/http:\/\//g, "https://");
+      if (imgUrl && imgUrl !== "none") {
+        bg.style.backgroundImage = imgUrl;
       }
     }
   }
 
-  // 等待 APlayer 加载完成
-  let timer = setInterval(() => {
-    const pic = document.querySelector(".aplayer-pic");
-    if (pic) {
-      clearInterval(timer);
-      syncBg();
-      
-      // 监听歌曲切换
-      const meting = document.querySelector("meting-js");
-      if (meting?.aplayer) {
-        meting.aplayer.on("listswitch", syncBg);
-      }
-    }
-  }, 100);
+  // 初始同步
+  setTimeout(syncBg, 500);
+  
+  // 持续监听变化
+  setInterval(syncBg, 1000);
 </script>
 
 <style is:global>
   /* 沉浸式页面基础配置 */
   main {
     margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* 音乐页面 body 背景透明 */
-  body:has(#anMusic-page) {
-    background: transparent !important;
   }
 
   /* 隐藏原有的博客干扰元素 */
@@ -81,30 +75,24 @@ import { MUSIC, SITE } from "@consts";
     opacity: 1;
   }
 
+  /* 音乐页面背景 */
+  #an_music_bg_wrapper {
+    display: none !important;
+  }
+
   #an_music_bg {
     display: block;
-    filter: blur(63px);
-    opacity: 0.6;
+    filter: blur(80px);
+    opacity: 0.7;
     position: fixed;
-    z-index: -999;
-    background-attachment: local;
-    background-position: center center;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background-position: center;
     background-size: cover;
-    background-repeat: no-repeat;
-    width: 200%;
-    height: 200%;
-    top: -50%;
-    left: -50%;
     transition: background-image 1s ease-in-out;
     pointer-events: none;
-  }
-
-  body:has(#anMusic-page) #an_music_bg {
-    display: block;
-  }
-
-  body:has(#anMusic-page) {
-    background: transparent !important;
   }
 
   #anMusic-page {
