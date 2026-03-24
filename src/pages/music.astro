@@ -35,7 +35,19 @@ import { MUSIC, SITE } from "@consts";
     const bg = document.getElementById("an_music_bg");
     const pic = document.querySelector(".aplayer-pic");
     if (bg && pic) {
-      bg.style.backgroundImage = pic.style.backgroundImage;
+      let imgUrl = pic.style.backgroundImage;
+      // 转换 Meting API 链接为网易云 HTTPS 直链
+      if (imgUrl && imgUrl.includes("api.i-meto.com")) {
+        const match = imgUrl.match(/id=(\d+)/);
+        if (match) {
+          imgUrl = `url("https://p3.music.126.net/iC4aAc5boxLPYyw5_sjl6Q==/${match[1]}.jpg?param=500y500")`;
+        }
+      }
+      // 强制使用 HTTPS
+      imgUrl = imgUrl.replace(/http:\/\//g, "https://");
+      if (imgUrl && imgUrl !== "none") {
+        bg.style.backgroundImage = imgUrl;
+      }
     }
   }
 
