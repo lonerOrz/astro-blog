@@ -19,12 +19,20 @@ import { MUSIC, SITE } from "@consts";
         list-folded="false"
         autoplay="false"
         mutex="true"
-        theme="#fff"></meting-js>
+        theme="#fff"
+        volume="0.5"></meting-js>
     </main>
   </Container>
 </Layout>
 
 <script is:inline>
+  // 忽略 APlayer 内部错误
+  window.addEventListener("error", (e) => {
+    if (e.message?.includes("classList") && e.filename?.includes("APlayer")) {
+      e.preventDefault();
+    }
+  });
+
   function syncPlayerUI() {
     const bg = document.getElementById("an_music_bg");
     if (!bg) return;
@@ -49,7 +57,11 @@ import { MUSIC, SITE } from "@consts";
       const pic = document.querySelector(".aplayer-pic");
       if (pic) {
         const imgUrl = window.getComputedStyle(pic).backgroundImage;
-        if (imgUrl && imgUrl !== "none" && bg.style.backgroundImage !== imgUrl) {
+        if (
+          imgUrl &&
+          imgUrl !== "none" &&
+          bg.style.backgroundImage !== imgUrl
+        ) {
           bg.style.backgroundImage = imgUrl;
         }
       }
@@ -253,6 +265,7 @@ import { MUSIC, SITE } from "@consts";
   /* 歌词区域优化 */
   #anMusic-page .aplayer-lrc {
     height: 300px !important;
+    --lrc-line-height: 40px; /* 歌词行距，可调整 */
     mask-image: linear-gradient(
       to bottom,
       transparent 0%,
@@ -272,7 +285,7 @@ import { MUSIC, SITE } from "@consts";
   }
 
   #anMusic-page .aplayer-lrc-contents {
-    padding-top: 100px !important; /* 让当前歌词显示在中间 */
+    padding-top: 100px !important;
   }
 
   #anMusic-page .aplayer-lrc:before,
@@ -281,11 +294,11 @@ import { MUSIC, SITE } from "@consts";
   }
 
   #anMusic-page .aplayer-lrc p {
-    font-size: 1rem !important;
+    font-size: 1.1rem !important;
     color: rgba(255, 255, 255, 0.5) !important;
     font-weight: 500 !important;
-    line-height: 16px !important; /* 与 APlayer 计算匹配 */
-    height: 16px !important; /* 与 APlayer 计算匹配 */
+    line-height: var(--lrc-line-height) !important;
+    height: var(--lrc-line-height) !important;
     margin: 0 !important;
     padding: 0 !important;
     transition: all 0.5s ease-out !important;
@@ -293,7 +306,7 @@ import { MUSIC, SITE } from "@consts";
 
   #anMusic-page .aplayer-lrc p.aplayer-lrc-current {
     color: #fff !important;
-    font-size: 1.2rem !important;
+    font-size: 1.4rem !important;
     font-weight: 700 !important;
     height: auto !important;
     min-height: 16px !important;
