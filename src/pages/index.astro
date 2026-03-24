@@ -55,36 +55,41 @@ const myCommands: Command[] = [
     <div class="h-20"></div>
 
     <aside data-pagefind-ignore>
-      <h1 class="font-semibold text-black dark:text-white">
-    About this space
-      </h1>
+      <h1 class="font-semibold text-black dark:text-white">About this space</h1>
       <div class="space-y-16">
-    <section>
-      <article class="space-y-4">
-        <span>
-          <p>
-            Welcome to my digital garden. I'm a developer who values simplicity and meaningful code. 
-            This blog is built to be fast, minimal, and focused on content—no unnecessary noise, 
-            just thoughts and tech.
-          </p>
-          <p>
-            I use this space to document my learning journey, share technical insights, 
-            and capture fleeting ideas that would otherwise be lost in the noise of the internet.
-          </p>
-        </span>
-        <span class="animate">
-          <p>
-            The world of software is vast and often overwhelming. Here, I try to slow down 
-            and build things with intent. Whether it's a deep dive into a new framework 
-            or a simple reflection on daily life, everything here is a piece of my digital footprint.
-          </p>
-        </span>
-      </article>
-    </section>
+        <section>
+          <article class="space-y-4">
+            <span>
+              <p>
+                Welcome to my digital garden. I'm a developer who values
+                simplicity and meaningful code. This blog is built to be fast,
+                minimal, and focused on content—no unnecessary noise, just
+                thoughts and tech.
+              </p>
+              <p>
+                I use this space to document my learning journey, share
+                technical insights, and capture fleeting ideas that would
+                otherwise be lost in the noise of the internet.
+              </p>
+            </span>
+            <span class="animate">
+              <p>
+                The world of software is vast and often overwhelming. Here, I
+                try to slow down and build things with intent. Whether it's a
+                deep dive into a new framework or a simple reflection on daily
+                life, everything here is a piece of my digital footprint.
+              </p>
+            </span>
+          </article>
+        </section>
 
-        <div style="display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 4rem;">
+        <div
+          style="display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 4rem;"
+        >
           <div style="flex: 1; padding-top: 2rem;">
-            <h1 style="font-size: 4.5rem; font-weight: bold; line-height: 1;">my terminal animation!</h1>
+            <h1 style="font-size: 4.5rem; font-weight: bold; line-height: 1;">
+              my terminal animation!
+            </h1>
           </div>
           <div style="flex: 2; padding-top: 8rem;">
             <TerminalAnimation commands={myCommands} />

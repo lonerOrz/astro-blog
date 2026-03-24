@@ -24,7 +24,7 @@ export async function GET(context) {
       link: `/${item.collection}/${item.id}/`,
     })),
     xmlns: {
-      atom: 'http://www.w3.org/2005/Atom',
+      atom: "http://www.w3.org/2005/Atom",
     },
     customData: `<atom:link href="${context.request.url}" rel="self" type="application/rss+xml" />`,
   });

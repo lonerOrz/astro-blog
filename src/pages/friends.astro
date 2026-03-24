@@ -8,20 +8,20 @@ const friends = [
     NAME: "Astro",
     HREF: "https://astro.build",
     DESCRIPTION: "The web framework for content-driven websites.",
-    ICON: "🚀"
+    ICON: "🚀",
   },
   {
     NAME: "Tailwind CSS",
     HREF: "https://tailwindcss.com",
     DESCRIPTION: "A utility-first CSS framework.",
-    ICON: "🎨"
+    ICON: "🎨",
   },
   {
     NAME: "LonerOrz",
     HREF: "https://github.com/lonerOrz",
     DESCRIPTION: "The creator of this space.",
-    ICON: "👾"
-  }
+    ICON: "👾",
+  },
 ];
 ---
 
@@ -41,40 +41,52 @@ const friends = [
       <!-- Friends Grid -->
       <section class="animate">
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {friends.map((friend) => (
-            <a 
-              href={friend.HREF} 
-              target="_blank" 
-              class="group flex items-start gap-4 rounded-xl border border-black/10 p-4 transition-all duration-300 hover:bg-black/5 hover:shadow-md dark:border-white/10 dark:hover:bg-white/5"
-            >
-              <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-2xl dark:bg-neutral-800">
-                {friend.ICON}
-              </div>
-              <div class="flex-1 overflow-hidden">
-                <div class="font-semibold text-black dark:text-white truncate group-hover:text-blue-500 transition-colors">
-                  {friend.NAME}
+          {
+            friends.map((friend) => (
+              <a
+                href={friend.HREF}
+                target="_blank"
+                class="group flex items-start gap-4 rounded-xl border border-black/10 p-4 transition-all duration-300 hover:bg-black/5 hover:shadow-md dark:border-white/10 dark:hover:bg-white/5"
+              >
+                <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-2xl dark:bg-neutral-800">
+                  {friend.ICON}
                 </div>
-                <div class="mt-1 text-sm text-neutral-500 line-clamp-2">
-                  {friend.DESCRIPTION}
+                <div class="flex-1 overflow-hidden">
+                  <div class="truncate font-semibold text-black transition-colors group-hover:text-blue-500 dark:text-white">
+                    {friend.NAME}
+                  </div>
+                  <div class="mt-1 line-clamp-2 text-sm text-neutral-500">
+                    {friend.DESCRIPTION}
+                  </div>
                 </div>
-              </div>
-            </a>
-          ))}
+              </a>
+            ))
+          }
         </div>
       </section>
 
       <!-- Exchange Section -->
-      <section class="animate rounded-xl bg-blue-500/5 p-6 border border-blue-500/10">
-        <h2 class="text-xl font-semibold text-black dark:text-white mb-4">
+      <section
+        class="animate rounded-xl border border-blue-500/10 bg-blue-500/5 p-6"
+      >
+        <h2 class="mb-4 text-xl font-semibold text-black dark:text-white">
           Exchange Links?
         </h2>
-        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
-          If you'd like to be added here, feel free to reach out with your site details!
+        <p class="mb-6 text-sm text-neutral-600 dark:text-neutral-400">
+          If you'd like to be added here, feel free to reach out with your site
+          details!
         </p>
-        <div class="bg-white/50 dark:bg-black/50 rounded-lg p-4 text-xs font-mono space-y-2 border border-black/5 dark:border-white/5 text-black dark:text-white">
+        <div
+          class="space-y-2 rounded-lg border border-black/5 bg-white/50 p-4 font-mono text-xs text-black dark:border-white/5 dark:bg-black/50 dark:text-white"
+        >
           <p><span class="text-blue-500">Title:</span> {SITE.TITLE}</p>
-          <p><span class="text-blue-500">Description:</span> {SITE.DESCRIPTION}</p>
-          <p><span class="text-blue-500">URL:</span> https://astro-blog-rosy.vercel.app</p>
+          <p>
+            <span class="text-blue-500">Description:</span>
+            {SITE.DESCRIPTION}
+          </p>
+          <p>
+            <span class="text-blue-500">URL:</span> https://astro-blog-rosy.vercel.app
+          </p>
         </div>
       </section>
     </div>

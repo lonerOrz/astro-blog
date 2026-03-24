@@ -9,7 +9,7 @@ import { MUSIC, SITE } from "@consts";
     <main id="anMusic-page">
       <!-- 动态虚化背景 -->
       <div id="an_music_bg"></div>
-      
+
       <meting-js
         id="2842079283"
         server="netease"
@@ -27,7 +27,11 @@ import { MUSIC, SITE } from "@consts";
 
 <script is:inline>
   // 设置 body 背景透明
-  document.body.style.setProperty("background-color", "transparent", "important");
+  document.body.style.setProperty(
+    "background-color",
+    "transparent",
+    "important",
+  );
   document.body.style.setProperty("background-image", "none", "important");
 
   // 同步背景图
@@ -41,7 +45,7 @@ import { MUSIC, SITE } from "@consts";
 
   // 初始同步
   setTimeout(syncBg, 500);
-  
+
   // 持续监听变化
   setInterval(syncBg, 1000);
 </script>

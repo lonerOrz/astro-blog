@@ -18,13 +18,19 @@ const terminalContent = JSON.stringify(TERMINAL);
     const commandTypeDelay = 40;
 
     // Get terminal content from data attribute
-    const terminalData = JSON.parse(terminalContainer.dataset.terminal || '{}');
+    const terminalData = JSON.parse(terminalContainer.dataset.terminal || "{}");
     const { asciiArt, systemInfo, about, contact } = terminalData;
 
-    const dynamicCommands = commands && commands.length > 0 ? commands : [
-      { cmd: "ls -a", output: "projects/  about.txt  contact.md\n" },
-      { cmd: "cat README.md", output: "Hello! Welcome to the portfolio.\n" },
-    ];
+    const dynamicCommands =
+      commands && commands.length > 0
+        ? commands
+        : [
+            { cmd: "ls -a", output: "projects/  about.txt  contact.md\n" },
+            {
+              cmd: "cat README.md",
+              output: "Hello! Welcome to the portfolio.\n",
+            },
+          ];
 
     function typeText(target, text, delay, callback) {
       let i = 0;
@@ -32,8 +38,8 @@ const terminalContent = JSON.stringify(TERMINAL);
       function next() {
         if (i < text.length) {
           let char = text[i];
-          if (char === '<') {
-            const tagEnd = text.indexOf('>', i);
+          if (char === "<") {
+            const tagEnd = text.indexOf(">", i);
             if (tagEnd !== -1) {
               target.innerHTML += text.substring(i, tagEnd + 1);
               i = tagEnd + 1;
@@ -52,15 +58,18 @@ const terminalContent = JSON.stringify(TERMINAL);
     }
 
     // Build text content
-    const systemInfoText = systemInfo.join('\n');
+    const systemInfoText = systemInfo.join("\n");
 
     // Build HTML for about section
     const aboutHtml = `<h3>${about.title}</h3><p>${about.content}</p>`;
-    
+
     // Build HTML for contact section
-    const contactLinksHtml = contact.links.map(link => 
-      `<p><span>${link.label}:</span> <a href="${link.url}" target="_blank">${link.url}</a></p>`
-    ).join('');
+    const contactLinksHtml = contact.links
+      .map(
+        (link) =>
+          `<p><span>${link.label}:</span> <a href="${link.url}" target="_blank">${link.url}</a></p>`,
+      )
+      .join("");
     const contactHtml = `<h3>${contact.title}</h3><div class="contact-grid">${contactLinksHtml}</div>`;
 
     terminalContainer.innerHTML = `
@@ -83,7 +92,7 @@ const terminalContent = JSON.stringify(TERMINAL);
     typeText(asciiEl, asciiArt, 2, null);
     typeText(systemEl, systemInfoText, 2, null);
     typeText(aboutEl, aboutHtml, 2, null);
-    
+
     setTimeout(() => {
       typeText(contactEl, contactHtml, 3, () => {
         const logContainer = document.createElement("div");
@@ -94,7 +103,10 @@ const terminalContent = JSON.stringify(TERMINAL);
 
         function runCommand(index) {
           if (index >= dynamicCommands.length) {
-            setTimeout(() => { logContainer.innerHTML = ""; runCommand(0); }, 3000);
+            setTimeout(() => {
+              logContainer.innerHTML = "";
+              runCommand(0);
+            }, 3000);
             return;
           }
           const cmdLine = "$ " + dynamicCommands[index].cmd;
@@ -106,7 +118,9 @@ const terminalContent = JSON.stringify(TERMINAL);
             const outputElement = document.createElement("span");
             outputElement.className = "terminal-output";
             logContainer.appendChild(outputElement);
-            typeText(outputElement, outputText, commandTypeDelay, () => runCommand(index + 1));
+            typeText(outputElement, outputText, commandTypeDelay, () =>
+              runCommand(index + 1),
+            );
           });
         }
         runCommand(0);
