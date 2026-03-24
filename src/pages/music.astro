@@ -27,18 +27,40 @@ import { MUSIC, SITE } from "@consts";
 <script is:inline>
   function syncPlayerUI() {
     const bg = document.getElementById("an_music_bg");
+    if (!bg) return;
+
+    document.body.style.backgroundColor = "transparent";
+
     const check = setInterval(() => {
       const pic = document.querySelector(".aplayer-pic");
-      if (pic && bg) {
-        const imgUrl = pic.style.backgroundImage;
-        if (imgUrl && bg.style.backgroundImage !== imgUrl) {
+      if (pic) {
+        const imgUrl = window.getComputedStyle(pic).backgroundImage;
+        if (imgUrl && imgUrl !== "none") {
+          bg.style.backgroundImage = imgUrl;
+          clearInterval(check);
+        }
+      }
+    }, 200);
+
+    setTimeout(() => clearInterval(check), 10000);
+
+    // 持续监听背景变化（切歌时）
+    setInterval(() => {
+      const pic = document.querySelector(".aplayer-pic");
+      if (pic) {
+        const imgUrl = window.getComputedStyle(pic).backgroundImage;
+        if (imgUrl && imgUrl !== "none" && bg.style.backgroundImage !== imgUrl) {
           bg.style.backgroundImage = imgUrl;
         }
       }
     }, 1000);
   }
-  document.addEventListener("astro:page-load", syncPlayerUI);
-  syncPlayerUI();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", syncPlayerUI);
+  } else {
+    syncPlayerUI();
+  }
 </script>
 
 <style is:global>
@@ -63,21 +85,24 @@ import { MUSIC, SITE } from "@consts";
     filter: blur(80px);
     opacity: 0.4;
     position: fixed;
-    z-index: -1;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
     background-position: center;
     background-size: cover;
-    width: 150%;
-    height: 150%;
-    top: -25%;
-    left: -25%;
     transition: background-image 1s ease-in-out;
+    pointer-events: none;
   }
 
-  /* APlayer 结构重组 (安知鱼风格) */
   #anMusic-page {
+    position: relative;
+    z-index: 1;
     margin-top: 0rem;
     padding-top: 0 !important;
   }
+
+  /* APlayer 结构重组 (安知鱼风格) */
 
   #anMusic-page .aplayer {
     display: flex !important;
