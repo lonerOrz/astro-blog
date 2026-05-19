@@ -4,7 +4,7 @@ import Container from "@components/Container.astro";
 import { MUSIC, SITE } from "@consts";
 ---
 
-<Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION}>
+<Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION} hideFooter>
   <Container>
     <main id="anMusic-page">
       <!-- 动态虚化背景 -->
@@ -57,9 +57,7 @@ import { MUSIC, SITE } from "@consts";
   }
 
   /* 隐藏原有的博客干扰元素 */
-  header,
-  footer,
-  #back-to-top {
+  header {
     opacity: 0.3;
     transition: opacity 0.3s;
   }
