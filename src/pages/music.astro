@@ -1,68 +1,268 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
-import { MUSIC, SITE } from "@consts";
+import { MUSIC } from "@consts";
 ---
 
 <Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION} hideFooter>
   <Container>
     <main id="anMusic-page">
-      <!-- 动态虚化背景 -->
-      <div id="an_music_bg"></div>
+      <!-- 动态封面氛围背景 -->
+      <div id="an_music_bg" aria-hidden="true"></div>
+      <div id="an_music_overlay" aria-hidden="true"></div>
 
-      <meting-js
-        id="2842079283"
-        server="netease"
-        type="playlist"
-        order="list"
-        fixed="false"
-        list-folded="false"
-        autoplay="false"
-        mutex="true"
-        theme="#fff"
-        volume="0.5"></meting-js>
+      <div id="an_music_player_mount">
+        <div id="an_music_loading" class="music-loading-shell">
+          <div class="music-loading-cover"></div>
+          <div class="music-loading-copy">
+            <p>Loading playlist</p>
+            <span>Music will start as soon as the playlist is ready.</span>
+          </div>
+        </div>
+      </div>
     </main>
   </Container>
 </Layout>
 
-<script is:inline>
-  // 设置 body 背景透明
-  document.body.style.setProperty(
-    "background-color",
-    "transparent",
-    "important",
-  );
-  document.body.style.setProperty("background-image", "none", "important");
-
-  // 同步背景图
-  function syncBg() {
+<script is:inline data-astro-rerun>
+  (() => {
+    /**
+     * Music page is intentionally immersive and should not inherit the normal
+     * blog background. Scope all page-level overrides behind this html class so
+     * the rest of the site is never polluted after client-side navigation.
+     */
+    const root = document.documentElement;
+    const page = document.getElementById("anMusic-page");
     const bg = document.getElementById("an_music_bg");
-    const pic = document.querySelector(".aplayer-pic");
-    if (bg && pic) {
-      bg.style.backgroundImage = pic.style.backgroundImage;
+    const mount = document.getElementById("an_music_player_mount");
+
+    if (!page || !bg || !mount) return;
+
+    root.classList.add("music-page-active");
+
+    let shellTimer = 0;
+
+    function mountPlayer() {
+      if (mount.querySelector("meting-js")) return;
+
+      const player = document.createElement("meting-js");
+      const attrs = {
+        id: "2842079283",
+        server: "netease",
+        type: "playlist",
+        order: "list",
+        fixed: "false",
+        "list-folded": "false",
+        autoplay: "false",
+        mutex: "true",
+        theme: "#fff",
+        volume: "0.5",
+      };
+
+      Object.entries(attrs).forEach(([key, value]) => {
+        player.setAttribute(key, value);
+      });
+
+      mount.appendChild(player);
+
+      // Remove the lightweight shell once APlayer has actually appeared.
+      const shell = document.getElementById("an_music_loading");
+      shellTimer = window.setInterval(() => {
+        if (page.querySelector(".aplayer")) {
+          shell?.classList.add("is-hidden");
+          window.setTimeout(() => shell?.remove(), 300);
+          window.clearInterval(shellTimer);
+        }
+      }, 100);
     }
-  }
 
-  // 初始同步
-  setTimeout(syncBg, 500);
+    // Let the page paint first, then start Meting/APlayer work.
+    window.requestAnimationFrame(() => {
+      window.setTimeout(mountPlayer, 0);
+    });
 
-  // 持续监听变化
-  setInterval(syncBg, 1000);
+    function normalizeCover(background) {
+      if (!background || background === "none") return null;
+      return background;
+    }
+
+    function getPic() {
+      return document.querySelector("#anMusic-page .aplayer-pic");
+    }
+
+    function getCurrentCover(pic = getPic()) {
+      if (!pic) return null;
+
+      const inlineBackground = normalizeCover(pic.style.backgroundImage);
+      if (inlineBackground) return inlineBackground;
+
+      const computedBackground = normalizeCover(
+        window.getComputedStyle(pic).backgroundImage,
+      );
+      if (computedBackground) return computedBackground;
+
+      const img = pic.querySelector("img");
+      if (img?.currentSrc || img?.src) return `url("${img.currentSrc || img.src}")`;
+
+      return null;
+    }
+
+    function syncMusicCoverBackground(pic = getPic()) {
+      const cover = getCurrentCover(pic);
+      if (!cover || bg.dataset.currentCover === cover) return false;
+
+      bg.dataset.currentCover = cover;
+      bg.style.setProperty("--music-cover", cover);
+      bg.classList.add("is-cover-ready");
+      return true;
+    }
+
+    let frame = 0;
+    function scheduleSync(pic) {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => syncMusicCoverBackground(pic));
+    }
+
+    let picObserver = null;
+    function attachCoverObserver(pic) {
+      if (!pic || pic.dataset.coverObserved === "true") return;
+      pic.dataset.coverObserved = "true";
+
+      picObserver = new MutationObserver(() => scheduleSync(pic));
+      picObserver.observe(pic, {
+        attributes: true,
+        attributeFilter: ["style", "class", "src"],
+        childList: true,
+        subtree: true,
+      });
+
+      scheduleSync(pic);
+    }
+
+    // APlayer is created asynchronously. Find the cover node first, then only
+    // observe that small node instead of the entire player subtree.
+    let attempts = 0;
+    const bootTimer = window.setInterval(() => {
+      const pic = getPic();
+      if (pic) {
+        attachCoverObserver(pic);
+        if (syncMusicCoverBackground(pic)) {
+          window.clearInterval(bootTimer);
+        }
+      }
+
+      attempts += 1;
+      if (attempts > 60) window.clearInterval(bootTimer);
+    }, 100);
+
+    window.setTimeout(() => scheduleSync(getPic()), 50);
+    window.setTimeout(() => scheduleSync(getPic()), 250);
+    window.addEventListener("load", () => scheduleSync(getPic()), { once: true });
+
+    // Clicking a track usually updates cover shortly after the click. Probe a few
+    // times so the background follows the selected song without permanent polling.
+    page.addEventListener("click", () => {
+      const pic = getPic();
+      if (pic) attachCoverObserver(pic);
+      scheduleSync(pic);
+      window.setTimeout(() => scheduleSync(getPic()), 120);
+      window.setTimeout(() => scheduleSync(getPic()), 360);
+    });
+
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        picObserver?.disconnect();
+        window.clearInterval(bootTimer);
+        window.clearInterval(shellTimer);
+        window.cancelAnimationFrame(frame);
+        root.classList.remove("music-page-active");
+      },
+      { once: true },
+    );
+  })();
 </script>
 
 <style is:global>
-  /* 沉浸式页面基础配置 */
-  main {
-    margin: 0 !important;
+  /*
+    Immersive music mode.
+    All global overrides are scoped behind html.music-page-active so the normal
+    blog theme is restored automatically when navigating away.
+  */
+  html.music-page-active {
+    background: #050505;
   }
 
-  /* 隐藏原有的博客干扰元素 */
-  header {
-    opacity: 0.3;
-    transition: opacity 0.3s;
+  html.music-page-active body {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12), transparent 38%),
+      #050505 !important;
+    color: #fff;
   }
-  header:hover {
+
+  html.music-page-active body > main {
+    padding-block: 0 !important;
+  }
+
+  html.music-page-active #anMusic-page {
+    padding-top: 72px !important;
+  }
+
+  @media (max-width: 640px) {
+    html.music-page-active #anMusic-page {
+      padding-top: 48px !important;
+    }
+  }
+
+  html.music-page-active header {
+    opacity: 0.82;
+    background: rgba(5, 5, 5, 0.18) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    transition:
+      opacity 250ms cubic-bezier(0.23, 1, 0.32, 1),
+      background-color 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  html.music-page-active header:hover {
     opacity: 1;
+    background: rgba(5, 5, 5, 0.28) !important;
+  }
+
+  html.music-page-active header a,
+  html.music-page-active header .nav-item {
+    color: rgba(255, 255, 255, 0.72) !important;
+  }
+
+  html.music-page-active header .nav-item:hover,
+  html.music-page-active header .nav-active {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+  }
+
+  html.music-page-active header span {
+    color: rgba(255, 255, 255, 0.28) !important;
+  }
+
+  html.music-page-active #magnifying-glass {
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.74) !important;
+    box-shadow: none !important;
+  }
+
+  html.music-page-active #magnifying-glass:hover,
+  html.music-page-active #magnifying-glass:focus-visible {
+    border-color: rgba(255, 255, 255, 0.24) !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #fff !important;
+  }
+
+  html.music-page-active #magnifying-glass kbd {
+    border-color: rgba(255, 255, 255, 0.14) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.5) !important;
   }
 
   /* 音乐页面背景 */
@@ -70,31 +270,129 @@ import { MUSIC, SITE } from "@consts";
     display: none !important;
   }
 
-  #an_music_bg {
-    display: block;
-    filter: blur(80px);
-    opacity: 0.7;
+  #an_music_bg,
+  #an_music_overlay {
     position: fixed;
     inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Cover-driven atmosphere layer. Updated by JS from the current song cover. */
+  #an_music_bg {
+    inset: -5vh;
+    width: 110vw;
+    height: 110vh;
+    background-image: var(
+      --music-cover,
+      radial-gradient(circle at 35% 28%, rgba(99, 102, 241, 0.55), transparent 34%),
+      radial-gradient(circle at 68% 38%, rgba(236, 72, 153, 0.42), transparent 30%),
+      radial-gradient(circle at 50% 72%, rgba(20, 184, 166, 0.34), transparent 38%)
+    );
     background-position: center;
     background-size: cover;
-    transition: background-image 1s ease-in-out;
-    pointer-events: none;
+    filter: blur(28px) saturate(1.62) brightness(1.16);
+    opacity: 1;
+    scale: 1.015;
+    transform-origin: center;
+    transition:
+      opacity 500ms cubic-bezier(0.23, 1, 0.32, 1),
+      filter 500ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  #an_music_bg.is-cover-ready {
+    animation: music-cover-in 500ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  @keyframes music-cover-in {
+    from {
+      filter: blur(36px) saturate(1.35) brightness(0.96);
+    }
+  }
+
+  /* Stable readability layer — keeps text legible regardless of cover color. */
+  #an_music_overlay {
+    background:
+      radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.24), transparent 30%),
+      radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.28) 66%, rgba(0, 0, 0, 0.58) 100%),
+      linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.42));
   }
 
   #anMusic-page {
     position: relative;
     z-index: 1;
-    margin-top: 0rem;
-    padding-top: 0 !important;
+    min-height: calc(100vh - 144px);
+  }
+
+  .music-loading-shell {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    min-height: 52vh;
+    place-items: center;
+    gap: 20px;
+    text-align: center;
+    opacity: 1;
+    transition:
+      opacity 300ms cubic-bezier(0.23, 1, 0.32, 1),
+      scale 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .music-loading-shell.is-hidden {
+    opacity: 0;
+    scale: 0.985;
+  }
+
+  .music-loading-cover {
+    width: 180px;
+    height: 180px;
+    border-radius: 28px;
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
+      rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 24px 80px rgba(0, 0, 0, 0.35);
+    animation: music-shell-pulse 1.8s ease-in-out infinite;
+  }
+
+  .music-loading-copy p {
+    margin: 0;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .music-loading-copy span {
+    display: block;
+    margin-top: 6px;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.875rem;
+  }
+
+  @keyframes music-shell-pulse {
+    0%,
+    100% {
+      opacity: 0.72;
+      scale: 1;
+    }
+    50% {
+      opacity: 1;
+      scale: 1.015;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .music-loading-cover {
+      animation: none;
+    }
   }
 
   /* APlayer 结构重组 (安知鱼风格) */
 
   #anMusic-page .aplayer {
+    position: relative !important;
+    z-index: 1 !important;
     display: flex !important;
     flex-direction: row-reverse !important;
     background: transparent !important;
