@@ -18,11 +18,18 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort();
       />
       <div class="animate border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-wrap gap-3">
         {
-          tags.map((tag) => {
+          tags.map((tag, i) => {
             const count = posts.filter((post) =>
               post.data.tags?.includes(tag),
             ).length;
-            return <TagPill tag={tag} count={count} />;
+            return (
+              <span
+                class="stagger-item"
+                style={`--delay: ${100 + i * 30}ms`}
+              >
+                <TagPill tag={tag} count={count} />
+              </span>
+            );
           })
         }
       </div>

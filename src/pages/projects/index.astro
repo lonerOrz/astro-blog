@@ -22,8 +22,11 @@ const projects = (await getCollection("projects"))
 
         <ul class="animate not-prose flex flex-col gap-4">
           {
-            projects.map((project) => (
-              <li>
+            projects.map((project, i) => (
+              <li
+                class="stagger-item"
+                style={`--delay: ${150 + i * 60}ms`}
+              >
                 <ArrowCard entry={project} />
               </li>
             ))

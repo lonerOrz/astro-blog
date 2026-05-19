@@ -55,7 +55,12 @@
   }
 
   header {
-    @apply relative;
+    @apply sticky top-0 z-40;
+    @apply bg-white/95 dark:bg-[#111111]/95;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 250ms cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   main {
@@ -130,19 +135,34 @@ html.scrolled #back-to-top {
   opacity: 1;
 }
 
+/* Scrolled header gets a subtle bottom border */
+html.scrolled header {
+  border-bottom-color: rgb(228 228 231); /* zinc-200 */
+}
+
+html.dark.scrolled header {
+  border-bottom-color: rgb(39 39 42); /* zinc-800 */
+}
+
 /*
   Interactive card pattern.
-  Handles background-color hover + scale press feedback.
-  Subtle scale(0.98) on :active makes the UI feel like it's listening.
+  Hover: lift 2px (translate-y) + background tint.
+  Active: return to baseline + scale(0.98) press feel.
 */
 .card-interactive {
   transition:
     color 150ms ease,
     background-color 150ms ease,
+    translate 200ms cubic-bezier(0.23, 1, 0.32, 1),
     scale 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+.card-interactive:hover {
+  translate: 0 -2px;
+}
+
 .card-interactive:active {
+  translate: 0 0;
   scale: 0.98;
 }
 
@@ -159,6 +179,23 @@ html.scrolled #back-to-top {
 
 .btn-interactive:active {
   scale: 0.97;
+}
+
+/*
+  Stagger item entrance animation.
+  Usage: add class="stagger-item" + style="--delay: Xms" to each <li>.
+  Items cascade in with opacity + translate, independent of the .animate system.
+*/
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    translate: 0 10px;
+  }
+}
+
+.stagger-item {
+  animation: stagger-in 450ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  animation-delay: var(--delay, 0ms);
 }
 
 /* shiki config */
@@ -230,5 +267,15 @@ pre {
   .btn-interactive:active,
   .copy-code:active {
     scale: 1;
+  }
+
+  /* Disable entrance stagger for users who prefer reduced motion */
+  .stagger-item {
+    animation: none;
+  }
+
+  /* Disable card hover lift */
+  .card-interactive:hover {
+    translate: 0 0;
   }
 }

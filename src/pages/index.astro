@@ -59,14 +59,16 @@ const projects: CollectionEntry<"projects">[] = (
           </Link>
         </div>
 
-        <!-- Lightweight text list — not bordered cards -->
         <ul>
           {
-            blog.map((post) => (
-              <li>
+            blog.map((post, i) => (
+              <li
+                class="stagger-item"
+                style={`--delay: ${150 + i * 60}ms`}
+              >
                 <a
                   href={`/blog/${post.id}`}
-                  class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-zinc-100 dark:border-zinc-800"
+                  class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 -mx-2 px-2 rounded-sm"
                 >
                   <span class="flex-1 text-sm text-zinc-900 dark:text-zinc-50 truncate group-hover:underline underline-offset-2 decoration-zinc-300 dark:decoration-zinc-600">
                     {post.data.title}
@@ -103,11 +105,14 @@ const projects: CollectionEntry<"projects">[] = (
                 </Link>
               </div>
               <ul>
-                {projects.map((project) => (
-                  <li>
+                {projects.map((project, i) => (
+                  <li
+                    class="stagger-item"
+                    style={`--delay: ${250 + i * 60}ms`}
+                  >
                     <a
                       href={`/projects/${project.id}`}
-                      class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-zinc-100 dark:border-zinc-800"
+                      class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 -mx-2 px-2 rounded-sm"
                     >
                       <span class="flex-1 text-sm text-zinc-900 dark:text-zinc-50 truncate group-hover:underline underline-offset-2 decoration-zinc-300 dark:decoration-zinc-600">
                         {project.data.title}
