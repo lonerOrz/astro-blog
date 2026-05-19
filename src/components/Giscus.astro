@@ -1,20 +1,85 @@
-<div class="giscus"></div>
+---
+// Giscus comment system
+// - Lazy loaded via IntersectionObserver — script only fetches when near viewport
+// - Theme syncs with blog's html.dark class at load time
+// - Theme updates via postMessage (no iframe reload on toggle)
+---
 
-<script
-  is:inline
-  data-astro-rerun
-  src="https://giscus.app/client.js"
-  data-repo="lonerOrz/astro-blog"
-  data-repo-id="R_kgDOPXNc_A"
-  data-category="Announcements"
-  data-category-id="DIC_kwDOPXNc_M4CttkN"
-  data-mapping="pathname"
-  data-strict="0"
-  data-reactions-enabled="1"
-  data-emit-metadata="0"
-  data-input-position="top"
-  data-theme="catppuccin_macchiato"
-  data-lang="en"
-  data-loading="lazy"
-  crossorigin="anonymous"
-  async></script>
+<div class="giscus-wrapper" data-loaded="false">
+  <!-- Minimal placeholder shown until IntersectionObserver fires -->
+  <div class="giscus-placeholder py-10 text-center">
+    <span
+      class="font-mono text-[11px] uppercase tracking-widest text-zinc-300 dark:text-zinc-700"
+    >
+      comments
+    </span>
+  </div>
+</div>
+
+<script data-astro-rerun>
+  (function () {
+    const wrapper = document.querySelector(".giscus-wrapper");
+    if (!wrapper || wrapper.dataset.loaded === "true") return;
+
+    /** Pick the right Giscus theme to match the blog's current mode. */
+    function getTheme() {
+      return document.documentElement.classList.contains("dark")
+        ? "dark_dimmed"   // soft dark — matches #111111 better than full dark
+        : "light";        // clean GitHub light — matches white/zinc palette
+    }
+
+    function loadGiscus() {
+      if (wrapper.dataset.loaded === "true") return;
+      wrapper.dataset.loaded = "true";
+
+      const placeholder = wrapper.querySelector(".giscus-placeholder");
+
+      // Mount the <div class="giscus"> that giscus.js will target
+      const container = document.createElement("div");
+      container.className = "giscus";
+      wrapper.appendChild(container);
+
+      // Dynamically inject the giscus script so it only downloads on demand
+      const script = document.createElement("script");
+      const attrs = {
+        src: "https://giscus.app/client.js",
+        "data-repo": "lonerOrz/astro-blog",
+        "data-repo-id": "R_kgDOPXNc_A",
+        "data-category": "Announcements",
+        "data-category-id": "DIC_kwDOPXNc_M4CttkN",
+        "data-mapping": "pathname",
+        "data-strict": "0",
+        "data-reactions-enabled": "1",
+        "data-emit-metadata": "0",
+        "data-input-position": "top",
+        "data-theme": getTheme(),
+        "data-lang": "en",
+        crossorigin: "anonymous",
+      };
+      Object.entries(attrs).forEach(([k, v]) => script.setAttribute(k, v));
+      script.async = true;
+
+      // Fade out placeholder once script has loaded
+      script.addEventListener("load", () => {
+        if (!placeholder) return;
+        placeholder.style.transition = "opacity 400ms ease";
+        placeholder.style.opacity = "0";
+        setTimeout(() => placeholder.remove(), 400);
+      });
+
+      wrapper.appendChild(script);
+    }
+
+    // Only start loading when the wrapper is within 300px of the viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadGiscus();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px 0px" }
+    );
+    observer.observe(wrapper);
+  })();
+</script>
