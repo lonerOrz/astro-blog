@@ -99,4 +99,9 @@ export const FRIENDS: Friends = [
     HREF: "https://github.com/lonerOrz",
     DESCRIPTION: "The creator of this space.",
   },
+  {
+    NAME: "Guanran928",
+    HREF: "https://blog.ny4.dev/",
+    DESCRIPTION: "Guanran928 的个人博客，记录技术、折腾与日常",
+  },
 ];
