@@ -7,8 +7,8 @@ import Link from "@components/Link.astro";
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 // terminal
-import TerminalAnimation from "../components/TerminalAnimation.astro";
-import type { Command } from "../lib/terminal.ts";
+
+
 
 const blog = (await getCollection("blog"))
   .filter((post) => !post.data.draft)
@@ -22,26 +22,22 @@ const projects: CollectionEntry<"projects">[] = (
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
 
-// 定义命令数组
-const myCommands: Command[] = [
-  { cmd: "echo Hello TypeScript!", output: "Hello TypeScript!\n" },
-  { cmd: "date", output: new Date().toString() + "\n" },
-];
+
 ---
 
 <Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
     <!-- 新加一个 欢迎文本 和 网站大logo -->
-    <div class="flex items-center justify-center gap-20 py-16">
+    <div class="flex items-center justify-center gap-16 py-20">
       <div class="max-w-xl space-y-6">
-        <h1 class="text-7xl font-bold">
+        <h1 class="text-8xl font-extrabold leading-tight">
           <span
             class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
           >
             Welcome to lonerOrz's website!
           </span>
         </h1>
-        <div class="tagline">System online.</div>
+        <div class="tagline text-lg text-gray-600 dark:text-gray-400">System online.</div>
         今こそ、救いの時だ。
       </div>
       <img
@@ -52,7 +48,7 @@ const myCommands: Command[] = [
     </div>
 
     <!-- 保持距离的div -->
-    <div class="h-20"></div>
+    <div class="h-24"></div>
 
     <aside data-pagefind-ignore>
       <h1 class="font-semibold text-black dark:text-white">About this space</h1>
@@ -83,18 +79,7 @@ const myCommands: Command[] = [
           </article>
         </section>
 
-        <div
-          style="display: flex; align-items: flex-start; gap: 2rem; margin-bottom: 4rem;"
-        >
-          <div style="flex: 1; padding-top: 2rem;">
-            <h1 style="font-size: 4.5rem; font-weight: bold; line-height: 1;">
-              my terminal animation!
-            </h1>
-          </div>
-          <div style="flex: 2; padding-top: 8rem;">
-            <TerminalAnimation commands={myCommands} />
-          </div>
-        </div>
+
 
         <section class="animate space-y-4">
           <h2 class="font-semibold text-black dark:text-white">
@@ -106,10 +91,10 @@ const myCommands: Command[] = [
               hi, reach out on social media or send me an email.
             </p>
           </article>
-          <ul class="not-prose flex flex-wrap gap-2">
+          <ul class="not-prose flex flex-wrap gap-4 items-center">
             {
               SOCIALS.map((SOCIAL) => (
-                <li class="flex gap-x-2 text-nowrap">
+                <li class="flex gap-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white">
                   <Link
                     href={SOCIAL.HREF}
                     external
