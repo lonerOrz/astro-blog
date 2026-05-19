@@ -6,9 +6,6 @@ import ArrowCard from "@components/ArrowCard.astro";
 import Link from "@components/Link.astro";
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
-// terminal
-
-
 
 const blog = (await getCollection("blog"))
   .filter((post) => !post.data.draft)
@@ -21,102 +18,147 @@ const projects: CollectionEntry<"projects">[] = (
   .filter((project) => !project.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, SITE.NUM_PROJECTS_ON_HOMEPAGE);
-
-
 ---
 
 <Layout title={HOME.TITLE} description={HOME.DESCRIPTION}>
   <Container>
-    <!-- 新加一个 欢迎文本 和 网站大logo -->
-    <div class="flex items-center justify-center gap-16 py-20">
-      <div class="max-w-xl space-y-6">
-        <h1 class="text-8xl font-extrabold leading-tight">
-          <span
-            class="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent"
-          >
-            Welcome to lonerOrz's website!
-          </span>
+    <aside data-pagefind-ignore class="mx-auto max-w-3xl">
+
+      <!-- ── Intro ─────────────────────────────────────── -->
+      <section class="animate space-y-8 py-16">
+        <p class="font-mono text-[11px] uppercase tracking-[0.15em] text-black/30 dark:text-white/30">
+          {SITE.TITLE}
+        </p>
+        <h1
+          class="text-5xl font-bold tracking-tight text-black dark:text-white leading-[1.1]"
+        >
+          Digital garden.<br />Notes and builds.
         </h1>
-        <div class="tagline text-lg text-gray-600 dark:text-gray-400">System online.</div>
-        今こそ、救いの時だ。
-      </div>
-      <img
-        src="/site/hero.png"
-        alt="Website Logo"
-        class="h-[400px] w-[400px] object-contain"
-      />
-    </div>
+        <p class="text-base leading-relaxed text-black/55 dark:text-white/55 max-w-sm">
+          A developer who values simplicity and meaningful code. This space
+          documents learning, shares insights, and captures fleeting ideas.
+        </p>
+        <p class="font-mono text-sm text-black/25 dark:text-white/25">
+          今こそ、救いの時だ。
+        </p>
+      </section>
 
-    <!-- 保持距离的div -->
-    <div class="h-24"></div>
+      <hr class="border-black/10 dark:border-white/10" />
 
-    <aside data-pagefind-ignore>
-      <h1 class="font-semibold text-black dark:text-white">About this space</h1>
-      <div class="space-y-16">
-        <section>
-          <article class="space-y-4">
-            <span>
-              <p>
-                Welcome to my digital garden. I'm a developer who values
-                simplicity and meaningful code. This blog is built to be fast,
-                minimal, and focused on content—no unnecessary noise, just
-                thoughts and tech.
-              </p>
-              <p>
-                I use this space to document my learning journey, share
-                technical insights, and capture fleeting ideas that would
-                otherwise be lost in the noise of the internet.
-              </p>
-            </span>
-            <span class="animate">
-              <p>
-                The world of software is vast and often overwhelming. Here, I
-                try to slow down and build things with intent. Whether it's a
-                deep dive into a new framework or a simple reflection on daily
-                life, everything here is a piece of my digital footprint.
-              </p>
-            </span>
-          </article>
-        </section>
-
-
-
-        <section class="animate space-y-4">
-          <h2 class="font-semibold text-black dark:text-white">
-            Let's Connect
+      <!-- ── Recent Writing ────────────────────────────── -->
+      <section class="animate space-y-5 py-14">
+        <div class="flex items-center justify-between">
+          <h2 class="text-sm font-semibold text-black dark:text-white">
+            Recent Writing
           </h2>
-          <article>
-            <p>
-              If you want to get in touch with me about something or just to say
-              hi, reach out on social media or send me an email.
-            </p>
-          </article>
-          <ul class="not-prose flex flex-wrap gap-4 items-center">
-            {
-              SOCIALS.map((SOCIAL) => (
-                <li class="flex gap-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white">
-                  <Link
-                    href={SOCIAL.HREF}
-                    external
-                    aria-label={`${SITE.TITLE} on ${SOCIAL.NAME}`}
-                  >
-                    {SOCIAL.NAME}
-                  </Link>
-                  {"/"}
-                </li>
-              ))
-            }
-            <li class="line-clamp-1">
-              <Link
-                href={`mailto:${SITE.EMAIL}`}
-                aria-label={`Email ${SITE.TITLE}`}
-              >
-                {SITE.EMAIL}
-              </Link>
-            </li>
-          </ul>
-        </section>
-      </div>
+          <Link
+            href="/blog"
+            underline={false}
+            class="text-xs text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors duration-150"
+          >
+            All articles →
+          </Link>
+        </div>
+
+        <!-- Lightweight text list — not bordered cards -->
+        <ul>
+          {
+            blog.map((post) => (
+              <li>
+                <a
+                  href={`/blog/${post.id}`}
+                  class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-black/8 dark:border-white/8"
+                >
+                  <span class="flex-1 text-sm text-black dark:text-white truncate group-hover:underline underline-offset-2 decoration-black/20 dark:decoration-white/20">
+                    {post.data.title}
+                  </span>
+                  <time class="font-mono text-[11px] text-black/30 dark:text-white/30 shrink-0">
+                    {post.data.date.toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </time>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <!-- ── Projects ──────────────────────────────────── -->
+      {
+        projects.length > 0 && (
+          <Fragment>
+            <hr class="border-black/10 dark:border-white/10" />
+            <section class="animate space-y-5 py-14">
+              <div class="flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-black dark:text-white">
+                  Projects
+                </h2>
+                <Link
+                  href="/projects"
+                  underline={false}
+                  class="text-xs text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors duration-150"
+                >
+                  All projects →
+                </Link>
+              </div>
+              <ul>
+                {projects.map((project) => (
+                  <li>
+                    <a
+                      href={`/projects/${project.id}`}
+                      class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-black/8 dark:border-white/8"
+                    >
+                      <span class="flex-1 text-sm text-black dark:text-white truncate group-hover:underline underline-offset-2 decoration-black/20 dark:decoration-white/20">
+                        {project.data.title}
+                      </span>
+                      <span class="font-mono text-[11px] text-black/30 dark:text-white/30 shrink-0 hidden sm:block max-w-[180px] truncate text-right">
+                        {project.data.description}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </Fragment>
+        )
+      }
+
+      <hr class="border-black/10 dark:border-white/10" />
+
+      <!-- ── Connect ───────────────────────────────────── -->
+      <section class="animate space-y-5 py-14">
+        <h2 class="text-sm font-semibold text-black dark:text-white">
+          Connect
+        </h2>
+        <ul class="flex flex-wrap gap-x-6 gap-y-2.5">
+          {
+            SOCIALS.map((SOCIAL) => (
+              <li>
+                <Link
+                  href={SOCIAL.HREF}
+                  external
+                  underline={false}
+                  class="text-sm text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-150"
+                >
+                  {SOCIAL.NAME}
+                </Link>
+              </li>
+            ))
+          }
+          <li>
+            <Link
+              href={`mailto:${SITE.EMAIL}`}
+              underline={false}
+              class="text-sm text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-150"
+            >
+              {SITE.EMAIL}
+            </Link>
+          </li>
+        </ul>
+      </section>
+
     </aside>
   </Container>
 </Layout>
