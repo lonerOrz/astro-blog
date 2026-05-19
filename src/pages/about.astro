@@ -2,33 +2,117 @@
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
 import PageHeader from "@components/PageHeader.astro";
-import { ABOUT } from "@consts";
+import Link from "@components/Link.astro";
+import { ABOUT, SITE, SOCIALS } from "@consts";
+
+const facts = [
+  {
+    label: "Focus",
+    value: "Web, tooling, and small useful systems.",
+  },
+  {
+    label: "Taste",
+    value: "Quiet interfaces, fast pages, clear writing.",
+  },
+  {
+    label: "Stack",
+    value: "Astro, TypeScript, Tailwind CSS, and Nix.",
+  },
+];
 ---
 
 <Layout title={ABOUT.TITLE} description={ABOUT.DESCRIPTION}>
   <Container>
-    <div class="animate space-y-10">
-      <PageHeader title="About." subtitle="lonerOrz" class="space-y-1.5" />
-      <article class="prose dark:prose-invert max-w-none">
-        <p>
-          Hello! I'm lonerOrz, a developer passionate about creating beautiful
-          and functional websites.
-        </p>
-        <p>
-          This website is my personal blog and portfolio where I share my
-          thoughts on technology, programming, and other interests.
-        </p>
-        <img
-          src="/site/cat.png"
-          alt="A picture of a cat"
-          class="mx-auto rounded-lg shadow-lg"
-        />
-        <p class="text-center text-sm">This is my cat, a lovely companion.</p>
-        <p>
-          Feel free to explore my blog posts and projects. If you'd like to get
-          in touch, you can find my social media links on the homepage.
-        </p>
-      </article>
+    <div class="mx-auto max-w-5xl space-y-14">
+      <PageHeader title="About." subtitle="lonerOrz" />
+
+      <section class="animate grid gap-12 lg:grid-cols-[1fr_340px] lg:items-start">
+        <div class="space-y-8">
+          <div class="space-y-5">
+            <p class="max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
+              I build quiet things for the web — notes, tools, experiments, and
+              small systems that feel considered.
+            </p>
+            <div class="max-w-2xl space-y-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+              <p>
+                Hello, I'm lonerOrz. I'm a developer who cares about simplicity,
+                speed, and the details that make software feel pleasant to use.
+              </p>
+              <p>
+                This site is my digital garden: a place to document what I'm
+                learning, collect technical notes, and keep track of projects
+                that would otherwise disappear into folders and browser tabs.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid gap-3 sm:grid-cols-3">
+            {
+              facts.map((fact, i) => (
+                <div
+                  class="stagger-item rounded-xl border border-zinc-200 bg-white/70 p-4 shadow-sm shadow-zinc-950/[0.03] dark:border-zinc-800 dark:bg-zinc-900/40 dark:shadow-black/10"
+                  style={`--delay: ${120 + i * 60}ms`}
+                >
+                  <p class="font-mono text-[11px] uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                    {fact.label}
+                  </p>
+                  <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                    {fact.value}
+                  </p>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <aside class="stagger-item" style="--delay: 240ms">
+          <figure class="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-2 shadow-xl shadow-zinc-950/[0.06] dark:border-zinc-800 dark:bg-zinc-900/50 dark:shadow-black/20">
+            <img
+              src="/site/cat.png"
+              alt="A picture of a cat"
+              class="aspect-[4/5] w-full rounded-xl object-cover"
+            />
+            <figcaption class="px-2 py-3 text-center font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
+              a lovely companion / cat.png
+            </figcaption>
+          </figure>
+        </aside>
+      </section>
+
+      <section class="animate border-t border-zinc-200 pt-10 dark:border-zinc-800">
+        <div class="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
+          <div class="space-y-3">
+            <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+              Connect
+            </h2>
+            <p class="max-w-xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+              If you want to talk about code, writing, music, or anything else,
+              you can find me through the links below.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-x-5 gap-y-2">
+            {
+              SOCIALS.map((SOCIAL) => (
+                <Link
+                  href={SOCIAL.HREF}
+                  external
+                  underline={false}
+                  class="text-sm text-zinc-500 transition-colors duration-150 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+                >
+                  {SOCIAL.NAME}
+                </Link>
+              ))
+            }
+            <Link
+              href={`mailto:${SITE.EMAIL}`}
+              underline={false}
+              class="text-sm text-zinc-500 transition-colors duration-150 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+            >
+              Email
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   </Container>
 </Layout>
