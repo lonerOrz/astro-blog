@@ -96,9 +96,19 @@
     transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   }
 
-  /* Reusable nav link style used in Header */
-  .nav-link {
-    @apply rounded px-2 py-1 transition-colors hover:bg-zinc-100 active:bg-zinc-200 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-700;
+  /* Header nav item base — inactive state */
+  .nav-item {
+    @apply rounded-md px-2.5 py-1.5 text-sm text-zinc-500 dark:text-zinc-400;
+    @apply transition-colors duration-150;
+    @apply hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-300;
+  }
+
+  /*
+    Active nav item — toggled by JS since header uses transition:persist.
+    The stronger text color + bg + font-medium distinguish it from hover.
+  */
+  .nav-active {
+    @apply bg-zinc-100 font-medium text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50;
   }
 }
 

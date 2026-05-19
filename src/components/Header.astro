@@ -1,73 +1,77 @@
 ---
 import Container from "@components/Container.astro";
 import Link from "@components/Link.astro";
-import { SITE } from "@consts";
 ---
 
 <header transition:persist class="py-3">
   <Container>
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between gap-6">
       <Link href="/" underline={false}>
-        <div class="flex items-center gap-1 text-lg font-semibold">
+        <div class="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           <img src="/site/hero.png" alt="logo" class="h-6 w-6 flex-shrink-0" />
-          {SITE.TITLE}
+          lonerOrz
         </div>
       </Link>
-      <nav class="flex items-center gap-0.5 text-sm">
+      <nav class="flex items-center gap-1 text-sm">
         <Link
           href="/"
-          class="nav-link"
+          class={`nav-item ${Astro.url.pathname === "/" ? "nav-active" : ""}`}
           >home</Link
         >
-        <span class="text-black/20 dark:text-white/20">/</span>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
         <Link
           href="/blog"
-          class="nav-link"
+          class={`nav-item ${Astro.url.pathname.startsWith("/blog") ? "nav-active" : ""}`}
           >blog</Link
         >
-        <span class="text-black/20 dark:text-white/20">/</span>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
         <Link
           href="/projects"
-          class="nav-link"
+          class={`nav-item ${Astro.url.pathname.startsWith("/projects") ? "nav-active" : ""}`}
           >projects</Link
         >
-        <span class="text-black/20 dark:text-white/20">/</span>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
         <Link
           href="/music"
-          class="nav-link"
+          class={`nav-item ${Astro.url.pathname === "/music" ? "nav-active" : ""}`}
           >music</Link
         >
-        <span class="text-black/20 dark:text-white/20">/</span>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
         <Link
           href="/friends"
-          class="nav-link"
+          class={`nav-item ${Astro.url.pathname === "/friends" ? "nav-active" : ""}`}
           >friends</Link
         >
-        <span class="text-black/20 dark:text-white/20">/</span>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
         <Link
           href="/about"
-          class="nav-link"
+          class={`nav-item ${Astro.url.pathname === "/about" ? "nav-active" : ""}`}
           >about</Link
         >
-        <span class="mx-1 text-black/20 dark:text-white/20">/</span>
         <button
           id="magnifying-glass"
           aria-label="Search"
-          class="flex items-center rounded-sm border border-zinc-200 bg-zinc-100 px-9 py-1 text-xs transition-colors btn-interactive hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
+          class="btn-interactive ml-2 inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white/70 px-2.5 py-1.5 text-sm text-zinc-500 shadow-sm shadow-zinc-950/[0.03] transition-colors duration-150 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900 focus-visible:border-zinc-300 focus-visible:bg-zinc-50 focus-visible:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-400 dark:shadow-black/10 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:border-zinc-700 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
         >
           <svg
-            height="16"
+            aria-hidden="true"
+            height="15"
             stroke-linejoin="round"
             viewBox="0 0 16 16"
-            width="16"
-            style="color: currentcolor;"
-            ><path
+            width="15"
+            class="shrink-0"
+          >
+            <path
               fill-rule="evenodd"
               clip-rule="evenodd"
               d="M3.5 7C3.5 5.067 5.067 3.5 7 3.5C8.933 3.5 10.5 5.067 10.5 7C10.5 7.88461 10.1718 8.69256 9.63058 9.30876L9.30876 9.63058C8.69256 10.1718 7.88461 10.5 7 10.5C5.067 10.5 3.5 8.933 3.5 7ZM9.96544 11.0261C9.13578 11.6382 8.11014 12 7 12C4.23858 12 2 9.76142 2 7C2 4.23858 4.23858 2 7 2C9.76142 2 12 4.23858 12 7C12 8.11014 11.6382 9.13578 11.0261 9.96544L14.0303 12.9697L14.5607 13.5L13.5 14.5607L12.9697 14.0303L9.96544 11.0261Z"
-              fill="currentColor"></path></svg
+              fill="currentColor"></path>
+          </svg>
+          <span>Search</span>
+          <kbd
+            class="hidden rounded border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] leading-none text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500 sm:inline-flex"
+            >/</kbd
           >
-          &nbsp;Search
         </button>
       </nav>
     </div>
