@@ -26,35 +26,35 @@ const projects: CollectionEntry<"projects">[] = (
 
       <!-- ── Intro ─────────────────────────────────────── -->
       <section class="animate space-y-8 py-16">
-        <p class="font-mono text-[11px] uppercase tracking-[0.15em] text-black/30 dark:text-white/30">
+        <p class="font-mono text-[11px] uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-500">
           {SITE.TITLE}
         </p>
         <h1
-          class="text-5xl font-bold tracking-tight text-black dark:text-white leading-[1.1]"
+          class="text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 leading-[1.1]"
         >
           Digital garden.<br />Notes and builds.
         </h1>
-        <p class="text-base leading-relaxed text-black/55 dark:text-white/55 max-w-sm">
+        <p class="text-base leading-relaxed text-zinc-500 dark:text-zinc-400 max-w-sm">
           A developer who values simplicity and meaningful code. This space
           documents learning, shares insights, and captures fleeting ideas.
         </p>
-        <p class="font-mono text-sm text-black/25 dark:text-white/25">
+        <p class="font-mono text-sm text-zinc-400 dark:text-zinc-600">
           今こそ、救いの時だ。
         </p>
       </section>
 
-      <hr class="border-black/10 dark:border-white/10" />
+      <hr class="border-zinc-200 dark:border-zinc-800" />
 
       <!-- ── Recent Writing ────────────────────────────── -->
       <section class="animate space-y-5 py-14">
         <div class="flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-black dark:text-white">
+          <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
             Recent Writing
           </h2>
           <Link
             href="/blog"
             underline={false}
-            class="text-xs text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors duration-150"
+            class="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors duration-150"
           >
             All articles →
           </Link>
@@ -67,12 +67,12 @@ const projects: CollectionEntry<"projects">[] = (
               <li>
                 <a
                   href={`/blog/${post.id}`}
-                  class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-black/8 dark:border-white/8"
+                  class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-zinc-100 dark:border-zinc-800"
                 >
-                  <span class="flex-1 text-sm text-black dark:text-white truncate group-hover:underline underline-offset-2 decoration-black/20 dark:decoration-white/20">
+                  <span class="flex-1 text-sm text-zinc-900 dark:text-zinc-50 truncate group-hover:underline underline-offset-2 decoration-zinc-300 dark:decoration-zinc-600">
                     {post.data.title}
                   </span>
-                  <time class="font-mono text-[11px] text-black/30 dark:text-white/30 shrink-0">
+                  <time class="font-mono text-[11px] text-zinc-400 dark:text-zinc-500 shrink-0">
                     {post.data.date.toLocaleDateString("en-US", {
                       month: "short",
                       year: "numeric",
@@ -89,16 +89,16 @@ const projects: CollectionEntry<"projects">[] = (
       {
         projects.length > 0 && (
           <Fragment>
-            <hr class="border-black/10 dark:border-white/10" />
+            <hr class="border-zinc-200 dark:border-zinc-800" />
             <section class="animate space-y-5 py-14">
               <div class="flex items-center justify-between">
-                <h2 class="text-sm font-semibold text-black dark:text-white">
+                <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                   Projects
                 </h2>
                 <Link
                   href="/projects"
                   underline={false}
-                  class="text-xs text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors duration-150"
+                  class="text-xs text-zinc-400 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors duration-150"
                 >
                   All projects →
                 </Link>
@@ -108,12 +108,12 @@ const projects: CollectionEntry<"projects">[] = (
                   <li>
                     <a
                       href={`/projects/${project.id}`}
-                      class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-black/8 dark:border-white/8"
+                      class="btn-interactive group flex items-center gap-4 py-3.5 border-b border-zinc-100 dark:border-zinc-800"
                     >
-                      <span class="flex-1 text-sm text-black dark:text-white truncate group-hover:underline underline-offset-2 decoration-black/20 dark:decoration-white/20">
+                      <span class="flex-1 text-sm text-zinc-900 dark:text-zinc-50 truncate group-hover:underline underline-offset-2 decoration-zinc-300 dark:decoration-zinc-600">
                         {project.data.title}
                       </span>
-                      <span class="font-mono text-[11px] text-black/30 dark:text-white/30 shrink-0 hidden sm:block max-w-[180px] truncate text-right">
+                      <span class="font-mono text-[11px] text-zinc-400 dark:text-zinc-500 shrink-0 hidden sm:block max-w-[180px] truncate text-right">
                         {project.data.description}
                       </span>
                     </a>
@@ -125,11 +125,11 @@ const projects: CollectionEntry<"projects">[] = (
         )
       }
 
-      <hr class="border-black/10 dark:border-white/10" />
+      <hr class="border-zinc-200 dark:border-zinc-800" />
 
       <!-- ── Connect ───────────────────────────────────── -->
       <section class="animate space-y-5 py-14">
-        <h2 class="text-sm font-semibold text-black dark:text-white">
+        <h2 class="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
           Connect
         </h2>
         <ul class="flex flex-wrap gap-x-6 gap-y-2.5">
@@ -140,7 +140,7 @@ const projects: CollectionEntry<"projects">[] = (
                   href={SOCIAL.HREF}
                   external
                   underline={false}
-                  class="text-sm text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-150"
+                  class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors duration-150"
                 >
                   {SOCIAL.NAME}
                 </Link>
@@ -151,7 +151,7 @@ const projects: CollectionEntry<"projects">[] = (
             <Link
               href={`mailto:${SITE.EMAIL}`}
               underline={false}
-              class="text-sm text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white transition-colors duration-150"
+              class="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-50 transition-colors duration-150"
             >
               {SITE.EMAIL}
             </Link>

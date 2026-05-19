@@ -77,9 +77,9 @@ const { Content, headings } = await render(post);
             {post.data.tags.map((tag) => (
               <a
                 href={`/tags/${tag}`}
-                class="btn-interactive group inline-flex items-baseline gap-1 rounded border border-black/10 dark:border-white/10 px-2.5 py-1 hover:border-black/25 dark:hover:border-white/25"
+                class="btn-interactive group inline-flex items-baseline gap-1 rounded border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 hover:border-zinc-400 dark:hover:border-zinc-500"
               >
-                <span class="font-mono text-[11px] text-black/55 dark:text-white/55 group-hover:text-black dark:group-hover:text-white transition-colors duration-150">
+                <span class="font-mono text-[11px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-50 transition-colors duration-150">
                   #{tag}
                 </span>
               </a>
