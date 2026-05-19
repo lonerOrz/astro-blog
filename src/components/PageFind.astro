@@ -63,12 +63,7 @@ import Search from "astro-pagefind/components/Search";
     } else if ((e.metaKey || e.ctrlKey) && e.key === "k") {
       e.preventDefault();
       openPagefind();
-    }
-  });
-
-  // close pagefind
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
+    } else if (e.key === "Escape") {
       closePagefind();
     }
   });

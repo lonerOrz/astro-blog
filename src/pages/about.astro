@@ -1,20 +1,14 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
+import PageHeader from "@components/PageHeader.astro";
 import { ABOUT } from "@consts";
 ---
 
 <Layout title={ABOUT.TITLE} description={ABOUT.DESCRIPTION}>
   <Container>
     <div class="animate space-y-10">
-      <div class="space-y-1.5">
-        <h1 class="text-3xl font-semibold text-zinc-900 dark:text-zinc-50">
-          About.
-        </h1>
-        <p class="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-          lonerOrz
-        </p>
-      </div>
+      <PageHeader title="About." subtitle="lonerOrz" class="space-y-1.5" />
       <article class="prose dark:prose-invert max-w-none">
         <p>
           Hello! I'm lonerOrz, a developer passionate about creating beautiful

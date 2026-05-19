@@ -1,0 +1,27 @@
+---
+type Props = {
+  title: string;
+  subtitle?: string;
+  /** 外层 div 的 class，默认带 animate 和 space-y-1.5。 */
+  class?: string;
+};
+
+const {
+  title,
+  subtitle,
+  class: className = "animate space-y-1.5",
+} = Astro.props;
+---
+
+<div class={className}>
+  <h1 class="text-3xl font-semibold text-zinc-900 dark:text-zinc-50">
+    {title}
+  </h1>
+  {
+    subtitle && (
+      <p class="font-mono text-xs text-zinc-400 dark:text-zinc-500">
+        {subtitle}
+      </p>
+    )
+  }
+</div>

@@ -1,9 +1,10 @@
-import type { Metadata, Site, Socials } from "@types";
+import type { Metadata, Site, Socials, Friend, Friends } from "@types";
 
 export const SITE: Site = {
   TITLE: "lonerOrz's website",
   DESCRIPTION: "Own notepads and brochures.",
   EMAIL: "lonerOrz@qq.com",
+  URL: "https://astro-blog-rosy.vercel.app",
   NUM_POSTS_ON_HOMEPAGE: 5,
   NUM_PROJECTS_ON_HOMEPAGE: 3,
 };
@@ -34,7 +35,7 @@ export const MUSIC: Metadata = {
   DESCRIPTION: "My personal music collection and playlists.",
 };
 
-export const FRIENDS: Metadata = {
+export const FRIENDS_PAGE: Metadata = {
   TITLE: "Friends",
   DESCRIPTION: "A collection of links to my friends and other cool websites.",
 };
@@ -81,3 +82,21 @@ export const TERMINAL = {
     ],
   },
 };
+
+export const FRIENDS: Friends = [
+  {
+    NAME: "Astro",
+    HREF: "https://astro.build",
+    DESCRIPTION: "The web framework for content-driven websites.",
+  },
+  {
+    NAME: "Tailwind CSS",
+    HREF: "https://tailwindcss.com",
+    DESCRIPTION: "A utility-first CSS framework.",
+  },
+  {
+    NAME: "LonerOrz",
+    HREF: "https://github.com/lonerOrz",
+    DESCRIPTION: "The creator of this space.",
+  },
+];

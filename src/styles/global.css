@@ -90,6 +90,11 @@
   .ease-emphasis {
     transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   }
+
+  /* Reusable nav link style used in Header */
+  .nav-link {
+    @apply rounded px-2 py-1 transition-colors hover:bg-zinc-100 active:bg-zinc-200 dark:hover:bg-zinc-800/60 dark:active:bg-zinc-700;
+  }
 }
 
 /*

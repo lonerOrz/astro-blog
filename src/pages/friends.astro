@@ -1,45 +1,23 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
-import { FRIENDS, SITE } from "@consts";
-
-const friends = [
-  {
-    NAME: "Astro",
-    HREF: "https://astro.build",
-    DESCRIPTION: "The web framework for content-driven websites.",
-  },
-  {
-    NAME: "Tailwind CSS",
-    HREF: "https://tailwindcss.com",
-    DESCRIPTION: "A utility-first CSS framework.",
-  },
-  {
-    NAME: "LonerOrz",
-    HREF: "https://github.com/lonerOrz",
-    DESCRIPTION: "The creator of this space.",
-  },
-];
+import PageHeader from "@components/PageHeader.astro";
+import ArrowIcon from "@components/ArrowIcon.astro";
+import { FRIENDS_PAGE, FRIENDS, SITE } from "@consts";
 ---
 
-<Layout title={FRIENDS.TITLE} description={FRIENDS.DESCRIPTION}>
+<Layout title={FRIENDS_PAGE.TITLE} description={FRIENDS_PAGE.DESCRIPTION}>
   <Container>
     <div class="space-y-10">
 
-      <!-- Page header -->
-      <section class="animate space-y-1.5">
-        <h1 class="text-3xl font-semibold text-zinc-900 dark:text-zinc-50">
-          Friends.
-        </h1>
-        <p class="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-          Awesome people and projects that inspire me.
-        </p>
-      </section>
+      <PageHeader
+        title="Friends."
+        subtitle="Awesome people and projects that inspire me."
+      />
 
-      <!-- Friends list – editorial numbered style -->
       <section class="animate border-t border-zinc-200 dark:border-zinc-800">
         {
-          friends.map((friend, i) => (
+          FRIENDS.map((friend, i) => (
             <a
               href={friend.HREF}
               target="_blank"
@@ -60,30 +38,17 @@ const friends = [
                     {friend.DESCRIPTION}
                   </div>
                 </div>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  class="mt-0.5 shrink-0 size-4 fill-none stroke-current stroke-2 text-zinc-400 dark:text-zinc-600 transition-colors duration-150 group-hover:text-zinc-900 dark:group-hover:text-zinc-50"
-                >
-                  <line
-                    x1="5"
-                    y1="12"
-                    x2="19"
-                    y2="12"
-                    class="translate-x-3 scale-x-0 transition-transform duration-200 ease-emphasis group-hover:translate-x-0 group-hover:scale-x-100"
-                  />
-                  <polyline
-                    points="12 5 19 12 12 19"
-                    class="-translate-x-1 transition-transform duration-200 ease-emphasis group-hover:translate-x-0"
-                  />
-                </svg>
+                <ArrowIcon
+                  direction="right"
+                  size={4}
+                  class="mt-0.5 shrink-0 text-zinc-400 dark:text-zinc-600 transition-colors duration-150 group-hover:text-zinc-900 dark:group-hover:text-zinc-50"
+                />
               </div>
             </a>
           ))
         }
       </section>
 
-      <!-- Exchange info – minimal monospace block -->
       <section class="animate space-y-3">
         <p class="font-mono text-[11px] text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
           Exchange Links?
@@ -92,17 +57,13 @@ const friends = [
           class="font-mono text-xs text-zinc-500 dark:text-zinc-400 space-y-1.5 border-l-2 border-zinc-200 dark:border-zinc-800 pl-4"
         >
           <div>
-            <span class="text-zinc-400 dark:text-zinc-500">title: </span>{
-              SITE.TITLE
-            }
+            <span class="text-zinc-400 dark:text-zinc-500">title: </span>{SITE.TITLE}
           </div>
           <div>
-            <span class="text-zinc-400 dark:text-zinc-500">description: </span>{
-              SITE.DESCRIPTION
-            }
+            <span class="text-zinc-400 dark:text-zinc-500">description: </span>{SITE.DESCRIPTION}
           </div>
           <div>
-            <span class="text-zinc-400 dark:text-zinc-500">url: </span>https://astro-blog-rosy.vercel.app
+            <span class="text-zinc-400 dark:text-zinc-500">url: </span>{SITE.URL}
           </div>
           <div class="pt-1 text-zinc-400 dark:text-zinc-500">
             Reach out if you'd like to be added here.

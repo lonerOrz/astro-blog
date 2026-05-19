@@ -1,15 +1,14 @@
 ---
+import type { Heading } from "@types";
 import TableOfContentsHeading from "./TableOfContentsHeading.astro";
 
-// https://kld.dev/building-table-of-contents/
-const { headings } = Astro.props;
-const toc = buildToc(headings);
+type Props = {
+  headings: Heading[];
+};
 
-export interface Heading {
-  depth: number;
-  slug: string;
-  text: string;
-}
+const { headings } = Astro.props;
+
+const toc = buildToc(headings);
 
 function buildToc(headings: Heading[]) {
   const toc: Heading[] = [];

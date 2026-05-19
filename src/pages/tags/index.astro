@@ -2,6 +2,8 @@
 import { getCollection } from "astro:content";
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
+import PageHeader from "@components/PageHeader.astro";
+import TagPill from "@components/TagPill.astro";
 
 const posts = await getCollection("blog", ({ data }) => !data.draft);
 const tags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort();
@@ -10,31 +12,17 @@ const tags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort();
 <Layout title="Tags" description="List of tags used.">
   <Container>
     <div class="space-y-10">
-      <div class="animate space-y-1.5">
-        <h1 class="text-3xl font-semibold text-zinc-900 dark:text-zinc-50">Tags.</h1>
-        <p class="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-          {tags.length} topics
-        </p>
-      </div>
+      <PageHeader
+        title="Tags."
+        subtitle={`${tags.length} topics`}
+      />
       <div class="animate border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-wrap gap-3">
         {
           tags.map((tag) => {
             const count = posts.filter((post) =>
               post.data.tags?.includes(tag),
             ).length;
-            return (
-              <a
-                href={`/tags/${tag}`}
-                class="btn-interactive group inline-flex items-baseline gap-1.5 rounded border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 hover:border-zinc-400 dark:hover:border-zinc-500"
-              >
-                <span class="font-mono text-[11px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-50 transition-colors duration-150">
-                  #{tag}
-                </span>
-                <span class="font-mono text-[10px] text-zinc-400 dark:text-zinc-600">
-                  {count}
-                </span>
-              </a>
-            );
+            return <TagPill tag={tag} count={count} />;
           })
         }
       </div>

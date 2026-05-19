@@ -3,14 +3,13 @@ interface Props {
   type?: "default" | "info" | "warning" | "error";
 }
 const { type = "default" } = Astro.props;
-let emoji = "💡";
-if (type === "info") {
-  emoji = "ℹ️";
-} else if (type === "warning") {
-  emoji = "⚠️";
-} else if (type === "error") {
-  emoji = "🚨";
-}
+const emojiMap: Record<"default" | "info" | "warning" | "error", string> = {
+  default: "💡",
+  info: "ℹ️",
+  warning: "⚠️",
+  error: "🚨",
+};
+const emoji = emojiMap[type];
 
 const baseClasses = "relative my-4 flex rounded border p-3";
 const typeClasses = {

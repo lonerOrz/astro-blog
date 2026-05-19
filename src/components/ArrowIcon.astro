@@ -1,0 +1,51 @@
+---
+type Props = {
+  /** 箭头方向。"up" 实际是 "left" + rotate-90。默认 "right"。 */
+  direction?: "right" | "left" | "up";
+  /** 图标尺寸，对应 Tailwind size-4 / size-5。默认 5。 */
+  size?: 4 | 5;
+  class?: string;
+};
+
+const {
+  direction = "right",
+  size = 5,
+  class: className,
+} = Astro.props;
+
+const isLeft = direction === "left" || direction === "up";
+
+// line 的初始偏移量随尺寸不同而不同
+const lineOffset = size === 5 ? "translate-x-3" : "translate-x-2";
+// polyline 的初始偏移量随方向不同而不同
+const polyOffset = isLeft ? "translate-x-1" : "-translate-x-1";
+// polyline 的顶点坐标随方向不同而不同
+const points = isLeft ? "12 5 5 12 12 19" : "12 5 19 12 12 19";
+
+const sizeClass = size === 4 ? "size-4" : "size-5";
+const rotateClass = direction === "up" ? "rotate-90" : "";
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  class:list={[sizeClass, rotateClass, "fill-none stroke-current stroke-2", className]}
+>
+  <line
+    x1="5"
+    y1="12"
+    x2="19"
+    y2="12"
+    class:list={[
+      lineOffset,
+      "scale-x-0 transition-transform duration-200 ease-emphasis group-hover:translate-x-0 group-hover:scale-x-100 group-focus-visible:translate-x-0 group-focus-visible:scale-x-100",
+    ]}
+  />
+  <polyline
+    points={points}
+    class:list={[
+      polyOffset,
+      "transition-transform duration-200 ease-emphasis group-hover:translate-x-0 group-focus-visible:translate-x-0",
+    ]}
+  />
+</svg>

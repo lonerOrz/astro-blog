@@ -1,0 +1,27 @@
+---
+type Props = {
+  tag: string;
+  /** 显示文章数量，仅在 tags/index 页面传入。 */
+  count?: number;
+};
+
+const { tag, count } = Astro.props;
+---
+
+<a
+  href={`/tags/${tag}`}
+  class="btn-interactive group inline-flex items-baseline gap-1.5 rounded border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 hover:border-zinc-400 dark:hover:border-zinc-500"
+>
+  <span
+    class="font-mono text-[11px] text-zinc-500 dark:text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-50 transition-colors duration-150"
+  >
+    #{tag}
+  </span>
+  {
+    count !== undefined && (
+      <span class="font-mono text-[10px] text-zinc-400 dark:text-zinc-600">
+        {count}
+      </span>
+    )
+  }
+</a>
