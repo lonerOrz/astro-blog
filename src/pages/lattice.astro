@@ -1,0 +1,313 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Container from "../components/Container.astro";
+---
+
+<Layout
+  title="Torus Knot"
+  description="Minimal mathematical topology sculpture."
+>
+  <Container>
+    <div class="mx-auto max-w-6xl py-10">
+      <!-- HEADER -->
+      <div
+        class="mb-8 flex flex-col gap-6 border-b border-zinc-900 pb-6 md:flex-row md:items-end md:justify-between"
+      >
+        <div>
+          <div
+            class="mb-4 inline-flex items-center gap-2 border border-zinc-800 bg-zinc-950 px-3 py-1.5"
+          >
+            <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
+
+            <span class="text-[9px] tracking-[0.35em] text-zinc-500 uppercase">
+              TOPOLOGICAL GEOMETRY
+            </span>
+          </div>
+
+          <h1
+            class="text-3xl font-black tracking-[0.28em] text-white uppercase md:text-4xl"
+          >
+            TORUS // KNOT
+          </h1>
+
+          <p
+            class="mt-4 max-w-lg text-[10px] leading-relaxed tracking-[0.22em] text-zinc-600 uppercase"
+          >
+            Minimal parametric topology generated through toroidal harmonic
+            motion.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-8">
+          <div>
+            <div class="text-[8px] tracking-[0.28em] text-zinc-700 uppercase">
+              Formula
+            </div>
+
+            <div class="mt-1 font-mono text-[11px] tracking-wide text-zinc-300">
+              TORUS KNOT
+            </div>
+          </div>
+
+          <div>
+            <div class="text-[8px] tracking-[0.28em] text-zinc-700 uppercase">
+              Geometry
+            </div>
+
+            <div class="mt-1 font-mono text-[11px] tracking-wide text-zinc-300">
+              PARAMETRIC
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISUAL -->
+      <section class="relative overflow-hidden border border-zinc-800 bg-black">
+        <!-- ambient -->
+        <div
+          class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04),transparent_72%)]"
+        >
+        </div>
+
+        <!-- subtle grid -->
+        <div
+          class="pointer-events-none absolute inset-0 opacity-[0.02]"
+          style="
+            background-image:
+              linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 90px 90px;
+          "
+        >
+        </div>
+
+        <!-- info -->
+        <div
+          class="absolute top-6 left-6 z-10 border border-zinc-800 bg-black/70 px-4 py-3 backdrop-blur-xl"
+        >
+          <div class="text-[8px] tracking-[0.3em] text-zinc-600 uppercase">
+            Knot State
+          </div>
+
+          <div
+            id="formula-readout"
+            class="mt-2 font-mono text-[11px] tracking-wide text-zinc-300"
+          >
+            p = 3 / q = 5 / r = 0.32
+          </div>
+        </div>
+
+        <!-- canvas -->
+        <div class="relative h-[760px] w-full">
+          <canvas id="math-canvas" class="h-full w-full"></canvas>
+        </div>
+
+        <!-- fade -->
+        <div
+          class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent"
+        >
+        </div>
+      </section>
+
+      <!-- CONTROLS -->
+      <section
+        class="mt-6 grid gap-6 border border-zinc-800 bg-zinc-950/50 p-6 backdrop-blur-xl md:grid-cols-3"
+      >
+        <!-- P -->
+        <div>
+          <div class="mb-4 flex items-center justify-between">
+            <div class="text-[10px] tracking-[0.24em] text-zinc-500 uppercase">
+              Rotation
+            </div>
+
+            <div id="p-readout" class="font-mono text-[11px] text-white">3</div>
+          </div>
+
+          <input
+            id="input-p"
+            type="range"
+            min="1"
+            max="8"
+            step="1"
+            value="3"
+            class="slider"
+          />
+        </div>
+
+        <!-- Q -->
+        <div>
+          <div class="mb-4 flex items-center justify-between">
+            <div class="text-[10px] tracking-[0.24em] text-zinc-500 uppercase">
+              Harmonic
+            </div>
+
+            <div id="q-readout" class="font-mono text-[11px] text-white">5</div>
+          </div>
+
+          <input
+            id="input-q"
+            type="range"
+            min="2"
+            max="12"
+            step="1"
+            value="5"
+            class="slider"
+          />
+        </div>
+
+        <!-- Radius -->
+        <div>
+          <div class="mb-4 flex items-center justify-between">
+            <div class="text-[10px] tracking-[0.24em] text-zinc-500 uppercase">
+              Radius
+            </div>
+
+            <div id="r-readout" class="font-mono text-[11px] text-white">
+              0.32
+            </div>
+          </div>
+
+          <input
+            id="input-r"
+            type="range"
+            min="0.1"
+            max="0.8"
+            step="0.01"
+            value="0.32"
+            class="slider"
+          />
+        </div>
+      </section>
+    </div>
+  </Container>
+</Layout>
+
+<style>
+  .slider {
+    width: 100%;
+    appearance: none;
+    height: 1px;
+    background: rgb(63 63 70);
+    outline: none;
+  }
+
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: white;
+    border: 2px solid black;
+    cursor: pointer;
+  }
+
+  .slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: white;
+    border: 2px solid black;
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  const canvas = document.getElementById("math-canvas");
+  const ctx = canvas.getContext("2d", { alpha: false });
+
+  const inputP = document.getElementById("input-p");
+  const inputQ = document.getElementById("input-q");
+  const inputR = document.getElementById("input-r");
+  const pReadout = document.getElementById("p-readout");
+  const qReadout = document.getElementById("q-readout");
+  const rReadout = document.getElementById("r-readout");
+  const formulaReadout = document.getElementById("formula-readout");
+
+  let width, height, cx, cy, scale;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    width = canvas.offsetWidth;
+    height = canvas.offsetHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    ctx.scale(dpr, dpr);
+    cx = width / 2;
+    cy = height / 2;
+    scale = Math.min(width, height) * 0.14;
+  }
+
+  window.addEventListener("resize", resize);
+  resize();
+
+  let t = 0;
+  let lastTime = performance.now();
+
+  function render(now) {
+    const deltaTime = (now - lastTime) / 16.6; // 基于 60fps 的时间差
+    lastTime = now;
+    t += 0.002 * deltaTime;
+
+    const density = parseFloat(inputP.value);
+    const layers = parseFloat(inputQ.value);
+    const amplitude = parseFloat(inputR.value);
+
+    pReadout.innerText = density;
+    qReadout.innerText = layers;
+    rReadout.innerText = amplitude.toFixed(2);
+    formulaReadout.innerText = `d = ${density} / l = ${layers} / a = ${amplitude.toFixed(2)}`;
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, width, height);
+
+    const rotY = t * 0.22;
+    const rotX = Math.sin(t * 0.4) * 0.25;
+    const cosY = Math.cos(rotY),
+      sinY = Math.sin(rotY);
+    const cosX = Math.cos(rotX),
+      sinX = Math.sin(rotX);
+
+    ctx.lineWidth = 0.7;
+
+    for (let z = -layers; z <= layers; z += 0.4) {
+      const cosZ = Math.cos(z);
+      const sinZ = Math.sin(z);
+      const alpha = 0.04 + ((z + layers) / (layers * 2)) * 0.16;
+      ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+
+      ctx.beginPath();
+      let started = false;
+
+      for (let x = -Math.PI; x <= Math.PI; x += 0.06) {
+        const y = Math.sin(x * density + t) * cosZ * amplitude;
+        const gyroid =
+          Math.sin(x) * Math.cos(y) + Math.sin(y) * cosZ + sinZ * Math.cos(x);
+
+        const px = x * 1.4;
+        const py = gyroid;
+        const pz = z;
+
+        const rx = px * cosY - pz * sinY;
+        const rz = px * sinY + pz * cosY;
+        const ry = py * cosX - rz * sinX;
+        const finalZ = py * sinX + rz * cosX;
+
+        const p = 1 / (1 + finalZ * 0.18);
+        const sx = cx + rx * scale * p;
+        const sy = cy + ry * scale * p;
+
+        if (!started) {
+          ctx.moveTo(sx, sy);
+          started = true;
+        } else {
+          ctx.lineTo(sx, sy);
+        }
+      }
+      ctx.stroke();
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+</script>
