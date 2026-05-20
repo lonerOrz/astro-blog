@@ -1,7 +1,17 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
+import PlaylistSelector from "@components/PlaylistSelector.astro";
 import { MUSIC } from "@consts";
+
+// Playlists available for selection. Replace with actual playlist IDs.
+const PLAYLISTS = [
+  { id: "2842079283", label: "Default playlist" },
+  { id: "8991745471", label: "Chill (placeholder)" },
+  { id: "13054354660", label: "Top hits (placeholder)" },
+];
+
+const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 ---
 
 <Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION} hideFooter>
@@ -10,6 +20,15 @@ import { MUSIC } from "@consts";
       <!-- 动态封面氛围背景 -->
       <div id="an_music_bg" aria-hidden="true"></div>
       <div id="an_music_overlay" aria-hidden="true"></div>
+
+      <PlaylistSelector
+        playlists={PLAYLISTS}
+        defaultPlaylist={DEFAULT_PLAYLIST}
+        variant="v2"
+      />
+
+      <!-- spacer to create visual separation between selector and player (tightened) -->
+      <div class="h-2 md:h-3" aria-hidden="true"></div>
 
       <div id="an_music_player_mount">
         <div id="an_music_loading" class="music-loading-shell">
@@ -41,13 +60,22 @@ import { MUSIC } from "@consts";
     root.classList.add("music-page-active");
 
     let shellTimer = 0;
+    // currentPlaylist will be initialized after DOM paints — avoid referencing server-only constants
+    let currentPlaylist = null;
 
-    function mountPlayer() {
-      if (mount.querySelector("meting-js")) return;
+    function createLoadingShell() {
+      const shell = document.createElement("div");
+      shell.id = "an_music_loading";
+      shell.className = "music-loading-shell";
+      shell.innerHTML =
+        '<div class="music-loading-cover"></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
+      return shell;
+    }
 
+    function createMetingElement(playlistId) {
       const player = document.createElement("meting-js");
       const attrs = {
-        id: "2842079283",
+        id: playlistId,
         server: "netease",
         type: "playlist",
         order: "list",
@@ -63,23 +91,218 @@ import { MUSIC } from "@consts";
         player.setAttribute(key, value);
       });
 
-      mount.appendChild(player);
-
-      // Remove the lightweight shell once APlayer has actually appeared.
-      const shell = document.getElementById("an_music_loading");
-      shellTimer = window.setInterval(() => {
-        if (page.querySelector(".aplayer")) {
-          shell?.classList.add("is-hidden");
-          window.setTimeout(() => shell?.remove(), 300);
-          window.clearInterval(shellTimer);
-        }
-      }, 100);
+      return player;
     }
 
-    // Let the page paint first, then start Meting/APlayer work.
+    function removeExistingPlayer() {
+      const existing = mount.querySelector("meting-js");
+      if (existing) existing.remove();
+      document.querySelectorAll(".aplayer").forEach((n) => n.remove());
+    }
+
+    async function validatePlaylist(playlistId) {
+      const endpoint = `https://meting-api-rho-three.vercel.app/api?server=netease&type=playlist&id=${encodeURIComponent(playlistId)}&r=${Math.random()}`;
+      try {
+        const resp = await fetch(endpoint, { cache: "no-store" });
+        if (!resp.ok) return false;
+        const ct = resp.headers.get("content-type") || "";
+        if (ct.indexOf("application/json") === -1) {
+          const txt = await resp.text();
+          try {
+            JSON.parse(txt);
+            return true;
+          } catch (e) {
+            return false;
+          }
+        }
+        const data = await resp.json();
+        return Array.isArray(data) && data.length > 0;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function setPlaylist(playlistId) {
+      if (!playlistId) return;
+      currentPlaylist = playlistId;
+
+      // persist selection so the choice survives navigations
+      try {
+        localStorage.setItem("an_music_last_playlist", playlistId);
+      } catch (e) {
+        // ignore
+      }
+
+      // update selector UI
+      const buttons = document.querySelectorAll(
+        "#playlist-selector [data-playlist]",
+      );
+      buttons.forEach((b) => {
+        const pressed = b.dataset.playlist === playlistId;
+        if (pressed) {
+          b.classList.add("playlist-active");
+          b.classList.remove("playlist-inactive");
+          b.setAttribute("tabindex", "0");
+        } else {
+          b.classList.remove("playlist-active");
+          b.classList.add("playlist-inactive");
+          b.setAttribute("tabindex", "-1");
+        }
+        // keep both attributes for broader assistive tech compatibility
+        b.setAttribute("aria-selected", pressed ? "true" : "false");
+        b.setAttribute("aria-pressed", pressed ? "true" : "false");
+      });
+
+      // ensure loading shell
+      let shell = mount.querySelector("#an_music_loading");
+      if (!shell) {
+        shell = createLoadingShell();
+        mount.appendChild(shell);
+      } else {
+        shell.classList.remove("is-hidden");
+      }
+
+      // remove previous player and create a new one
+      removeExistingPlayer();
+      const player = createMetingElement(playlistId);
+
+      // Validate playlist via Meting API before inserting the element.
+      validatePlaylist(playlistId).then((valid) => {
+        if (!valid) {
+          // mark button disabled and show a short error message
+          const btn = document.querySelector(`#playlist-selector [data-playlist="${playlistId}"]`);
+          const select = document.querySelector('#playlist-selector select');
+          if (btn) {
+            btn.setAttribute("aria-disabled", "true");
+            btn.disabled = true;
+            btn.classList.add("playlist-disabled");
+          }
+          if (select && select.value === playlistId) {
+            select.setAttribute('aria-disabled', 'true');
+            select.disabled = true;
+            select.classList.add('playlist-disabled');
+          }
+
+          shell.classList.add("is-hidden");
+          window.setTimeout(() => shell.remove(), 300);
+
+          const err = document.createElement("div");
+          err.className = "music-loading-shell";
+          err.innerHTML = '<div class="music-loading-copy"><p>无法加载歌单</p><span>请检查歌单 ID 是否有效或稍后重试。</span></div>';
+          mount.appendChild(err);
+          window.setTimeout(() => err.remove(), 3500);
+
+          return;
+        }
+
+        // valid — insert meting-js which will bootstrap APlayer
+        mount.appendChild(player);
+      });
+
+      // wait for APlayer to appear, then remove shell and attach cover observer
+      const localTimer = window.setInterval(() => {
+        if (page.querySelector(".aplayer")) {
+          shell.classList.add("is-hidden");
+          window.setTimeout(() => shell.remove(), 300);
+          window.clearInterval(localTimer);
+          // expose to outer scope so cleanup on navigation works
+          shellTimer = localTimer;
+
+          const picTimer = window.setInterval(() => {
+            const pic = getPic();
+            if (pic) {
+              attachCoverObserver(pic);
+              scheduleSync(pic);
+              window.clearInterval(picTimer);
+            }
+          }, 80);
+        }
+      }, 150);
+    }
+
+    // initial mount: defer after paint — prefer saved playlist from localStorage when available
     window.requestAnimationFrame(() => {
-      window.setTimeout(mountPlayer, 0);
+      window.setTimeout(() => {
+        const selector = document.getElementById("playlist-selector");
+        let initial = null;
+        try {
+          const saved = localStorage.getItem("an_music_last_playlist");
+          const available = selector?.dataset.playlists
+            ? JSON.parse(selector.dataset.playlists)
+            : null;
+          const defaultFromDOM = selector?.dataset?.default;
+
+          if (saved && available && available.some((p) => p.id === saved)) {
+            initial = saved;
+          } else if (defaultFromDOM) {
+            initial = defaultFromDOM;
+          } else if (available && available.length) {
+            initial = available[0].id;
+          }
+        } catch (e) {
+          // ignore JSON/localStorage errors
+        }
+
+        if (initial) setPlaylist(initial);
+      }, 0);
     });
+
+    // wire playlist selector clicks
+    const selector = document.getElementById("playlist-selector");
+    if (selector) {
+      selector.addEventListener("click", (e) => {
+        // e.target can be a Text node when clicking button labels; normalize to Element
+        let node = e.target;
+        if (!(node instanceof Element)) node = node?.parentElement;
+        const btn =
+          node && node.closest ? node.closest("[data-playlist]") : null;
+        if (btn) {
+          const id = btn.dataset.playlist;
+          if (id && id !== currentPlaylist) setPlaylist(id);
+        }
+      });
+
+      // keyboard navigation: arrows to move focus, Enter/Space to select
+      selector.addEventListener("keydown", (e) => {
+        const buttons = Array.from(selector.querySelectorAll("[data-playlist]"));
+        if (!buttons.length) return;
+
+        const active = document.activeElement;
+        const idx = buttons.indexOf(active);
+
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+          e.preventDefault();
+          const next = idx > 0 ? idx - 1 : buttons.length - 1;
+          buttons[next].focus();
+        } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const next = idx < buttons.length - 1 ? idx + 1 : 0;
+          buttons[next].focus();
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          buttons[0].focus();
+        } else if (e.key === "End") {
+          e.preventDefault();
+          buttons[buttons.length - 1].focus();
+        } else if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          const btn = (document.activeElement || {}).closest?.("[data-playlist]") || null;
+          if (btn) {
+            const id = btn.dataset.playlist;
+            if (id && id !== currentPlaylist) setPlaylist(id);
+          }
+        }
+      });
+
+      // handle <select> change when there are many playlists
+      selector.addEventListener('change', (e) => {
+        const target = e.target;
+        if (target && target.matches && target.matches('select')) {
+          const id = target.value;
+          if (id && id !== currentPlaylist) setPlaylist(id);
+        }
+      });
+    }
 
     function normalizeCover(background) {
       if (!background || background === "none") return null;
@@ -102,7 +325,8 @@ import { MUSIC } from "@consts";
       if (computedBackground) return computedBackground;
 
       const img = pic.querySelector("img");
-      if (img?.currentSrc || img?.src) return `url("${img.currentSrc || img.src}")`;
+      if (img?.currentSrc || img?.src)
+        return `url("${img.currentSrc || img.src}")`;
 
       return null;
     }
@@ -157,7 +381,9 @@ import { MUSIC } from "@consts";
 
     window.setTimeout(() => scheduleSync(getPic()), 50);
     window.setTimeout(() => scheduleSync(getPic()), 250);
-    window.addEventListener("load", () => scheduleSync(getPic()), { once: true });
+    window.addEventListener("load", () => scheduleSync(getPic()), {
+      once: true,
+    });
 
     // Clicking a track usually updates cover shortly after the click. Probe a few
     // times so the background follows the selected song without permanent polling.
@@ -195,7 +421,11 @@ import { MUSIC } from "@consts";
 
   html.music-page-active body {
     background:
-      radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12), transparent 38%),
+      radial-gradient(
+        circle at 50% 0%,
+        rgba(255, 255, 255, 0.12),
+        transparent 38%
+      ),
       #050505 !important;
     color: #fff;
   }
@@ -285,9 +515,21 @@ import { MUSIC } from "@consts";
     height: 110vh;
     background-image: var(
       --music-cover,
-      radial-gradient(circle at 35% 28%, rgba(99, 102, 241, 0.55), transparent 34%),
-      radial-gradient(circle at 68% 38%, rgba(236, 72, 153, 0.42), transparent 30%),
-      radial-gradient(circle at 50% 72%, rgba(20, 184, 166, 0.34), transparent 38%)
+      radial-gradient(
+        circle at 35% 28%,
+        rgba(99, 102, 241, 0.55),
+        transparent 34%
+      ),
+      radial-gradient(
+        circle at 68% 38%,
+        rgba(236, 72, 153, 0.42),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 50% 72%,
+        rgba(20, 184, 166, 0.34),
+        transparent 38%
+      )
     );
     background-position: center;
     background-size: cover;
@@ -313,8 +555,17 @@ import { MUSIC } from "@consts";
   /* Stable readability layer — keeps text legible regardless of cover color. */
   #an_music_overlay {
     background:
-      radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.24), transparent 30%),
-      radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.28) 66%, rgba(0, 0, 0, 0.58) 100%),
+      radial-gradient(
+        circle at 50% 22%,
+        rgba(255, 255, 255, 0.24),
+        transparent 30%
+      ),
+      radial-gradient(
+        circle at 50% 50%,
+        rgba(0, 0, 0, 0),
+        rgba(0, 0, 0, 0.28) 66%,
+        rgba(0, 0, 0, 0.58) 100%
+      ),
       linear-gradient(180deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.42));
   }
 
@@ -348,7 +599,11 @@ import { MUSIC } from "@consts";
     height: 180px;
     border-radius: 28px;
     background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.04)),
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.18),
+        rgba(255, 255, 255, 0.04)
+      ),
       rgba(255, 255, 255, 0.08);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.16),

@@ -1,0 +1,247 @@
+---
+type Playlist = {
+  id: string;
+  label: string;
+};
+
+type Variant = 'default' | 'v2';
+
+interface Props {
+  playlists: Playlist[];
+  defaultPlaylist?: string;
+  id?: string;
+  variant?: Variant;
+}
+
+const {
+  playlists = [],
+  id = 'playlist-selector',
+  variant = 'default',
+} = Astro.props;
+
+const defaultPlaylist =
+  Astro.props.defaultPlaylist ??
+  playlists[0]?.id ??
+  '';
+
+const useDropdown = playlists.length > 6;
+
+const rootClass = [
+  'playlist-selector',
+  'animate',
+  `playlist-variant-${variant}`,
+];
+---
+
+<div
+  id={id}
+  class:list={rootClass}
+  role="tablist"
+  aria-label="Music playlists"
+  data-playlists={JSON.stringify(playlists)}
+  data-default={defaultPlaylist}
+>
+  <span class="playlist-label">
+    Playlist
+  </span>
+
+  {
+    useDropdown ? (
+      <select
+        class="playlist-select"
+        aria-label="Select playlist"
+        data-default={defaultPlaylist}
+      >
+        {playlists.map(({ id, label }) => (
+          <option
+            value={id}
+            selected={id === defaultPlaylist}
+          >
+            {label}
+          </option>
+        ))}
+      </select>
+    ) : (
+      <div class="playlist-buttons">
+        {playlists.map(({ id, label }, index) => {
+          const active = id === defaultPlaylist;
+
+          return (
+            <button
+              role="tab"
+              data-playlist={id}
+              data-index={index}
+              aria-selected={active}
+              tabIndex={active ? 0 : -1}
+              class:list={[
+                'playlist-btn',
+                {
+                  'playlist-active': active,
+                  'playlist-inactive': !active,
+                },
+              ]}
+            >
+              <span class="playlist-btn-label truncate">
+                {label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    )
+  }
+</div>
+
+<style>
+.playlist-selector {
+  --playlist-border: rgba(0, 0, 0, 0.06);
+  --playlist-line: rgba(0, 0, 0, 0.03);
+  --playlist-shadow: rgba(15, 23, 42, 0.025);
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .playlist-selector {
+    justify-content: flex-start;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .playlist-selector {
+    --playlist-border: rgba(255, 255, 255, 0.04);
+    --playlist-line: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.playlist-label {
+  margin-right: 0.5rem;
+
+  font:
+    0.75rem var(--font-mono);
+
+  color: #6b7280;
+  opacity: 0.95;
+}
+
+.playlist-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+
+  max-width: 100%;
+}
+
+.playlist-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  min-width: 84px;
+  padding: 0.32rem 0.75rem;
+
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+
+  background: transparent;
+  color: inherit;
+
+  font-size: 0.9rem;
+
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.playlist-btn:hover {
+  background: rgb(249 250 251);
+}
+
+@media (prefers-color-scheme: dark) {
+  .playlist-btn:hover {
+    background: rgba(17, 24, 39, 0.45);
+  }
+}
+
+.playlist-btn:focus {
+  outline: none;
+}
+
+.playlist-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.08);
+}
+
+.playlist-active {
+  position: relative;
+
+  border-color: var(--playlist-border);
+
+  box-shadow:
+    0 4px 8px var(--playlist-shadow);
+
+  transform: translateY(-0.25px);
+}
+
+.playlist-active::before {
+  content: '';
+
+  position: absolute;
+  left: -6px;
+  top: 50%;
+
+  width: 2px;
+  height: 52%;
+
+  border-radius: 9999px;
+
+  background: var(--playlist-line);
+
+  opacity: 0.7;
+
+  transform: translateY(-50%);
+}
+
+.playlist-inactive {
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .playlist-inactive {
+    color: #d1d5db;
+  }
+}
+
+.playlist-btn[aria-disabled='true'] {
+  pointer-events: none;
+
+  opacity: 0.6;
+  cursor: not-allowed;
+
+  color: #9ca3af;
+}
+
+.playlist-select {
+  min-width: 180px;
+
+  padding: 0.32rem 0.75rem;
+
+  border: 1px solid #e6e7e9;
+  border-radius: 0.375rem;
+
+  background: transparent;
+
+  font-size: 0.9rem;
+}
+
+#an_music_player_mount {
+  margin-top: 0.125rem;
+}
+</style>
