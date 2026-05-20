@@ -38,6 +38,12 @@ import Link from "@components/Link.astro";
         >
         <span class="text-zinc-300 dark:text-zinc-700">·</span>
         <Link
+          href="/github"
+          class={`nav-item ${Astro.url.pathname === "/github" ? "nav-active" : ""}`}
+          >github</Link
+        >
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <Link
           href="/music"
           class={`nav-item ${Astro.url.pathname === "/music" ? "nav-active" : ""}`}
           >music</Link

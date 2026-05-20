@@ -1,0 +1,460 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Container from "@components/Container.astro";
+import PageHeader from "@components/PageHeader.astro";
+import Link from "@components/Link.astro";
+
+const GITHUB_USERNAME = "lonerOrz";
+---
+
+<Layout
+  title="GitHub Stats"
+  description="A polished GitHub dashboard with contribution heatmap, top repositories, stars, and forks."
+>
+  <Container>
+    <div
+      class="mx-auto max-w-6xl space-y-10 pb-8"
+      data-github-user={GITHUB_USERNAME}
+    >
+      <PageHeader
+        title="GitHub."
+        subtitle={`/ ${GITHUB_USERNAME}`}
+        class="animate space-y-1.5"
+      />
+
+      <section class="animate grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+        <div
+          class="flex flex-col justify-between overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-zinc-50/50 to-white p-6 shadow-sm shadow-zinc-950/[0.04] sm:p-8 dark:border-zinc-800/80 dark:from-zinc-900/50 dark:to-zinc-950"
+        >
+          <div
+            class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between"
+          >
+            <div class="flex items-start gap-4">
+              <img
+                id="gh-avatar"
+                src={`https://github.com/${GITHUB_USERNAME}.png`}
+                alt="avatar"
+                class="h-16 w-16 flex-shrink-0 rounded-2xl border border-zinc-200 object-cover shadow-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hover:scale-[1.04] md:hover:rounded-full dark:border-zinc-800"
+                width="64"
+                height="64"
+                loading="lazy"
+              />
+              <div class="space-y-3">
+                <div class="space-y-1">
+                  <h2
+                    id="gh-name"
+                    class="text-2xl font-semibold tracking-tight text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
+                  >
+                    {GITHUB_USERNAME}
+                  </h2>
+                  <p class="font-mono text-sm text-zinc-500 dark:text-zinc-400">
+                    @{GITHUB_USERNAME}
+                  </p>
+                </div>
+                <p
+                  id="gh-bio"
+                  class="max-w-2xl text-sm leading-6 text-zinc-600 opacity-40 transition-opacity duration-300 dark:text-zinc-400"
+                >
+                  Loading profile context...
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 sm:justify-end">
+              <Link
+                href={`https://github.com/${GITHUB_USERNAME}`}
+                external
+                underline={false}
+                class="btn-interactive inline-flex items-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm shadow-zinc-950/[0.03] dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
+              >
+                View profile
+              </Link>
+            </div>
+          </div>
+
+          <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div
+              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] backdrop-blur dark:border-zinc-800/60 dark:bg-zinc-950/40"
+            >
+              <p
+                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
+              >
+                Public repos
+              </p>
+              <p
+                id="stat-repos"
+                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
+              >
+                —
+              </p>
+            </div>
+            <div
+              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] backdrop-blur dark:border-zinc-800/60 dark:bg-zinc-950/40"
+            >
+              <p
+                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
+              >
+                Followers
+              </p>
+              <p
+                id="stat-followers"
+                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
+              >
+                —
+              </p>
+            </div>
+            <div
+              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] backdrop-blur dark:border-zinc-800/60 dark:bg-zinc-950/40"
+            >
+              <p
+                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
+              >
+                Following
+              </p>
+              <p
+                id="stat-following"
+                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
+              >
+                —
+              </p>
+            </div>
+            <div
+              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] backdrop-blur dark:border-zinc-800/60 dark:bg-zinc-950/40"
+            >
+              <p
+                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
+              >
+                Featured repos
+              </p>
+              <p
+                id="stat-featured"
+                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
+              >
+                —
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <aside
+          class="flex flex-col justify-between overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-50/40 p-6 shadow-sm shadow-zinc-950/[0.01] sm:p-8 dark:border-zinc-800/80 dark:bg-zinc-900/10"
+        >
+          <div class="flex items-center justify-between gap-4">
+            <div class="space-y-0.5">
+              <p
+                class="text-[12px] font-medium tracking-tight text-zinc-400 dark:text-zinc-500"
+              >
+                Contribution heatmap
+              </p>
+              <h3
+                class="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
+              >
+                Year in review
+              </h3>
+            </div>
+
+            <div
+              class="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white px-2.5 py-1 font-mono text-[11px] font-medium text-zinc-500 shadow-sm shadow-zinc-950/[0.01] dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400"
+            >
+              <span class="relative flex h-1.5 w-1.5">
+                <span
+                  class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
+                ></span>
+                <span
+                  class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"
+                ></span>
+              </span>
+              <span>LIVE</span>
+            </div>
+          </div>
+
+          <div
+            class="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800/60 dark:bg-zinc-950/30"
+          >
+            <img
+              src={`https://ghchart.rshah.org/${GITHUB_USERNAME}`}
+              alt="GitHub contribution heatmap"
+              class="h-auto w-full dark:opacity-85"
+              loading="lazy"
+            />
+          </div>
+
+          <div
+            class="mt-5 grid grid-cols-2 gap-3 text-sm text-zinc-600 dark:text-zinc-400"
+          >
+            <div
+              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 dark:border-zinc-800/60 dark:bg-zinc-950/20"
+            >
+              <p
+                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
+              >
+                Public repos
+              </p>
+              <p
+                id="side-repos"
+                class="mt-1.5 font-mono text-base font-semibold text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
+              >
+                —
+              </p>
+            </div>
+            <div
+              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 dark:border-zinc-800/60 dark:bg-zinc-950/20"
+            >
+              <p
+                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
+              >
+                Top repo stars
+              </p>
+              <p
+                id="side-stars"
+                class="mt-1.5 font-mono text-base font-semibold text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
+              >
+                —
+              </p>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section
+        class="animate space-y-6 border-t border-zinc-200 pt-8 dark:border-zinc-800"
+      >
+        <div
+          class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
+        >
+          <div class="space-y-2">
+            <p
+              class="text-[12px] font-medium tracking-tight text-zinc-400 dark:text-zinc-500"
+            >
+              Top repositories
+            </p>
+            <h3
+              class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
+            >
+              Stars, forks, and a little more context
+            </h3>
+          </div>
+          <p
+            class="max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400"
+          >
+            Sorted by stars. Each card surfaces the signals people usually care
+            about first.
+          </p>
+        </div>
+
+        <div
+          id="repos-container"
+          class="grid min-h-[200px] gap-4 transition-all duration-300 md:grid-cols-2 xl:grid-cols-3"
+        >
+          <div
+            class="col-span-full flex animate-pulse items-center justify-center py-12 font-mono text-sm text-zinc-400"
+          >
+            Fetching repositories...
+          </div>
+        </div>
+      </section>
+    </div>
+  </Container>
+</Layout>
+
+<script>
+  async function initGitHubDashboard() {
+    const root = document.querySelector("[data-github-user]");
+    if (!root) return;
+
+    const username = root.getAttribute("data-github-user");
+    const numberFormatter = new Intl.NumberFormat("en-US");
+    const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+
+    try {
+      const [userRes, reposRes] = await Promise.all([
+        fetch(`https://api.github.com/users/${username}`),
+        fetch(
+          `https://api.github.com/users/${username}/repos?type=owner&per_page=100`,
+        ),
+      ]);
+
+      if (!userRes.ok || !reposRes.ok) throw new Error("API Fetch Failed");
+
+      const userData = await userRes.json();
+      const repos = await reposRes.json();
+
+      const allRepos = Array.isArray(repos) ? repos : [];
+      allRepos.sort(
+        (a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0),
+      );
+      const topRepos = allRepos.slice(0, 8);
+      const totalStars = topRepos.reduce(
+        (sum, repo) => sum + (repo.stargazers_count ?? 0),
+        0,
+      );
+
+      const updateText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerText = val;
+          el.classList.remove("opacity-40");
+        }
+      };
+
+      if (userData.avatar_url) {
+        document
+          .getElementById("gh-avatar")
+          ?.setAttribute("src", userData.avatar_url);
+      }
+      updateText("gh-name", userData.name || username);
+      updateText("gh-bio", userData.bio || "No profile bio provided.");
+
+      updateText(
+        "stat-repos",
+        numberFormatter.format(userData.public_repos ?? 0),
+      );
+      updateText(
+        "stat-followers",
+        numberFormatter.format(userData.followers ?? 0),
+      );
+      updateText(
+        "stat-following",
+        numberFormatter.format(userData.following ?? 0),
+      );
+      updateText("stat-featured", numberFormatter.format(topRepos.length));
+
+      updateText(
+        "side-repos",
+        numberFormatter.format(userData.public_repos ?? 0),
+      );
+      updateText("side-stars", numberFormatter.format(totalStars));
+
+      const container = document.getElementById("repos-container");
+      if (container) {
+        if (topRepos.length > 0) {
+          container.innerHTML = topRepos
+            .map(
+              (repo, index) => `
+            <article class="card-interactive group rounded-2xl border border-zinc-200 bg-white/50 p-4 shadow-sm shadow-zinc-950/[0.02] backdrop-blur dark:border-zinc-800/80 dark:bg-zinc-900/40 opacity-0 transform translate-y-2 transition-all duration-500" style="animation: fadeInUp 0.4s ease forwards ${index * 60}ms">
+              <div class="flex h-full flex-col justify-between gap-4">
+                <div class="space-y-2 min-w-0">
+                  <div class="flex items-start justify-between gap-3">
+                    <h4 class="text-base font-medium tracking-tight text-zinc-800 transition-colors duration-200 md:group-hover:text-zinc-950 dark:text-zinc-200 dark:md:group-hover:text-zinc-50 truncate">
+                      ${repo.name}
+                    </h4>
+                    <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="btn-interactive inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-zinc-50/50 px-2 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-400">
+                      <span>Open</span>
+                      <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" class="text-zinc-400 transition-transform duration-200 md:group-hover:-translate-y-0.5 md:group-hover:translate-x-0.5 dark:text-zinc-500">
+                        <path d="M14 3h7v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </a>
+                  </div>
+                  ${repo.description ? `<p class="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">${repo.description}</p>` : ""}
+                </div>
+                <div class="flex items-center justify-between gap-3 text-xs border-t border-zinc-100/80 pt-3 dark:border-zinc-800/50">
+                  <div class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400">
+                    ${
+                      repo.language
+                        ? `
+                      <span class="flex items-center gap-1.5">
+                        <span class="inline-block h-2 w-2 rounded-full bg-zinc-400 dark:bg-zinc-500 opacity-80"></span>
+                        <span>${repo.language}</span>
+                      </span>`
+                        : ""
+                    }
+                    <span class="text-zinc-400 dark:text-zinc-500 font-mono">Updated ${dateFormatter.format(new Date(repo.pushed_at))}</span>
+                  </div>
+                  <div class="flex items-center gap-2.5 text-zinc-500 dark:text-zinc-400 font-mono">
+                    <span class="flex items-center gap-1">
+                      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" class="text-zinc-400 fill-current transition-colors duration-200 md:group-hover:text-amber-500/90"><path d="M12 .587l3.668 7.431L24 9.748l-6 5.854 1.416 8.262L12 18.896 4.584 23.864 6 15.602 0 9.748l8.332-1.73L12 .587z"/></svg>
+                      <span>${numberFormatter.format(repo.stargazers_count ?? 0)}</span>
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400"><path d="M6 3v12a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V3"/><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/></svg>
+                      <span>${numberFormatter.format(repo.forks_count ?? 0)}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          `,
+            )
+            .join("");
+        } else {
+          container.innerHTML = `<div class="col-span-full rounded-3xl border border-dashed border-zinc-300 bg-zinc-50/70 p-8 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-950/40 dark:text-zinc-400">No repositories found.</div>`;
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      const container = document.getElementById("repos-container");
+      if (container)
+        container.innerHTML = `<div class="col-span-full text-sm text-red-500 dark:text-red-400 font-mono">Failed to sync profile data from GitHub.</div>`;
+    }
+  }
+
+  initGitHubDashboard();
+  document.addEventListener("astro:after-swap", initGitHubDashboard);
+</script>
+
+<style>
+  .card-interactive {
+    transition:
+      transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .card-interactive:hover {
+      transform: translateY(-2px);
+      border-color: #d4d4d8;
+      background-color: #ffffff;
+      box-shadow:
+        0 10px 20px -5px rgba(9, 9, 11, 0.03),
+        0 4px 8px -4px rgba(9, 9, 11, 0.03);
+    }
+    :global(.dark) .card-interactive:hover {
+      border-color: #3f3f46;
+      background-color: #09090b;
+      box-shadow: none;
+    }
+  }
+
+  .card-interactive:active {
+    transform: translateY(0px) scale(0.985);
+    transition: transform 80ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .btn-interactive {
+    transition:
+      transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-interactive:hover {
+      border-color: #d4d4d8;
+      background-color: #f4f4f5;
+      color: #09090b;
+    }
+    :global(.dark) .btn-interactive:hover {
+      border-color: #3f3f46;
+      background-color: #18181b;
+      color: #f4f4f5;
+    }
+  }
+  .btn-interactive:active {
+    transform: scale(0.96);
+    transition: transform 60ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
