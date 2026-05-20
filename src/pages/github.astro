@@ -293,10 +293,10 @@ const GITHUB_USERNAME = "lonerOrz";
         0,
       );
 
-      const updateText = (id, val) => {
+      const updateText = (id: string, val: string | number) => {
         const el = document.getElementById(id);
         if (el) {
-          el.innerText = val;
+          el.innerText = String(val);
           el.classList.remove("opacity-40");
         }
       };
