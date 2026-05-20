@@ -1,11 +1,91 @@
-# Introducing [Astro Micro 🔬](https://astro-micro.vercel.app/)
+# My Blog
 
-Astro Micro is an accessible theme for Astro. It's a fork of [Mark Horn's](https://github.com/markhorn-dev) popular theme [Astro Nano](https://astro-nano-demo.vercel.app/). Like Nano, Micro comes with zero frameworks installed.
+A personal blog focused on writing, notes, and web development.
 
-Micro adds features like [Pagefind](https://pagefind.app) for search, [Giscus](https://giscus.app) for comments, and more. For a full list of changes, see this [blog post](https://astro-micro.vercel.app/blog/00-micro-changelog).
+Built with a minimalist design, fast loading experience, dark mode support, full-text search, and MDX-based content authoring.
 
-Micro still comes with everything great about Nano — full type safety, a sitemap, an RSS feed, and Markdown + MDX support. Styled with TailwindCSS and preconfigured with system, light, and dark themes.
+![Blog Preview](https://github.com/user-attachments/assets/fc9b55b9-53e5-4933-9d23-936e1c61e6c2)
 
----
+## Features
 
-![astro-micro](https://github.com/user-attachments/assets/fc9b55b9-53e5-4933-9d23-936e1c61e6c2)
+- Minimal and clean UI
+- Responsive layout
+- Dark mode
+- MDX support
+- Full-text search
+- Syntax highlighting
+- GitHub-based comments
+- SEO friendly
+- Accessible design
+
+## Writing
+
+All posts are written in Markdown / MDX and stored in:
+
+```text
+src/content/
+````
+
+## Development
+
+Clone the repository:
+
+```bash
+git clone https://github.com/your-username/your-blog.git
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build:
+
+```bash
+npm run preview
+```
+
+## Project Structure
+
+```text
+src/
+├── components/
+├── content/
+├── layouts/
+├── pages/
+├── styles/
+└── utils/
+```
+
+## Stack
+
+* Astro
+* Tailwind CSS
+* TypeScript
+* MDX
+* Pagefind
+* Giscus
+
+## Credits
+
+Based on:
+
+* Astro Micro
+* Astro Nano
+
+## License
+
+MIT
