@@ -1,12 +1,12 @@
 ---
 // Giscus comment system
-// - Lazy loaded via IntersectionObserver — script only fetches when near viewport
+// - Loaded on page render — no scroll delay
 // - Theme syncs with blog's html.dark class at load time
 // - Theme updates via postMessage (no iframe reload on toggle)
 ---
 
 <div class="giscus-wrapper" data-loaded="false">
-  <!-- Minimal placeholder shown until IntersectionObserver fires -->
+  <!-- Placeholder shown until Giscus loads -->
   <div class="giscus-placeholder py-10 text-center">
     <span
       class="font-mono text-[11px] uppercase tracking-widest text-zinc-300 dark:text-zinc-700"
@@ -70,16 +70,11 @@
       wrapper.appendChild(script);
     }
 
-    // Only start loading when the wrapper is within 300px of the viewport
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadGiscus();
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "300px 0px" }
-    );
-    observer.observe(wrapper);
+    // Load immediately when page renders — no scroll delay needed
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", loadGiscus);
+    } else {
+      loadGiscus();
+    }
   })();
 </script>
