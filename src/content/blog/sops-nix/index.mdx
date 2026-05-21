@@ -1,0 +1,324 @@
+---
+title: "在 Flake 中使用 sops-nix 加密密钥"
+description: "NixOS Flake 集成 sops-nix 与 age，实现安全管理 secrets 与用户密码。"
+date: "2025-03-31"
+draft: false
+tags:
+  - nixos
+  - flake
+  - sops
+  - age
+  - security
+---
+
+import Callout from "@/components/Callout.astro";
+
+## 什么是 sops-nix
+
+`sops-nix` 是 NixOS 中常用的密钥管理方案。
+
+它可以：
+
+- 加密 secrets
+- 避免密码明文提交 Git
+- 自动解密配置
+- 与 Flake 集成
+- 使用 age / PGP 管理密钥
+
+---
+
+## 在 Flake 中安装 sops-nix
+
+编辑 `flake.nix`：
+
+```nix
+{
+  inputs.sops-nix.url = "github:Mic92/sops-nix";
+  inputs.sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+
+  outputs = { self, nixpkgs, sops-nix }: {
+    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+
+      modules = [
+        ./configuration.nix
+        sops-nix.nixosModules.sops
+      ];
+    };
+  };
+}
+```
+
+<Callout>
+  请将 `yourhostname` 替换为你的主机名。
+</Callout>
+
+---
+
+## 生成 age 密钥
+
+### 创建目录
+
+```bash
+mkdir -p ~/.config/sops/age
+```
+
+### 生成 age 密钥
+
+```bash
+age-keygen -o ~/.config/sops/age/keys.txt
+```
+
+---
+
+## 使用 SSH 密钥转换为 age
+
+如果你已经有：
+
+```txt
+~/.ssh/id_ed25519
+```
+
+可以直接转换：
+
+```bash
+nix-shell -p ssh-to-age --run \
+"ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
+```
+
+<Callout>
+  SSH 私钥不能设置 passphrase，否则转换可能失败。
+</Callout>
+
+---
+
+## 获取 age 公钥
+
+执行：
+
+```bash
+nix shell nixpkgs#age -c \
+age-keygen -y ~/.config/sops/age/keys.txt
+```
+
+输出示例：
+
+```txt
+age1examplepublickeyxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+---
+
+## SSH 公钥转换为 age 公钥
+
+也可以直接转换 SSH 公钥：
+
+```bash
+nix-shell -p ssh-to-age --run \
+"ssh-to-age < ~/.ssh/id_ed25519.pub"
+```
+
+或者：
+
+```bash
+nix-shell -p ssh-to-age --run \
+"ssh-add -L | ssh-to-age"
+```
+
+---
+
+## 创建 `.sops.yaml`
+
+在仓库根目录创建：
+
+```yaml
+keys:
+  - &admin_example age1examplepublickeyxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+creation_rules:
+  - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
+    key_groups:
+      - age:
+          - *admin_example
+```
+
+目录结构示例：
+
+```txt
+.
+├── flake.nix
+├── .sops.yaml
+└── secrets
+    └── secrets.yaml
+```
+
+<Callout>
+  `.sops.yaml` 用于定义哪些文件会被自动加密。
+</Callout>
+
+---
+
+## 创建 secrets.yaml
+
+编辑 secrets：
+
+```bash
+nix-shell -p sops --run \
+"sops secrets/secrets.yaml"
+```
+
+示例内容：
+
+```yaml
+hello: Welcome to SOPS!
+example_key: password01
+
+myservice:
+  my_subdir:
+    my_secret: password02
+```
+
+保存后：
+
+- 文件会自动加密
+- Git 中不会出现明文
+
+---
+
+## 配置 sops-nix
+
+创建：
+
+```txt
+secrets/default.nix
+```
+
+内容：
+
+```nix
+{
+  pkgs,
+  inputs,
+  username,
+  ...
+}:
+{
+  imports = [
+    inputs.sops-nix.nixosModules.sops
+  ];
+
+  environment.systemPackages = with pkgs; [
+    sops
+  ];
+
+  sops.defaultSopsFile = ./secrets.yaml;
+
+  sops.age.sshKeyPaths = [
+    "/home/${username}/.ssh/id_ed25519"
+  ];
+
+  sops.age.keyFile =
+    "/home/${username}/.config/sops/age/keys.txt";
+
+  sops.age.generateKey = true;
+
+  sops.secrets.example-key = { };
+
+  sops.secrets."myservice/my_subdir/my_secret" = { };
+}
+```
+
+---
+
+## 读取 secrets
+
+系统生成后：
+
+```txt
+/run/secrets/
+```
+
+中会自动出现对应文件。
+
+示例：
+
+```bash
+sudo cat /run/secrets/example-key
+```
+
+输出：
+
+```txt
+password01
+```
+
+读取嵌套 secret：
+
+```bash
+sudo cat /run/secrets/myservice/my_subdir/my_secret
+```
+
+输出：
+
+```txt
+password02
+```
+
+---
+
+## 使用 sops 管理用户密码
+
+示例：
+
+```nix
+{ config, ... }:
+
+{
+  sops.secrets."users/loner/password" = {
+    neededForUsers = true;
+  };
+
+  users.users.loner = {
+    isNormalUser = true;
+
+    hashedPasswordFile =
+      config.sops.secrets."users/loner/password".path;
+  };
+}
+```
+
+这样：
+
+- 用户密码不会明文写进 Git
+- NixOS 会自动读取密码文件
+- 系统构建时自动解密
+
+---
+
+## 推荐目录结构
+
+```txt
+.
+├── flake.nix
+├── hosts
+├── modules
+├── secrets
+│   ├── default.nix
+│   └── secrets.yaml
+└── .sops.yaml
+```
+
+---
+
+## 总结
+
+`sops-nix` 是目前 NixOS 中最主流的密钥管理方案之一。
+
+相比直接写明文：
+
+- 更安全
+- 更适合 Git 管理
+- 更适合 Flake
+- 更适合多人协作
+
+对于使用 NixOS Flake 的用户，基本属于必备工具。

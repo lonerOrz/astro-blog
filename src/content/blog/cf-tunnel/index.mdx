@@ -1,0 +1,540 @@
+---
+title: "Cloudflare Tunnel 零公网 IP 内网穿透"
+description: "使用 Cloudflare Tunnel 安全暴露 NAS、面板、SSH 与内网服务，无需公网 IP 与端口映射。"
+date: "2026-05-22"
+draft: false
+tags:
+  - cloudflare
+  - tunnel
+  - zerotrust
+  - selfhost
+  - docker
+---
+
+import Callout from "@/components/Callout.astro";
+
+## 前言
+
+很多人会选择：
+
+- DDNS
+- FRP
+- 公网 IP + 端口映射
+
+但这些方案通常都有问题：
+
+- 没有公网 IP
+- 需要开放端口
+- 容易被扫描
+- HTTPS 配置复杂
+- 源站 IP 暴露
+- 安全性较差
+
+而 `Cloudflare Tunnel` 的核心思路是：
+
+> 内网主动连接 Cloudflare，而不是公网主动访问你的机器。
+
+这样可以做到：
+
+- 不需要公网 IP
+- 不需要端口映射
+- 默认 HTTPS
+- 隐藏真实 IP
+- 可接入 Zero Trust 身份验证
+
+非常适合：
+
+- NAS
+- HomeLab
+- 自建博客
+- Docker 服务
+- 开发环境
+- SSH / RDP
+- 面板类服务
+
+## 工作原理
+
+```txt
+用户浏览器
+    ↓
+Cloudflare Edge
+    ↓
+Cloudflare Tunnel
+    ↓
+cloudflared
+    ↓
+本地服务
+````
+
+本地只需要运行一个：
+
+```bash
+cloudflared
+```
+
+它会主动连接 Cloudflare。
+
+因此：
+
+* 不需要开放防火墙端口
+* 不暴露源站 IP
+* NAT / CGNAT 环境也能使用
+
+---
+
+## 准备工作
+
+你需要：
+
+* 一个 Cloudflare 账号
+* 域名托管到 Cloudflare
+* 开启 Zero Trust
+* 一台内网设备
+
+<Callout>
+  免费计划即可使用，大多数个人场景完全够用。
+</Callout>
+
+---
+
+## 安装 cloudflared
+
+### Linux
+
+```bash
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+
+sudo dpkg -i cloudflared-linux-amd64.deb
+```
+
+验证：
+
+```bash
+cloudflared --version
+```
+
+### macOS
+
+```bash
+brew install cloudflare/cloudflare/cloudflared
+```
+
+### Windows
+
+```powershell
+winget install --id Cloudflare.cloudflared
+```
+
+---
+
+## 登录 Cloudflare
+
+```bash
+cloudflared tunnel login
+```
+
+浏览器会自动打开授权页面。
+
+完成后会生成：
+
+```txt
+~/.cloudflared/cert.pem
+```
+
+---
+
+## 创建 Tunnel
+
+```bash
+cloudflared tunnel create homelab
+```
+
+输出类似：
+
+```txt
+Created tunnel homelab with id:
+
+12345678-abcd-1234-abcd-1234567890ab
+```
+
+同时会生成：
+
+```txt
+~/.cloudflared/12345678-abcd.json
+```
+
+<Callout type="warning">
+  不要泄露 json 凭据文件。
+</Callout>
+
+---
+
+## 绑定域名
+
+例如：
+
+```bash
+cloudflared tunnel route dns homelab nas.example.com
+```
+
+Cloudflare 会自动创建 DNS 记录。
+
+---
+
+## 配置 Tunnel
+
+创建配置文件：
+
+```bash
+mkdir -p ~/.cloudflared
+
+nvim ~/.cloudflared/config.yml
+```
+
+### 单服务配置
+
+```yaml
+tunnel: 12345678-abcd-1234-abcd-1234567890ab
+
+credentials-file: /home/user/.cloudflared/12345678-abcd.json
+
+ingress:
+  - hostname: nas.example.com
+    service: http://localhost:8080
+
+  - service: http_status:404
+```
+
+### 多服务配置
+
+```yaml
+tunnel: 12345678-abcd-1234-abcd-1234567890ab
+
+credentials-file: /home/user/.cloudflared/12345678-abcd.json
+
+ingress:
+  - hostname: blog.example.com
+    service: http://localhost:3000
+
+  - hostname: nas.example.com
+    service: https://192.168.1.10:5001
+
+    originRequest:
+      noTLSVerify: true
+
+  - hostname: ssh.example.com
+    service: ssh://localhost:22
+
+  - service: http_status:404
+```
+
+---
+
+## 启动 Tunnel
+
+### 前台测试
+
+```bash
+cloudflared tunnel run homelab
+```
+
+如果看到：
+
+```txt
+Connection registered
+```
+
+说明已经成功连接。
+
+### 安装为系统服务
+
+```bash
+sudo cloudflared service install
+```
+
+启动：
+
+```bash
+sudo systemctl enable cloudflared
+sudo systemctl start cloudflared
+```
+
+查看状态：
+
+```bash
+systemctl status cloudflared
+```
+
+---
+
+## Docker 部署
+
+### run
+
+```bash
+docker run -d \
+  --name cloudflared \
+  --restart unless-stopped \
+  -v ~/.cloudflared:/etc/cloudflared \
+  cloudflare/cloudflared:latest \
+  tunnel run
+```
+
+### logs
+
+```bash
+docker logs -f cloudflared
+```
+
+---
+
+## SSH 内网穿透
+
+配置：
+
+```yaml
+ingress:
+  - hostname: ssh.example.com
+    service: ssh://localhost:22
+
+  - service: http_status:404
+```
+
+连接：
+
+```bash
+cloudflared access ssh --hostname ssh.example.com
+```
+
+也可以写入：
+
+```txt
+~/.ssh/config
+```
+
+```txt
+Host ssh.example.com
+  ProxyCommand cloudflared access ssh --hostname %h
+```
+
+之后：
+
+```bash
+ssh ssh.example.com
+```
+
+即可直接连接。
+
+---
+
+## 私网路由（内网组网）
+
+开启：
+
+```yaml
+warp-routing:
+  enabled: true
+```
+
+然后进入：
+
+```txt
+Zero Trust
+→ Networks
+→ Tunnels
+→ Private Networks
+```
+
+添加：
+
+```txt
+192.168.1.0/24
+```
+
+之后：
+
+* 安装 WARP 客户端
+* 登录 Zero Trust
+
+即可直接访问：
+
+```txt
+192.168.1.x
+```
+
+效果类似：
+
+* Tailscale
+* Zerotier
+
+但与 Cloudflare 深度集成。
+
+---
+
+## Zero Trust 访问控制
+
+建议：
+
+* NAS
+* 面板
+* SSH
+* 管理后台
+
+全部开启 Access。
+
+路径：
+
+```txt
+Zero Trust
+→ Access
+→ Applications
+```
+
+添加：
+
+```txt
+Self-hosted
+```
+
+然后限制：
+
+* 指定邮箱
+* GitHub 登录
+* Google 登录
+* OTP 验证
+
+这样即使知道域名：
+
+```txt
+https://nas.example.com
+```
+
+也无法直接访问。
+
+---
+
+## 常见问题
+
+### 502 Bad Gateway
+
+说明：
+
+```txt
+cloudflared 无法连接本地服务
+```
+
+检查：
+
+```bash
+curl http://localhost:8080
+```
+
+---
+
+### Tunnel Disconnected
+
+查看日志：
+
+```bash
+journalctl -u cloudflared -f
+```
+
+或者：
+
+```bash
+docker logs -f cloudflared
+```
+
+---
+
+### HTTPS 证书错误
+
+检查：
+
+```txt
+SSL/TLS
+```
+
+是否开启：
+
+```txt
+Full
+```
+
+不要关闭 SSL。
+
+---
+
+## 推荐架构
+
+```txt
+Cloudflare
+    ↓
+Tunnel
+    ↓
+Nginx / Caddy
+    ↓
+Docker Services
+```
+
+适合：
+
+* HomeLab
+* NAS
+* Kubernetes
+* Docker Compose
+
+---
+
+## 与传统方案对比
+
+| 方案                | 公网 IP | 开放端口 | HTTPS | 安全性 |
+| ----------------- | ----- | ---- | ----- | --- |
+| Cloudflare Tunnel | ❌     | ❌    | ✅     | 高   |
+| DDNS              | ✅     | ✅    | 手动    | 低   |
+| FRP               | 需要服务器 | 需要   | 手动    | 中   |
+| 端口映射              | ✅     | ✅    | 手动    | 低   |
+
+---
+
+## 推荐做法
+
+建议：
+
+* 小型服务直接 Tunnel
+* 敏感服务加 Access
+* Docker 部署 cloudflared
+* 配置文件纳入 Git 管理
+* 使用多个 Tunnel 分离不同用途
+
+例如：
+
+```txt
+homelab
+dev
+staging
+ssh
+```
+
+---
+
+## 总结
+
+Cloudflare Tunnel 基本已经成为：
+
+> 没有公网 IP 场景下最舒服的内网穿透方案。
+
+尤其适合：
+
+* NAS
+* HomeLab
+* 自建服务
+* Docker 环境
+* 远程开发
+
+相比传统方案：
+
+* 更安全
+* 更简单
+* 更稳定
+* 基本零维护

@@ -1,0 +1,699 @@
+---
+title: "在 Wayland 上使用 Fcitx5"
+description: "Wayland 环境下配置 Fcitx5 输入法，包括 GTK、Qt、Chromium、Electron、KDE Plasma、GNOME 与 Sway。"
+date: "2025-03-31"
+draft: false
+tags:
+  - linux
+  - fcitx5
+  - wayland
+  - hyprland
+  - kde
+  - gnome
+---
+
+import Callout from "@/components/Callout.astro";
+
+## 在 Wayland 上使用 Fcitx5
+
+Wayland 是下一代 Linux 显示协议。
+
+相比传统 X11：
+
+- 更现代
+- 更安全
+- 更适合高刷新率与多显示器
+
+但输入法支持一直比较复杂。
+
+尤其：
+
+- GTK
+- Qt
+- Electron
+- Chromium
+- XWayland
+
+在不同桌面环境下配置方式并不相同。
+
+本文整理：
+
+- Fcitx5
+- Wayland
+- GTK
+- Qt
+- Chromium
+- KDE Plasma
+- GNOME
+- Sway
+- Hyprland
+
+的实际配置方案。
+
+---
+
+## Wayland 与输入法
+
+Wayland 下：
+
+输入法主要依赖：
+
+- text-input-v1
+- text-input-v2
+- text-input-v3
+- zwp_input_method
+
+不同桌面实现完全不同。
+
+因此：
+
+- KDE
+- GNOME
+- wlroots
+- Weston
+
+配置方式都不同。
+
+---
+
+## 环境变量说明
+
+在 Linux 输入法中：
+
+最常见的是：
+
+- `XMODIFIERS`
+- `GTK_IM_MODULE`
+- `QT_IM_MODULE`
+
+---
+
+## XMODIFIERS
+
+对于：
+
+- X11
+- XWayland
+
+仍然必须设置：
+
+```bash id="mzw2km"
+export XMODIFIERS=@im=fcitx
+````
+
+因为大量应用：
+
+* Electron
+* Chromium
+* Qt4
+* X11 程序
+
+仍依赖 XIM。
+
+---
+
+## GTK_IM_MODULE
+
+### 推荐方案
+
+Wayland 下：
+
+不建议全局设置：
+
+```bash id="5g4n4l"
+GTK_IM_MODULE=fcitx
+```
+
+更推荐：
+
+* Gtk3/4 使用 Wayland text-input
+* Gtk2 使用 fcitx 模块
+
+---
+
+### Gtk2
+
+编辑：
+
+```bash id="h1qz5r"
+~/.gtkrc-2.0
+```
+
+添加：
+
+```ini id="0f2phm"
+gtk-im-module="fcitx"
+```
+
+---
+
+### Gtk3
+
+编辑：
+
+```bash id="t0h6mn"
+~/.config/gtk-3.0/settings.ini
+```
+
+添加：
+
+```ini id="n9d7l8"
+[Settings]
+gtk-im-module=fcitx
+```
+
+---
+
+### Gtk4
+
+编辑：
+
+```bash id="3hsh3q"
+~/.config/gtk-4.0/settings.ini
+```
+
+添加：
+
+```ini id="hkj7wl"
+[Settings]
+gtk-im-module=fcitx
+```
+
+---
+
+### GNOME 用户
+
+额外执行：
+
+```bash id="9vr1j8"
+gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "{'Gtk/IMModule':<'fcitx'>}"
+```
+
+---
+
+## QT_IM_MODULE
+
+Qt 在 Wayland 下情况最复杂。
+
+---
+
+### KDE Plasma
+
+KWin 支持：
+
+* text-input-v2
+* text-input-v4
+
+因此：
+
+不建议设置：
+
+```bash id="n7mwd5"
+QT_IM_MODULE
+```
+
+让 Qt 使用 Wayland 原生输入法即可。
+
+---
+
+### GNOME / Sway / Hyprland
+
+这些环境：
+
+不支持 Qt text-input-v2。
+
+因此必须：
+
+```bash id="l4t7fh"
+export QT_IM_MODULE=fcitx
+```
+
+否则 Qt 程序无法输入中文。
+
+---
+
+## Qt 专有软件兼容
+
+部分软件：
+
+* WPS
+* DaVinci Resolve
+* Mathematica
+* Anki
+
+输入法兼容很差。
+
+可以尝试：
+
+---
+
+### 方案 1
+
+```bash id="xfj7lz"
+QT_IM_MODULE=fcitx
+```
+
+---
+
+### 方案 2
+
+```bash id="dlyi0j"
+QT_IM_MODULE=ibus
+```
+
+---
+
+### 方案 3（强制 X11）
+
+```bash id="mr5yqf"
+QT_QPA_PLATFORM=xcb QT_IM_MODULE=ibus
+```
+
+---
+
+## Qt 6.7 新特性
+
+Qt 6.7 新增：
+
+```bash id="2oq5hh"
+QT_IM_MODULES
+```
+
+支持 fallback。
+
+推荐：
+
+```bash id="eecvbo"
+QT_IM_MODULES="wayland;fcitx;ibus"
+```
+
+这样：
+
+* Wayland 不可用
+* 自动回退 fcitx
+* 最后使用 ibus
+
+---
+
+## XWayland 应用
+
+大量应用仍运行在：
+
+* XWayland
+* X11
+
+例如：
+
+* Electron
+* Chromium
+* SDL2
+* Qt4
+* 老 GTK2
+
+---
+
+### Electron / Chromium
+
+通常建议：
+
+```bash id="v0jvse"
+export GTK_IM_MODULE=fcitx
+```
+
+即可。
+
+---
+
+### SDL2
+
+设置：
+
+```bash id="2kw4de"
+export SDL_IM_MODULE=fcitx
+```
+
+---
+
+## Chromium / Electron Wayland 原生支持
+
+Wayland 原生运行：
+
+需要额外参数。
+
+---
+
+### Chromium
+
+```bash id="0f8xvk"
+chromium \
+--enable-features=UseOzonePlatform \
+--ozone-platform=wayland \
+--enable-wayland-ime
+```
+
+---
+
+### VSCode
+
+```bash id="i5vd3m"
+code \
+--enable-features=UseOzonePlatform \
+--ozone-platform=wayland \
+--enable-wayland-ime
+```
+
+---
+
+<Callout>
+  Chromium 的 text-input-v1 支持并不稳定，可能出现随机崩溃。
+</Callout>
+
+---
+
+## Chromium Gtk4 模式
+
+Chromium 可使用 Gtk4 输入法模块：
+
+```bash id="5gb4z5"
+chromium \
+--enable-features=UseOzonePlatform \
+--ozone-platform=wayland \
+--gtk-version=4
+```
+
+但：
+
+* Electron 不支持
+* GNOME 下候选框位置可能异常
+
+---
+
+## KDE Plasma 配置
+
+### 推荐方案
+
+KDE Plasma 5.27+：
+
+最佳兼容。
+
+---
+
+### 环境变量
+
+只设置：
+
+```bash id="8q2yfm"
+export XMODIFIERS=@im=fcitx
+```
+
+不要设置：
+
+* `GTK_IM_MODULE`
+* `QT_IM_MODULE`
+* `SDL_IM_MODULE`
+
+---
+
+### 开启虚拟键盘
+
+进入：
+
+```txt id="1yyqee"
+系统设置 → 虚拟键盘 → Fcitx5
+```
+
+必须使用 KDE 的虚拟键盘机制启动 fcitx5。
+
+---
+
+### Chromium
+
+推荐：
+
+```bash id="s4mjlwm"
+--enable-features=UseOzonePlatform \
+--ozone-platform=wayland \
+--enable-wayland-ime
+```
+
+---
+
+## GNOME 配置
+
+GNOME：
+
+默认基于 ibus。
+
+Fcitx5 会替换 ibus-daemon。
+
+---
+
+### 推荐环境变量
+
+```bash id="z4x3k4"
+export XMODIFIERS=@im=fcitx
+export QT_IM_MODULE=fcitx
+```
+
+---
+
+### Chrome
+
+推荐：
+
+* XWayland
+* GTK_IM_MODULE=fcitx
+
+---
+
+### 候选框问题
+
+GNOME 存在：
+
+候选词无法覆盖 Shell UI。
+
+解决方案：
+
+使用：
+
+* kimpanel 扩展
+
+---
+
+## Sway / Hyprland 配置
+
+### wlroots 环境
+
+包括：
+
+* Sway
+* Hyprland
+* River
+
+通常支持：
+
+* text-input-v3
+
+但：
+
+Qt 仍需：
+
+```bash id="4n8f7f"
+export QT_IM_MODULE=fcitx
+```
+
+---
+
+### Hyprland 推荐配置
+
+编辑：
+
+```bash id="ob7uqv"
+~/.config/hypr/hyprland.conf
+```
+
+添加：
+
+```ini id="ihmnzr"
+env = XMODIFIERS,@im=fcitx
+env = QT_IM_MODULE,fcitx
+```
+
+---
+
+## Weston 配置
+
+Weston：
+
+只支持：
+
+* text-input-v1
+
+因此必须：
+
+```bash id="9p8azr"
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+```
+
+---
+
+### 配置 weston.ini
+
+编辑：
+
+```bash id="4k2j9n"
+~/.config/weston.ini
+```
+
+添加：
+
+```ini id="8mjlwm"
+[core]
+xwayland=true
+
+[input-method]
+path=/usr/bin/fcitx5
+```
+
+---
+
+## 候选框问题
+
+Wayland：
+
+没有全局坐标。
+
+因此：
+
+输入法候选框定位一直是难点。
+
+---
+
+### 当前解决方案
+
+不同环境：
+
+* XWayland：正常
+* KDE：text-input-v2
+* GNOME：kimpanel
+* Gtk/Qt：客户端内嵌 popup
+
+---
+
+## 每窗口输入法状态
+
+Wayland 下：
+
+输入法状态通常是全局的。
+
+不像 X11：
+
+可以做到：
+
+* 每窗口独立输入法状态
+
+---
+
+## 已知问题
+
+### Fcitx 管理 XKB 布局
+
+Wayland 没有统一 XKB API。
+
+因此：
+
+仅：
+
+* KDE Plasma
+* GNOME
+
+能较好支持。
+
+---
+
+### 候选框闪烁
+
+Gtk3 / Qt5：
+
+popup 会：
+
+* show/hide
+* 频繁重定位
+
+可能导致闪烁。
+
+---
+
+## 推荐配置总结
+
+### KDE Plasma
+
+推荐：
+
+```bash id="d9bq0q"
+XMODIFIERS=@im=fcitx
+```
+
+不要设置：
+
+```bash id="a2fl6m"
+GTK_IM_MODULE
+QT_IM_MODULE
+```
+
+---
+
+### Hyprland / Sway
+
+推荐：
+
+```bash id="pvfxl9"
+XMODIFIERS=@im=fcitx
+QT_IM_MODULE=fcitx
+```
+
+---
+
+### GNOME
+
+推荐：
+
+```bash id="xmdq3k"
+XMODIFIERS=@im=fcitx
+QT_IM_MODULE=fcitx
+```
+
+Chrome：
+
+推荐 XWayland。
+
+---
+
+## 总结
+
+Wayland 下：
+
+输入法生态仍不统一。
+
+目前：
+
+* KDE Plasma 兼容最好
+* GNOME 依赖 ibus
+* wlroots 环境需要更多手动配置
+* Qt Wayland 支持仍存在大量问题
+
+对于：
+
+* Hyprland
+* Sway
+* River
+
+通常推荐：
+
+```bash id="tob5k9"
+XMODIFIERS=@im=fcitx
+QT_IM_MODULE=fcitx
+```
+
+Gtk 不全局设置即可。

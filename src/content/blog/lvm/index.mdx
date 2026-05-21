@@ -1,0 +1,565 @@
+---
+title: "LVM 逻辑卷管理入门与扩容"
+description: "Linux LVM 逻辑卷管理基础教程，包括 PV、VG、LV 创建、挂载、扩容与常用命令。"
+date: "2026-05-22"
+draft: false
+tags:
+  - linux
+  - lvm
+  - storage
+  - disk
+  - filesystem
+---
+
+import Callout from "@/components/Callout.astro";
+
+LVM（Logical Volume Manager）是 Linux 下常用的逻辑卷管理方案。
+
+相比传统分区：
+
+- LVM 可以动态扩容
+- 支持多个磁盘组合
+- 可以在线扩展容量
+- 更适合服务器与 NAS 场景
+
+常见用途：
+
+- Docker 数据盘
+- NAS 存储
+- 数据库磁盘
+- 虚拟化存储
+- HomeLab
+
+---
+
+## LVM 结构
+
+LVM 主要由三层组成：
+
+```txt
+Disk / Partition
+        ↓
+PV（Physical Volume）
+        ↓
+VG（Volume Group）
+        ↓
+LV（Logical Volume）
+        ↓
+Filesystem
+````
+
+简单理解：
+
+| 层级 | 作用            |
+| -- | ------------- |
+| PV | 物理卷，实际磁盘      |
+| VG | 卷组，多个磁盘组成的大池子 |
+| LV | 逻辑卷，实际使用的分区   |
+
+---
+
+## 创建 LVM
+
+### 1. 创建 LVM 分区
+
+先使用：
+
+```bash
+fdisk /dev/sda
+```
+
+创建新分区。
+
+然后修改分区类型：
+
+```txt
+8e
+```
+
+表示：
+
+```txt
+Linux LVM
+```
+
+保存：
+
+```txt
+w
+```
+
+查看结果：
+
+```bash
+fdisk -l
+```
+
+输出类似：
+
+```txt
+/dev/sda1   8e  Linux LVM
+```
+
+---
+
+## 创建 PV / VG / LV
+
+### 创建 PV
+
+```bash
+pvcreate /dev/sda1
+```
+
+---
+
+### 创建 VG
+
+```bash
+vgcreate data_vg /dev/sda1
+```
+
+这里：
+
+```txt
+data_vg
+```
+
+是卷组名称。
+
+---
+
+### 创建 LV
+
+使用全部空间：
+
+```bash
+lvcreate -l 100%FREE -n data_lv data_vg
+```
+
+参数说明：
+
+| 参数 | 作用      |
+| -- | ------- |
+| -l | 使用百分比容量 |
+| -n | 逻辑卷名称   |
+
+---
+
+## 常用 LV 创建方式
+
+### 指定固定容量
+
+```bash
+lvcreate -L 20G -n data_lv data_vg
+```
+
+---
+
+### 使用全部 VG 空间
+
+```bash
+lvcreate -l 100%VG -n data_lv data_vg
+```
+
+---
+
+### 使用剩余空间的 80%
+
+```bash
+lvcreate -l 80%FREE -n data_lv data_vg
+```
+
+这是最常见的方式。
+
+---
+
+## 查看 LVM 信息
+
+### 查看 PV
+
+```bash
+pvs
+```
+
+---
+
+### 查看 VG
+
+```bash
+vgs
+```
+
+---
+
+### 查看 LV
+
+```bash
+lvs
+```
+
+---
+
+### 查看完整信息
+
+```bash
+lvdisplay
+vgdisplay
+pvdisplay
+```
+
+---
+
+## 格式化与挂载
+
+### 格式化文件系统
+
+ext4：
+
+```bash
+mkfs.ext4 /dev/data_vg/data_lv
+```
+
+xfs：
+
+```bash
+mkfs.xfs /dev/data_vg/data_lv
+```
+
+---
+
+## 挂载逻辑卷
+
+### 临时挂载
+
+```bash
+mount /dev/data_vg/data_lv /mnt
+```
+
+---
+
+### 开机自动挂载
+
+编辑：
+
+```bash
+/etc/fstab
+```
+
+添加：
+
+```txt
+/dev/data_vg/data_lv /mnt ext4 defaults 0 0
+```
+
+生效：
+
+```bash
+mount -a
+```
+
+查看：
+
+```bash
+df -h
+```
+
+---
+
+## LVM 扩容
+
+LVM 最大的优势就是：
+
+> 可以动态扩容。
+
+---
+
+## 扩容流程
+
+```txt
+新磁盘
+  ↓
+创建 PV
+  ↓
+扩展 VG
+  ↓
+扩展 LV
+  ↓
+扩展文件系统
+```
+
+---
+
+## 添加新磁盘
+
+例如：
+
+```txt
+/dev/vdb
+```
+
+先创建：
+
+```txt
+/dev/vdb1
+```
+
+并设置：
+
+```txt
+8e Linux LVM
+```
+
+---
+
+## 创建新 PV
+
+```bash
+pvcreate /dev/vdb1
+```
+
+---
+
+## 扩展 VG
+
+```bash
+vgextend data_vg /dev/vdb1
+```
+
+查看：
+
+```bash
+vgs
+```
+
+---
+
+## 扩展 LV
+
+使用所有剩余空间：
+
+```bash
+lvextend -l +100%FREE /dev/data_vg/data_lv
+```
+
+---
+
+## 扩展文件系统
+
+### ext4
+
+```bash
+resize2fs /dev/data_vg/data_lv
+```
+
+---
+
+### xfs
+
+```bash
+xfs_growfs /mnt
+```
+
+<Callout type="info">
+  xfs 无法缩容，只能扩容。
+</Callout>
+
+---
+
+## 查看扩容结果
+
+```bash
+df -h
+```
+
+---
+
+## 缩容注意事项
+
+LVM 缩容风险很高。
+
+尤其：
+
+* xfs 不支持缩容
+* ext4 缩容前必须先卸载
+* 缩容顺序错误会直接损坏数据
+
+正确顺序：
+
+```txt
+卸载文件系统
+  ↓
+fsck 检查
+  ↓
+缩小文件系统
+  ↓
+缩小 LV
+```
+
+---
+
+## ext4 缩容示例
+
+卸载：
+
+```bash
+umount /mnt
+```
+
+检查文件系统：
+
+```bash
+e2fsck -f /dev/data_vg/data_lv
+```
+
+缩小文件系统：
+
+```bash
+resize2fs /dev/data_vg/data_lv 50G
+```
+
+缩小 LV：
+
+```bash
+lvreduce -L 50G /dev/data_vg/data_lv
+```
+
+重新挂载：
+
+```bash
+mount -a
+```
+
+<Callout type="warning">
+  缩容前务必备份数据。
+</Callout>
+
+---
+
+## 删除 LVM
+
+删除顺序：
+
+```txt
+LV
+  ↓
+VG
+  ↓
+PV
+```
+
+---
+
+### 删除 LV
+
+```bash
+lvremove /dev/data_vg/data_lv
+```
+
+---
+
+### 删除 VG
+
+```bash
+vgremove data_vg
+```
+
+---
+
+### 删除 PV
+
+```bash
+pvremove /dev/sda1
+```
+
+---
+
+## 常见问题
+
+### Device busy
+
+说明卷正在使用。
+
+查看：
+
+```bash
+mount
+```
+
+或者：
+
+```bash
+lsof | grep data_lv
+```
+
+---
+
+### xfs 无法缩容
+
+这是 xfs 的设计限制。
+
+解决方案：
+
+* 备份数据
+* 重建文件系统
+* 重新恢复数据
+
+---
+
+### 扩容后容量没变化
+
+说明：
+
+```txt
+文件系统没有扩容
+```
+
+需要执行：
+
+```bash
+resize2fs
+```
+
+或者：
+
+```bash
+xfs_growfs
+```
+
+---
+
+## 推荐实践
+
+建议：
+
+* 系统盘使用 LVM
+* 数据盘独立 VG
+* xfs 用于大容量存储
+* ext4 用于需要缩容的场景
+* Docker 数据目录单独 LV
+
+推荐结构：
+
+```txt
+system_vg
+├── root
+├── home
+└── swap
+
+data_vg
+├── docker
+├── mysql
+└── media
+```
+
+---
+
+## 总结
+
+LVM 是 Linux 中最重要的存储管理技术之一。
+
+核心优势：
+
+* 动态扩容
+* 灵活管理
+* 多磁盘聚合
+* 在线扩展
