@@ -62,7 +62,7 @@
       // Fade out placeholder once script has loaded
       script.addEventListener("load", () => {
         if (!placeholder) return;
-        placeholder.style.transition = "opacity 400ms ease";
+        placeholder.style.transition = "opacity 200ms ease-out";
         placeholder.style.opacity = "0";
         setTimeout(() => placeholder.remove(), 400);
       });

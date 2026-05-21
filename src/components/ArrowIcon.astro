@@ -49,3 +49,12 @@ const rotateClass = direction === "up" ? "rotate-90" : "";
     ]}
   />
 </svg>
+
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    svg line,
+    svg polyline {
+      transition-duration: 0ms !important;
+    }
+  }
+</style>

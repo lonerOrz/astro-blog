@@ -663,7 +663,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     border-radius: 8px !important;
     margin-bottom: 8px !important;
     color: #fff !important;
-    transition: all 0.3s !important;
+    transition: background 0.3s !important;
     padding-left: 15px !important; /* 给指示条留空间 */
     position: relative !important;
   }
@@ -791,7 +791,11 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     height: var(--lrc-line-height) !important;
     margin: 0 !important;
     padding: 0 !important;
-    transition: all 0.5s ease-out !important;
+    transition:
+      color 0.5s ease-out,
+      font-size 0.5s ease-out,
+      font-weight 0.5s ease-out,
+      height 0.5s ease-out !important;
   }
 
   #anMusic-page .aplayer-lrc p.aplayer-lrc-current {

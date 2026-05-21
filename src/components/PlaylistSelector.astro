@@ -244,4 +244,13 @@ const rootClass = [
 #an_music_player_mount {
   margin-top: 0.125rem;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .playlist-btn {
+    transition-duration: 0ms;
+  }
+  .playlist-active {
+    transform: none;
+  }
+}
 </style>
