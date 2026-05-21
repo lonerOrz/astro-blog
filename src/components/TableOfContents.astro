@@ -2,26 +2,43 @@
 import type { Heading } from "@types";
 import TableOfContentsHeading from "./TableOfContentsHeading.astro";
 
+type TocHeading = Heading & {
+  subheadings: TocHeading[];
+};
+
 type Props = {
   headings: Heading[];
 };
 
-const { headings } = Astro.props;
+const { headings = [] } = Astro.props;
 
 const toc = buildToc(headings);
 
-function buildToc(headings: Heading[]) {
-  const toc: Heading[] = [];
-  const parentHeadings = new Map();
+function buildToc(headings: Heading[]): TocHeading[] {
+  const toc: TocHeading[] = [];
+
+  const parentHeadings = new Map<number, TocHeading>();
+
   headings.forEach((h) => {
-    const heading = { ...h, subheadings: [] };
+    const heading: TocHeading = {
+      ...h,
+      subheadings: [],
+    };
+
     parentHeadings.set(heading.depth, heading);
+
     if (heading.depth === 2) {
       toc.push(heading);
-    } else {
-      parentHeadings.get(heading.depth - 1).subheadings.push(heading);
+      return;
+    }
+
+    const parent = parentHeadings.get(heading.depth - 1);
+
+    if (parent) {
+      parent.subheadings.push(heading);
     }
   });
+
   return toc;
 }
 ---
@@ -32,8 +49,10 @@ function buildToc(headings: Heading[]) {
 >
   <summary
     class="cursor-pointer rounded-t-lg px-3 py-1.5 font-medium transition-colors duration-150 group-open:bg-zinc-100 hover:bg-zinc-100 dark:group-open:bg-zinc-800/60 dark:hover:bg-zinc-800/60"
-    >Table of Contents</summary
   >
+    Table of Contents
+  </summary>
+
   <nav>
     <ul class="py-3">
       {toc.map((heading) => <TableOfContentsHeading heading={heading} />)}
