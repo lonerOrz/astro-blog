@@ -50,7 +50,7 @@ const facts = [
             {
               facts.map((fact, i) => (
                 <div
-                  class="stagger-item rounded-xl border border-zinc-200 bg-white/70 p-4 shadow-sm shadow-zinc-950/[0.03] dark:border-zinc-800 dark:bg-zinc-900/40 dark:shadow-black/10"
+                  class="stagger-item rounded-xl border border-zinc-200 bg-white/70 p-4 shadow-sm shadow-zinc-950/[0.03] transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900/40 dark:shadow-black/10"
                   style={`--delay: ${120 + i * 60}ms`}
                 >
                   <p class="font-mono text-[11px] uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
@@ -66,18 +66,67 @@ const facts = [
         </div>
 
         <aside class="stagger-item" style="--delay: 240ms">
-          <figure class="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-2 shadow-xl shadow-zinc-950/[0.06] dark:border-zinc-800 dark:bg-zinc-900/50 dark:shadow-black/20">
-            <img
-              src="/site/cat.png"
-              alt="A picture of a cat"
-              class="aspect-[4/5] w-full rounded-xl object-cover"
-            />
-            <figcaption class="px-2 py-3 text-center font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
-              a lovely companion / cat.png
-            </figcaption>
-          </figure>
+          <div class="group perspective-[1200px]">
+            <div class="relative transition-transform duration-300 ease-out [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+              <!-- Front: cat image -->
+              <figure class="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-2 shadow-xl shadow-zinc-950/[0.06] dark:border-zinc-800 dark:bg-zinc-900/50 dark:shadow-black/20 [backface-visibility:hidden]">
+                <img
+                  src="/site/cat.png"
+                  alt="A picture of a cat"
+                  class="aspect-[4/5] w-full rounded-xl object-cover"
+                />
+                <figcaption class="px-2 py-3 text-center font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
+                  a lovely companion / cat.png
+                </figcaption>
+              </figure>
+
+              <!-- Back: revealed content -->
+              <div class="absolute inset-0 flex flex-col justify-center rounded-2xl border border-zinc-200 bg-zinc-50 p-6 shadow-xl shadow-zinc-950/[0.06] [backface-visibility:hidden] [transform:rotateY(180deg)] dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/20">
+                <div class="space-y-4">
+                  <div>
+                    <p class="font-mono text-[11px] uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                      Current Status
+                    </p>
+                    <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                      Building things that last, writing things that matter.
+                    </p>
+                  </div>
+                  <div>
+                    <p class="font-mono text-[11px] uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                      Currently Reading
+                    </p>
+                    <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                      A Book in Progress — notes & thoughts
+                    </p>
+                  </div>
+                  <div>
+                    <p class="font-mono text-[11px] uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                      Fun Fact
+                    </p>
+                    <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                      This cat has been here since day one.
+                    </p>
+                  </div>
+                </div>
+                <p class="mt-6 text-center font-mono text-[11px] text-zinc-400 dark:text-zinc-500">
+                  hover to flip back →
+                </p>
+              </div>
+            </div>
+          </div>
         </aside>
       </section>
+
+      <style>
+        @media (prefers-reduced-motion: reduce) {
+          .group:hover [class*="transition-transform"] {
+            transform: none;
+          }
+          .stagger-item:hover {
+            transform: none;
+          }
+        }
+      </style>
 
       <section class="animate border-t border-zinc-200 pt-10 dark:border-zinc-800">
         <div class="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
