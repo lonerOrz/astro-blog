@@ -156,9 +156,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     }
 
     /** Wait for APlayer DOM to appear using MutationObserver instead of polling. */
-    function waitForAplayer(shell) {
-      return new Promise((resolve) => {
-        const observer = new MutationObserver((mutations, obs) => {
+    async function waitForAplayer(shell) {
+      await new Promise((resolve) => {
+        const observer = new MutationObserver((_mutations, obs) => {
           if (mount.querySelector(".aplayer")) {
             obs.disconnect();
             resolve();
@@ -167,15 +167,14 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         observer.observe(mount, { childList: true, subtree: true });
         // Safety timeout — if APlayer doesn't appear in 8s, give up
         window.setTimeout(() => { observer.disconnect(); resolve(); }, 8000);
-      }).then(() => {
-        hideShell(shell);
       });
+      hideShell(shell);
     }
 
     /** Wait for cover image to appear. */
     function waitForCover() {
       return new Promise((resolve) => {
-        const observer = new MutationObserver((mutations, obs) => {
+        const observer = new MutationObserver((_mutations, obs) => {
           const pic = getPic();
           if (pic) {
             obs.disconnect();
