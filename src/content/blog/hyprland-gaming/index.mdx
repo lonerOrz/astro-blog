@@ -1,0 +1,353 @@
+---
+title: "Hyprland 游戏优化"
+description: "Hyprland + Wayland 游戏性能优化指南，包括 gamescope、gamemode、MangoHud、NVIDIA 与 AMD 驱动优化。"
+date: "2025-03-31"
+draft: false
+tags:
+  - linux
+  - hyprland
+  - gaming
+  - wayland
+---
+
+import Callout from "@/components/Callout.astro";
+
+## Hyprland + 游戏优化（Wayland 专用）
+
+本文主要针对：
+
+- Hyprland
+- Wayland
+- Steam / Proton
+- NVIDIA / AMD 显卡
+
+进行游戏性能优化。
+
+<Callout>
+  Wayland 与 X11 的优化方式不同，部分旧游戏可能仍需 XWayland 兼容层运行。
+</Callout>
+
+---
+
+## 启用 gamescope（Wayland 游戏模式）
+
+Hyprland 默认使用 Wayland。
+
+推荐使用 Valve 开发的 `gamescope` 作为游戏容器，可以获得：
+
+- 更稳定的全屏体验
+- 更低延迟
+- 更好的分辨率控制
+- Wayland 兼容优化
+
+### 安装 gamescope
+
+```bash
+sudo pacman -S gamescope
+````
+
+### Steam 启动参数
+
+```txt
+gamescope -W 1920 -H 1080 -r 144 -f -- %command%
+```
+
+参数说明：
+
+| 参数          | 作用           |
+| ----------- | ------------ |
+| `-W`        | 游戏宽度         |
+| `-H`        | 游戏高度         |
+| `-r`        | 刷新率          |
+| `-f`        | 强制全屏         |
+| `%command%` | Steam 游戏启动命令 |
+
+<Callout>
+  刷新率建议改成你显示器的实际刷新率，例如 144Hz / 165Hz。
+</Callout>
+
+---
+
+## 启用 gamemode
+
+`gamemode` 是 Feral Interactive 提供的 Linux 游戏优化工具。
+
+作用：
+
+* 自动提升 CPU 频率
+* 调整调度策略
+* 降低后台进程影响
+
+### 安装 gamemode
+
+```bash
+sudo pacman -S gamemode
+```
+
+### Steam 启动参数
+
+```txt
+gamemoderun %command%
+```
+
+推荐与 `gamescope` 一起使用：
+
+```txt
+gamemoderun gamescope -f -- %command%
+```
+
+---
+
+## NVIDIA / AMD 驱动优化
+
+### NVIDIA 用户（Wayland）
+
+安装驱动：
+
+```bash
+sudo pacman -S nvidia nvidia-utils nvidia-dkms
+```
+
+编辑：
+
+```bash
+/etc/environment
+```
+
+加入：
+
+```txt
+WLR_NO_HARDWARE_CURSORS=1
+LIBVA_DRIVER_NAME=nvidia
+GBM_BACKEND=nvidia-drm
+__GLX_VENDOR_LIBRARY_NAME=nvidia
+```
+
+然后重启系统。
+
+### AMD 用户
+
+安装 Mesa Vulkan 驱动：
+
+```bash
+sudo pacman -S mesa mesa-utils vulkan-radeon \
+lib32-mesa lib32-vulkan-radeon
+```
+
+<Callout>
+  AMD 显卡在 Wayland 下通常兼容性更好。
+</Callout>
+
+---
+
+## Hyprland 本身优化
+
+编辑配置：
+
+```bash
+nano ~/.config/hypr/hyprland.conf
+```
+
+### damage tracking
+
+加入：
+
+```ini
+damage_tracking = full
+```
+
+重新加载：
+
+```bash
+hyprctl reload
+```
+
+作用：
+
+* 减少屏幕重绘
+* 降低 GPU 压力
+* 提高帧率稳定性
+
+---
+
+## 关闭 VSync 降低输入延迟
+
+在：
+
+```bash
+~/.config/hypr/hyprland.conf
+```
+
+添加：
+
+```ini
+env = WLR_NO_VSYNC,1
+```
+
+重新加载：
+
+```bash
+hyprctl reload
+```
+
+作用：
+
+* 降低输入延迟
+* 提高响应速度
+
+缺点：
+
+* 可能出现画面撕裂
+
+<Callout>
+  FPS 类游戏通常建议关闭 VSync。
+</Callout>
+
+---
+
+## 使用 MangoHud 监控性能
+
+`MangoHud` 可以实时显示：
+
+* FPS
+* GPU 占用
+* CPU 温度
+* 显存使用率
+
+### 安装 MangoHud
+
+```bash
+sudo pacman -S mangohud
+```
+
+### Steam 启动参数
+
+```txt
+MANGOHUD=1 %command%
+```
+
+或者：
+
+```txt
+mangohud %command%
+```
+
+---
+
+## Proton 游戏启用 fsync / esync
+
+对于 Steam Proton 游戏：
+
+```txt
+WINEFSYNC=1 %command%
+```
+
+作用：
+
+* 降低卡顿
+* 提高 Wine 多线程性能
+* 提升大型游戏流畅度
+
+适用于：
+
+* Wine
+* Proton
+* DXVK
+
+---
+
+## AMD 用户启用 mesa-git
+
+如果你使用 AMD 显卡：
+
+```bash
+yay -S mesa-git
+```
+
+优势：
+
+* 最新 Vulkan 驱动
+* 更新的 Mesa 优化
+* 更好的 Wayland 支持
+
+缺点：
+
+* 可能不稳定
+
+<Callout>
+  mesa-git 更适合追求最新特性的用户。
+</Callout>
+
+---
+
+## 精简后台服务
+
+游戏时可以关闭不必要服务：
+
+```bash
+systemctl stop bluetooth
+systemctl disable bluetooth
+```
+
+还可以关闭：
+
+* 打印服务
+* Docker
+* 虚拟机
+* 自动同步程序
+
+作用：
+
+* 降低 CPU 占用
+* 提高帧率稳定性
+
+---
+
+## 推荐 Steam 启动参数组合
+
+### NVIDIA 用户
+
+```txt
+gamemoderun gamescope -W 1920 -H 1080 -r 144 -f -- mangohud %command%
+```
+
+### AMD 用户
+
+```txt
+gamemoderun mangohud %command%
+```
+
+### Proton 游戏
+
+```txt
+WINEFSYNC=1 gamemoderun mangohud %command%
+```
+
+---
+
+## 总结
+
+| 优化项             | 作用           | 推荐       |
+| --------------- | ------------ | -------- |
+| gamescope       | Wayland 全屏优化 | 强烈推荐     |
+| gamemode        | CPU 调度优化     | 推荐       |
+| MangoHud        | 实时性能监控       | 推荐       |
+| fsync           | Proton 游戏优化  | 推荐       |
+| damage tracking | 降低重绘开销       | 推荐       |
+| 关闭 VSync        | 降低输入延迟       | FPS 游戏推荐 |
+| mesa-git        | AMD 新驱动      | 进阶用户     |
+| 精简后台服务          | 降低资源占用       | 推荐       |
+
+## 结语
+
+Hyprland 在 Wayland 下已经具备非常优秀的游戏体验。
+
+配合：
+
+* gamescope
+* gamemode
+* MangoHud
+* Proton
+* Vulkan
+
+基本已经能够达到接近 Windows 的游戏性能表现。
