@@ -30,15 +30,15 @@ const GITHUB_USERNAME = "lonerOrz";
             class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between"
           >
             <div class="flex items-start gap-4">
-              <img
-                id="gh-avatar"
-                src={`https://github.com/${GITHUB_USERNAME}.png`}
-                alt="avatar"
-                class="h-16 w-16 flex-shrink-0 rounded-2xl border border-zinc-200 object-cover shadow-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hover:scale-[1.04] md:hover:rounded-full dark:border-zinc-800"
-                width="64"
-                height="64"
-                loading="lazy"
-              />
+                <img
+                  id="gh-avatar"
+                  src={`https://github.com/${GITHUB_USERNAME}.png`}
+                  alt="avatar"
+                  class="h-16 w-16 flex-shrink-0 rounded-2xl border border-zinc-200 object-cover shadow-sm transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] md:hover:scale-[1.04] md:hover:rounded-full dark:border-zinc-800"
+                  width="64"
+                  height="64"
+                  decoding="async"
+                />
               <div class="space-y-3">
                 <div class="space-y-1">
                   <h2
@@ -176,6 +176,8 @@ const GITHUB_USERNAME = "lonerOrz";
               alt="GitHub contribution heatmap"
               class="h-auto w-full dark:opacity-85"
               loading="lazy"
+              decoding="async"
+              onerror="this.style.display='none';this.parentElement.innerHTML='<p class=text-sm text-zinc-400 py-8 text-center>Heatmap unavailable</p>';"
             />
           </div>
 
@@ -257,7 +259,20 @@ const GITHUB_USERNAME = "lonerOrz";
   </Container>
 </Layout>
 
-<script>
+<script is:inline>
+  async function fetchWithTimeout(url, timeout = 8000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
+      return res;
+    } catch (e) {
+      clearTimeout(timer);
+      throw e;
+    }
+  }
+
   async function initGitHubDashboard() {
     const root = document.querySelector("[data-github-user]");
     if (!root) return;
@@ -272,8 +287,8 @@ const GITHUB_USERNAME = "lonerOrz";
 
     try {
       const [userRes, reposRes] = await Promise.all([
-        fetch(`https://api.github.com/users/${username}`),
-        fetch(
+        fetchWithTimeout(`https://api.github.com/users/${username}`),
+        fetchWithTimeout(
           `https://api.github.com/users/${username}/repos?type=owner&per_page=100`,
         ),
       ]);
@@ -293,10 +308,10 @@ const GITHUB_USERNAME = "lonerOrz";
         0,
       );
 
-      const updateText = (id: string, val: string | number) => {
+      const updateText = (id, val) => {
         const el = document.getElementById(id);
         if (el) {
-          el.innerText = String(val);
+          el.textContent = String(val);
           el.classList.remove("opacity-40");
         }
       };
@@ -386,7 +401,6 @@ const GITHUB_USERNAME = "lonerOrz";
         }
       }
     } catch (e) {
-      console.error(e);
       const container = document.getElementById("repos-container");
       if (container)
         container.innerHTML = `<div class="col-span-full text-sm text-red-500 dark:text-red-400 font-mono">Failed to sync profile data from GitHub.</div>`;
