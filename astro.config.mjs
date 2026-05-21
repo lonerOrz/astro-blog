@@ -13,7 +13,10 @@ export default defineConfig({
   },
   markdown: {
     shikiConfig: {
-      theme: "css-variables",
+      themes: {
+        light: "github-light",
+        dark: "catppuccin-mocha",
+      },
     },
   },
 });

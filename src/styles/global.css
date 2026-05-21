@@ -208,49 +208,95 @@ html.dark.scrolled header {
   animation-delay: var(--delay, 0ms);
 }
 
-/* shiki config */
-pre {
-  @apply border border-zinc-200 py-5 dark:border-zinc-700;
+/* Code block styling — macOS-style window */
+pre.astro-code {
+  @apply border border-zinc-200 dark:border-zinc-700/50;
+  @apply pt-12 pb-5;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
 }
 
-:root {
-  --astro-code-foreground: #09090b;
-  --astro-code-background: #fafafa;
-  --astro-code-token-comment: #a19595;
-  --astro-code-token-keyword: #f47067;
-  --astro-code-token-string: #00a99a;
-  --astro-code-token-function: #429996;
-  --astro-code-token-constant: #2b70c5;
-  --astro-code-token-parameter: #4e8fdf;
-  --astro-code-token-string-expression: #ae42a0;
-  --astro-code-token-punctuation: #8996a3;
-  --astro-code-token-link: #8d85ff;
+/* macOS title bar */
+pre.astro-code::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #e5e5e5;
 }
 
-.dark {
-  --astro-code-foreground: #fafafa;
-  --astro-code-background: #09090b;
-  --astro-code-token-comment: #a19595;
-  --astro-code-token-keyword: #f47067;
-  --astro-code-token-string: #00a99a;
-  --astro-code-token-function: #6eafad;
-  --astro-code-token-constant: #b3cceb;
-  --astro-code-token-parameter: #4e8fdf;
-  --astro-code-token-string-expression: #bf7db6;
-  --astro-code-token-punctuation: #8996a3;
-  --astro-code-token-link: #8d85ff;
+html.dark pre.astro-code::before {
+  background-color: #2a2a3a;
+  border-bottom-color: #3a3a4a;
 }
 
-/* copy code button on codeblocks */
+/* macOS traffic light dots */
+pre.astro-code::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: 18px 0 0 #febc2e, 36px 0 0 #28c840;
+}
+
+/* Shiki dual-theme: switch to dark theme when .dark class is active */
+html.dark .astro-code,
+html.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
 .copy-code {
-  @apply absolute top-3 right-3 grid size-9 place-content-center rounded-sm border border-zinc-200 bg-zinc-50 text-center dark:border-zinc-700 dark:bg-zinc-900;
+  @apply absolute grid place-content-center text-center;
+  top: 6px;
+  right: 10px;
+  width: 24px;
+  height: 20px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: #999;
+  z-index: 10;
+  padding: 0;
   transition:
     background-color 150ms ease,
+    color 150ms ease,
     scale 120ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+.copy-code svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .copy-code:hover {
-  @apply bg-zinc-100 dark:bg-zinc-800;
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #555;
+}
+
+html.dark .copy-code {
+  color: #888;
+}
+
+html.dark .copy-code:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #bbb;
 }
 
 .copy-code:active {
