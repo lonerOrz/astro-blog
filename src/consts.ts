@@ -96,7 +96,7 @@ export const FRIENDS: Friends = [
   },
   {
     NAME: "LonerOrz",
-    HREF: "https://github.com/lonerOrz",
+    HREF: "https://astro-blog-rosy.vercel.app",
     DESCRIPTION: "The creator of this space.",
   },
   {
