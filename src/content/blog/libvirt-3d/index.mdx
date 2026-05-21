@@ -1,0 +1,349 @@
+---
+title: "Libvirt 开启 NVIDIA VirGL 3D 加速"
+description: "Libvirt / QEMU 在 Wayland 下开启 NVIDIA VirGL 3D 加速，包括 fixed IP、egl-headless、VirtIO GPU 与 NixOS edk2 修复。"
+date: "2025-03-31"
+draft: false
+tags:
+  - linux
+  - qemu
+  - libvirt
+  - virtualization
+  - nvidia
+  - virgl
+  - wayland
+---
+
+import Callout from "@/components/Callout.astro";
+
+## Libvirt 开启 NVIDIA VirGL 3D 加速
+
+本文主要记录：
+
+- Libvirt 固定 IP
+- NVIDIA VirGL 3D 加速
+- Wayland + VirtIO GPU 配置
+- NixOS 更新后 edk2 修复
+- 虚拟机常用工具安装
+
+适用于：
+
+- QEMU
+- Libvirt
+- Virt-Manager
+- Hyprland
+- NixOS
+- Arch Linux
+
+<Callout>
+  本文主要针对 Wayland 环境下的 VirtIO + VirGL 方案，而不是 GPU Passthrough。
+</Callout>
+
+---
+
+## 固定 IP 设置
+
+为了方便：
+
+- SSH
+- VSCode Remote
+- 文件共享
+- 端口映射
+
+建议为虚拟机设置固定 IP。
+
+编辑默认网络：
+
+```bash
+sudo EDITOR=nvim virsh net-edit default
+````
+
+添加：
+
+```xml id="q9b2r4"
+<network>
+  <name>default</name>
+
+  <forward mode='nat'/>
+
+  <bridge name='virbr0'/>
+
+  <ip address='192.168.122.1'
+      netmask='255.255.255.0'>
+
+    <dhcp>
+      <host mac='52:54:00:b7:a4:16'
+            name='nixos-live'
+            ip='192.168.122.88'/>
+    </dhcp>
+
+  </ip>
+</network>
+```
+
+参数说明：
+
+| 参数     | 作用        |
+| ------ | --------- |
+| `mac`  | 虚拟机网卡 MAC |
+| `name` | 主机名       |
+| `ip`   | 固定 IP     |
+
+### 重启网络
+
+```bash id="4vjlwm"
+sudo virsh net-destroy default
+sudo virsh net-start default
+```
+
+查看 DHCP：
+
+```bash id="m8y8e6"
+virsh net-dhcp-leases default
+```
+
+---
+
+## 安装 virglrenderer
+
+VirGL 是：
+
+* VirtIO GPU 的 OpenGL 加速方案
+* Wayland 下推荐方案
+* 比传统 QXL 更现代
+
+安装：
+
+```bash id="9vd4l9"
+sudo pacman -S virglrenderer
+```
+
+NixOS：
+
+```bash id="r7epml"
+nix-env -iA nixpkgs.virglrenderer
+```
+
+---
+
+## 开启 NVIDIA VirGL 3D 加速
+
+编辑虚拟机 XML：
+
+```bash id="i1z4dr"
+sudo virsh edit 虚拟机名称
+```
+
+---
+
+## 修改 graphics 节点
+
+替换：
+
+```xml id="g4l2u8"
+<graphics type="spice" autoport="yes">
+  <listen type="address"/>
+</graphics>
+
+<graphics type="egl-headless">
+  <gl rendernode="/dev/nvidia0"/>
+</graphics>
+```
+
+推荐：
+
+```txt id="g4jz7u"
+/dev/dri/renderD128
+```
+
+兼容性通常更好。
+
+---
+
+## 修改 video 节点
+
+替换：
+
+```xml id="tb4fwo"
+<video>
+  <model type="virtio"
+         heads="1"
+         primary="yes">
+
+    <acceleration accel3d="yes"/>
+
+  </model>
+
+  <address type="pci"
+           domain="0x0000"
+           bus="0x00"
+           slot="0x01"
+           function="0x0"/>
+</video>
+```
+
+### 关键参数
+
+| 参数              | 作用                |
+| --------------- | ----------------- |
+| `type="virtio"` | VirtIO GPU        |
+| `accel3d="yes"` | 开启 3D 加速          |
+| `egl-headless`  | Wayland OpenGL 渲染 |
+
+<Callout>
+  如果 PCI 地址冲突，可以直接删除 `<address />` 节点。
+</Callout>
+
+---
+
+## 验证 VirGL 是否成功
+
+安装：
+
+```bash id="74s0an"
+sudo pacman -S mesa-utils
+```
+
+检查：
+
+```bash id="m0n4o5"
+glxinfo | grep OpenGL
+```
+
+以及：
+
+```bash id="8dh3cq"
+glxinfo | grep renderer
+```
+
+正常情况下会看到：
+
+```txt id="4p8j0o"
+virgl
+```
+
+或者：
+
+```txt id="vv8ef0"
+NVIDIA
+```
+
+---
+
+## Wayland 下推荐配置
+
+推荐组合：
+
+| 组件     | 推荐       |
+| ------ | -------- |
+| 显示协议   | SPICE    |
+| GPU    | VirtIO   |
+| 渲染     | VirGL    |
+| 桌面     | Hyprland |
+| 后端     | Wayland  |
+| OpenGL | EGL      |
+
+---
+
+## NixOS 更新后 edk2 找不到
+
+NixOS 更新后：
+
+* `/nix/store` hash 会变化
+* qemu 路径失效
+
+可能导致：
+
+```txt id="61rj4m"
+edk2-x86_64-code.fd not found
+```
+
+---
+
+## 修复方法
+
+编辑 XML：
+
+```bash id="6ck0wz"
+sudo virsh edit 虚拟机名称
+```
+
+删除：
+
+```xml id="s7flj8"
+<loader readonly="yes"
+        type="pflash"
+        format="raw">
+/nix/store/xxxx-qemu/share/qemu/edk2-x86_64-code.fd
+</loader>
+
+<nvram template="/nix/store/xxxx-qemu/share/qemu/edk2-i386-vars.fd"
+       templateFormat="raw"
+       format="raw">
+/var/lib/libvirt/qemu/nvram/archlinux_VARS.fd
+</nvram>
+```
+
+libvirt 会自动重新生成。
+
+<Callout>
+  不建议在 NixOS 中手动写死 `/nix/store` 路径。
+</Callout>
+
+---
+
+## 虚拟机推荐安装的软件
+
+### qemu-guest-agent
+
+安装：
+
+```bash id="trqlz3"
+sudo pacman -S qemu-guest-agent
+```
+
+启用：
+
+```bash id="krf1ph"
+sudo systemctl enable --now qemu-guest-agent
+```
+
+作用：
+
+* 获取 IP
+* 文件系统同步
+* Virt-Manager 状态同步
+
+---
+
+## spice-vdagent
+
+安装：
+
+```bash id="tkrq1r"
+sudo pacman -S spice-vdagent
+```
+
+启用：
+
+```bash id="2ks9p0"
+sudo systemctl enable --now spice-vdagentd
+```
+
+作用：
+
+* 自动分辨率调整
+* 剪贴板共享
+* 鼠标同步
+
+---
+
+## 总结
+
+| 功能               | 推荐 |
+| ---------------- | -- |
+| VirtIO GPU       | 推荐 |
+| VirGL            | 推荐 |
+| egl-headless     | 推荐 |
+| SPICE            | 推荐 |
+| qemu-guest-agent | 必装 |
+| spice-vdagent    | 必装 |
