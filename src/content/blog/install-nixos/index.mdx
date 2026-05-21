@@ -1,0 +1,368 @@
+---
+title: "安装 NixOS"
+description: "NixOS 安装教程，包括 Btrfs 文件系统、EFI 启动与 Windows 双系统配置。"
+date: "2025-03-31"
+draft: false
+tags:
+  - linux
+  - nixos
+  - btrfs
+---
+
+import Callout from "@/components/Callout.astro";
+
+## 获取 NixOS 镜像
+
+NixOS 的 ISO 镜像可以从：
+
+- [NixOS 官方下载页面](https://nixos.org/download.html#nixos-iso)
+- [清华大学开源镜像站](https://mirrors.tuna.tsinghua.edu.cn/nixos-images/)
+
+下载。
+
+<Callout>
+  请确认自己下载的是正确架构与正确桌面环境的镜像。
+</Callout>
+
+常见镜像类型：
+
+- `latest-nixos`：最新稳定版
+- `gnome`：LiveCD 默认 GNOME
+- `plasma5`：LiveCD 默认 KDE Plasma
+- `minimal`：最小化安装镜像（无 GUI）
+
+如果机器支持 64 位系统，优先下载 `x86_64` 版本。
+
+---
+
+## 启动安装介质
+
+将镜像写入 USB 后重启电脑。
+
+进入 BIOS / Boot Menu：
+
+- 选择 USB 启动
+- 推荐使用 UEFI 模式
+
+启动后：
+
+- GUI 镜像会进入图形桌面
+- minimal 镜像会直接进入终端
+
+---
+
+## 图形化安装
+
+图形化安装流程比较直观：
+
+1. 选择语言
+2. 设置时区
+3. 选择键盘布局
+4. 创建用户
+5. 选择桌面环境
+6. 允许非自由软件
+7. 磁盘分区
+8. 安装系统
+
+<Callout>
+  分区操作请务必谨慎。
+</Callout>
+
+对于 UEFI 系统，至少需要：
+
+- ESP 分区
+- Root 分区
+
+可选：
+
+- Swap
+- 磁盘加密
+
+安装完成后：
+
+- 重启
+- 拔掉安装介质
+
+---
+
+## 命令行安装
+
+切换 root：
+
+```shell
+sudo su root
+```
+
+---
+
+## 连接网络
+
+### 启动 wpa_supplicant
+
+```shell
+systemctl start wpa_supplicant
+```
+
+### 进入 wpa_cli
+
+```shell
+wpa_cli
+```
+
+### 连接 WiFi
+
+```shell
+> add_network
+0
+
+> set_network 0 ssid "myhomenetwork"
+OK
+
+> set_network 0 psk "mypassword"
+OK
+
+> set_network 0 key_mgmt WPA-PSK
+OK
+
+> enable_network 0
+OK
+```
+
+连接成功后：
+
+```shell
+<3>CTRL-EVENT-CONNECTED - Connection completed
+```
+
+退出：
+
+```shell
+quit
+```
+
+---
+
+## 磁盘分区
+
+本文采用：
+
+- GPT
+- EFI
+- Btrfs
+- Swap
+
+分区结构：
+
+| 分区 | 用途 |
+|---|---|
+| `/dev/sda1` | EFI |
+| `/dev/sda2` | Swap |
+| `/dev/sda3` | Btrfs Root |
+
+创建分区：
+
+```shell
+printf "label: gpt\n,550M,U\n,+8G,S\n,,L\n" | sfdisk /dev/sda
+```
+
+---
+
+## 启用 Swap
+
+```bash
+mkswap /dev/sda2
+swapon /dev/sda2
+```
+
+写入 fstab：
+
+```shell
+echo '/dev/sda2 none swap sw 0 0' | sudo tee -a /etc/fstab
+```
+
+---
+
+## 创建 Btrfs 文件系统
+
+安装工具：
+
+```shell
+nix-shell -p btrfs-progs
+```
+
+格式化：
+
+```bash
+mkfs.fat -F 32 /dev/sda1
+mkfs.btrfs /dev/sda3
+```
+
+创建子卷：
+
+```bash
+mkdir -p /mnt
+
+mount /dev/sda3 /mnt
+
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@home
+btrfs subvolume create /mnt/@nix
+
+umount /mnt
+```
+
+---
+
+## 挂载子卷
+
+```shell
+mount -o compress=zstd,subvol=@ /dev/sda3 /mnt
+
+mkdir /mnt/{home,nix}
+
+mount -o compress=zstd,subvol=@home /dev/sda3 /mnt/home
+
+mount -o compress=zstd,noatime,subvol=@nix /dev/sda3 /mnt/nix
+
+mkdir /mnt/boot
+
+mount /dev/sda1 /mnt/boot
+```
+
+---
+
+## 安装 NixOS
+
+生成配置：
+
+```shell
+nixos-generate-config --root /mnt
+```
+
+编辑配置：
+
+```shell
+nano /mnt/etc/nixos/configuration.nix
+
+nano /mnt/etc/nixos/hardware-configuration.nix
+```
+
+安装系统：
+
+```shell
+nixos-install --show-trace
+```
+
+---
+
+## 创建用户
+
+```shell
+nixos-enter
+```
+
+设置 root 密码：
+
+```shell
+passwd root
+```
+
+创建普通用户：
+
+```shell
+useradd -m -G wheel loner
+
+passwd loner
+```
+
+刷新 GRUB：
+
+```shell
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+---
+
+## 删除 NixOS
+
+### 删除 Btrfs 子卷
+
+```bash
+sudo btrfs subvolume delete /mnt/@
+sudo btrfs subvolume delete /mnt/@home
+sudo btrfs subvolume delete /mnt/@nix
+```
+
+### 卸载分区
+
+```bash
+sudo umount /mnt
+sudo umount /mnt/home
+sudo umount /mnt/nix
+```
+
+### 删除分区
+
+```bash
+sudo parted /dev/nvme0n1 rm 7
+```
+
+---
+
+## 删除引导项
+
+### systemd-boot
+
+```bash
+bootctl list
+
+sudo rm /boot/efi/loader/entries/nixos-generation-1.conf
+```
+
+### GRUB
+
+```bash
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+---
+
+## 清理配置
+
+```bash
+sudo rm -rf /etc/nixos
+```
+
+---
+
+## 恢复启动顺序
+
+进入 BIOS / UEFI：
+
+- 将 Windows
+- 或 Arch Linux
+
+设置为默认启动项。
+
+---
+
+## 删除 Swap（可选）
+
+```bash
+sudo parted /dev/nvme0n1 rm 5
+```
+
+---
+
+## 总结
+
+本文完成了：
+
+- NixOS 安装
+- EFI 启动
+- Btrfs 子卷配置
+- Swap 配置
+- Windows 双系统
+- NixOS 卸载与清理
+
+至此，一个基础的 NixOS 环境已经搭建完成。

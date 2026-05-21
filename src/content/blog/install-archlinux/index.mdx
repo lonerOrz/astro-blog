@@ -1,0 +1,578 @@
+---
+title: "安装 ArchLinux"
+description: "Arch Linux 安装教程，包括 Btrfs、Hyprland、NVIDIA 与 Windows 双系统配置。"
+date: "2025-03-31"
+draft: false
+tags:
+  - linux
+  - arch
+  - hyprland
+  - nvidia
+---
+
+import Callout from "@/components/Callout.astro";
+
+## 安装 Arch Linux
+
+本文使用：
+
+- Btrfs 文件系统
+- Hyprland 桌面环境
+- NVIDIA 显卡
+- Windows 双系统
+
+进行安装与配置。
+
+<Callout>
+  本教程默认你已经制作好了 Arch Linux 启动 U 盘，并使用 UEFI 模式启动。
+</Callout>
+
+---
+
+## 准备工作
+
+### 下载 ISO 镜像
+
+从 Arch Linux 官网下载最新 ISO 镜像，并写入 USB 启动盘。
+
+---
+
+### 连接网络
+
+如果使用有线网络：
+
+```bash
+ip link
+```
+
+如果使用 WiFi：
+
+```bash
+iwctl
+
+station <网卡名> connect <WIFI名>
+
+# 输入密码
+
+quit
+```
+
+测试网络：
+
+```bash
+ping baidu.com
+```
+
+---
+
+## 开始安装 Arch Linux
+
+官方安装文档：
+
+- https://wiki.archlinux.org/title/installation_guide
+
+---
+
+## 检查 UEFI 模式
+
+```bash
+cat /sys/firmware/efi/fw_platform_size
+```
+
+如果输出：
+
+```txt
+64
+```
+
+说明当前为 UEFI 模式。
+
+---
+
+## 设置时区
+
+```bash
+timedatectl set-timezone Asia/Shanghai
+```
+
+---
+
+## 磁盘分区
+
+<Callout>
+  注意不要误格式化 Windows 分区。
+</Callout>
+
+打开分区工具：
+
+```bash
+cfdisk /dev/nvme0n1
+```
+
+推荐分区结构：
+
+| 分区 | 用途 |
+|---|---|
+| EFI | 512MB |
+| Swap | 8GB |
+| Root | 剩余空间（Btrfs） |
+
+---
+
+## 格式化分区
+
+### EFI 分区
+
+```bash
+mkfs.fat -F 32 /dev/efi_system_partition
+```
+
+### Swap 分区
+
+```bash
+mkswap /dev/swap_partition
+```
+
+### Btrfs 分区
+
+```bash
+mkfs.btrfs /dev/root_partition -f
+
+mount /dev/root_partition /mnt
+
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@home
+
+umount /dev/root_partition
+```
+
+---
+
+## 挂载分区
+
+```bash
+mount /dev/root_partition /mnt -o subvol=@
+
+mount /dev/root_partition /mnt/home \
+-o subvol=@home --mkdir
+
+mount /dev/efi_system_partition \
+/mnt/boot/efi --mkdir
+
+swapon /dev/swap_partition
+```
+
+---
+
+## 配置镜像源
+
+编辑：
+
+```bash
+/etc/pacman.d/mirrorlist
+```
+
+添加国内镜像：
+
+```txt
+Server = https://mirrors.ustc.edu.cn/archlinux/$repo/os/$arch
+
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch
+```
+
+---
+
+## 安装基础系统
+
+更新密钥与仓库：
+
+```bash
+pacman -Sy archlinux-keyring
+
+pacman -Syy
+```
+
+安装系统：
+
+```bash
+pacstrap -K /mnt \
+base \
+base-devel \
+linux \
+linux-firmware \
+linux-headers \
+git \
+fish \
+grub \
+efibootmgr \
+os-prober \
+openssl \
+networkmanager \
+dhcpcd \
+neovim
+```
+
+---
+
+## 生成 fstab
+
+```bash
+genfstab -U /mnt >> /mnt/etc/fstab
+
+arch-chroot /mnt
+```
+
+---
+
+## 配置时间
+
+```bash
+ln -sf /usr/share/zoneinfo/Asia/Shanghai \
+/etc/localtime
+
+hwclock --systohc
+```
+
+---
+
+## 配置语言
+
+编辑：
+
+```bash
+/etc/locale.gen
+```
+
+取消注释：
+
+```txt
+en_US.UTF-8
+zh_CN.UTF-8
+```
+
+生成 locale：
+
+```bash
+locale-gen
+```
+
+设置系统语言：
+
+```bash
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+```
+
+---
+
+## 配置网络
+
+启用服务：
+
+```bash
+systemctl enable dhcpcd
+
+systemctl enable NetworkManager
+```
+
+---
+
+## 配置 Initramfs
+
+安装：
+
+```bash
+pacman -S btrfs-progs
+```
+
+生成 initramfs：
+
+```bash
+mkinitcpio -P
+```
+
+---
+
+## 创建用户
+
+设置 root 密码：
+
+```bash
+passwd
+```
+
+创建用户：
+
+```bash
+useradd -m -G wheel <用户名>
+
+passwd <用户名>
+```
+
+---
+
+## 配置 sudo
+
+编辑：
+
+```bash
+EDITOR=nvim visudo
+```
+
+取消：
+
+```txt
+%wheel ALL=(ALL:ALL) ALL
+```
+
+---
+
+## 配置 GRUB 双系统
+
+安装 GRUB：
+
+```bash
+grub-install --recheck /dev/你的硬盘
+```
+
+编辑：
+
+```bash
+nvim /etc/default/grub
+```
+
+取消：
+
+```txt
+GRUB_DISABLE_OS_PROBER=false
+```
+
+检测系统：
+
+```bash
+os-prober
+```
+
+生成配置：
+
+```bash
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+---
+
+## 重启系统
+
+```bash
+exit
+
+umount -R /mnt
+
+reboot
+```
+
+重启后拔掉 U 盘。
+
+---
+
+## 安装 NVIDIA 驱动
+
+查看显卡：
+
+```bash
+lspci -k | grep -A 2 -E "(VGA|3D)"
+```
+
+安装驱动：
+
+```bash
+sudo pacman -S \
+nvidia \
+nvidia-utils \
+nvidia-settings
+```
+
+---
+
+## 配置 NVIDIA DRM
+
+编辑：
+
+```bash
+/etc/default/grub
+```
+
+加入：
+
+```txt
+nvidia_drm.modeset=1
+```
+
+重新生成：
+
+```bash
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+---
+
+## 配置 mkinitcpio
+
+编辑：
+
+```bash
+sudo nvim /etc/mkinitcpio.conf
+```
+
+在 `MODULES` 中加入：
+
+```txt
+nvidia
+nvidia_modeset
+nvidia_uvm
+nvidia_drm
+```
+
+重新生成：
+
+```bash
+sudo mkinitcpio -P
+```
+
+重启：
+
+```bash
+reboot
+```
+
+验证：
+
+```bash
+nvidia-smi
+```
+
+---
+
+## 安装 Hyprland
+
+安装桌面环境：
+
+```bash
+sudo pacman -S \
+hyprland \
+kitty \
+waybar \
+sddm
+```
+
+安装字体：
+
+```bash
+sudo pacman -S \
+ttf-jetbrains-mono-nerd \
+adobe-source-han-sans-cn-fonts \
+adobe-source-code-pro-fonts
+```
+
+启用 SDDM：
+
+```bash
+sudo systemctl enable sddm
+```
+
+---
+
+## 安装 Timeshift
+
+安装：
+
+```bash
+paru -S \
+timeshift-systemd-timer \
+grub-btrfs \
+xorg-xhost
+```
+
+创建快照：
+
+```bash
+sudo timeshift --create \
+--comments "starting point"
+```
+
+---
+
+## 配置 NVIDIA 与 Hyprland
+
+参考：
+
+- https://wiki.hyprland.org/Nvidia/
+
+编辑：
+
+```bash
+~/.config/hypr/hyprland.conf
+```
+
+加入：
+
+```txt
+env = LIBVA_DRIVER_NAME,nvidia
+env = XDG_SESSION_TYPE,wayland
+env = GBM_BACKEND,nvidia-drm
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+env = WLR_NO_HARDWARE_CURSORS,1
+```
+
+---
+
+## 安装常用软件
+
+### 输入法
+
+```bash
+sudo pacman -S \
+fcitx5 \
+fcitx5-chinese-addons \
+fcitx5-configtool
+```
+
+---
+
+### 安装 paru
+
+```bash
+git clone https://aur.archlinux.org/paru.git
+
+cd paru
+
+makepkg -si
+```
+
+---
+
+### 安装常用软件
+
+```bash
+sudo pacman -S \
+rofi \
+code
+```
+
+```bash
+paru -S google-chrome
+```
+
+---
+
+## 总结
+
+本文完成了：
+
+- Arch Linux 安装
+- Btrfs 配置
+- NVIDIA 驱动配置
+- Hyprland 桌面环境
+- Windows 双系统
+- Timeshift 快照
+
+至此，一个基础的 Arch Linux 开发环境已经搭建完成。
