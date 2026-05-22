@@ -3,14 +3,14 @@ import type { CollectionEntry } from "astro:content";
 import ArrowIcon from "@components/ArrowIcon.astro";
 
 type Props = {
-  entry: CollectionEntry<"blog"> | CollectionEntry<"projects">;
+  entry: CollectionEntry<"blog"> | CollectionEntry<"series">;
 };
 
 const { entry } = Astro.props;
 ---
 
 <a
-  href={`/${entry.collection}/${entry.id}`}
+  href={`/${entry.collection}/${entry.id.replace(/\.(md|mdx)$/, "")}`}
   class="not-prose group relative flex flex-nowrap rounded-lg border border-zinc-200 px-4 py-3 pr-10 card-interactive hover:bg-zinc-50 hover:text-zinc-900 focus-visible:bg-zinc-50 focus-visible:text-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/50 dark:focus-visible:text-zinc-50"
 >
   <div class="flex flex-1 flex-col truncate">

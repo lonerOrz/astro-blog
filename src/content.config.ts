@@ -15,12 +15,11 @@ const blog = defineCollection({
   }),
 });
 
-const projects = defineCollection({
-  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/projects" }),
+const series = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/series" }),
   schema: baseSchema.extend({
-    demoURL: z.string().optional(),
-    repoURL: z.string().optional(),
+    seriesOrder: z.number().optional(),
   }),
 });
 
-export const collections = { blog, projects };
+export const collections = { blog, series };

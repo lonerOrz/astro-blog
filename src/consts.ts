@@ -6,7 +6,7 @@ export const SITE: Site = {
   EMAIL: "lonerOrz@qq.com",
   URL: "https://astro-blog-rosy.vercel.app",
   NUM_POSTS_ON_HOMEPAGE: 5,
-  NUM_PROJECTS_ON_HOMEPAGE: 3,
+  NUM_SERIES_ON_HOMEPAGE: 3,
 };
 
 export const HOME: Metadata = {
@@ -19,10 +19,9 @@ export const BLOG: Metadata = {
   DESCRIPTION: "A collection of articles on topics I am passionate about.",
 };
 
-export const PROJECTS: Metadata = {
-  TITLE: "Projects",
-  DESCRIPTION:
-    "A collection of my projects with links to repositories and live demos.",
+export const SERIES: Metadata = {
+  TITLE: "Series",
+  DESCRIPTION: "A collection of topical series, each containing related articles.",
 };
 
 export const ABOUT: Metadata = {

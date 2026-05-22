@@ -3,18 +3,18 @@ import type { CollectionEntry } from "astro:content";
 import ArrowIcon from "@components/ArrowIcon.astro";
 
 type Props = {
-  prevPost?: CollectionEntry<"blog"> | null;
-  nextPost?: CollectionEntry<"blog"> | null;
+  prevSeriesEntry?: CollectionEntry<"series"> | null;
+  nextSeriesEntry?: CollectionEntry<"series"> | null;
 };
 
-const { prevPost, nextPost } = Astro.props;
+const { prevSeriesEntry, nextSeriesEntry } = Astro.props;
 ---
 
 <div class="grid grid-cols-2 gap-1.5 sm:gap-3">
   {
-    prevPost?.id ? (
+    prevSeriesEntry?.id ? (
       <a
-        href={`/blog/${prevPost.id.replace(/\.(md|mdx)$/, "")}`}
+        href={`/series/${prevSeriesEntry.id.replace(/\.(md|mdx)$/, "")}`}
         class="group relative flex flex-nowrap rounded-lg border border-zinc-200 px-4 py-3 pl-10 no-underline card-interactive hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
       >
         <ArrowIcon
@@ -22,7 +22,7 @@ const { prevPost, nextPost } = Astro.props;
           size={5}
           class="absolute top-1/2 left-2 -translate-y-1/2"
         />
-        <div class="flex items-center text-sm">{prevPost?.data.title}</div>
+        <div class="flex items-center text-sm">{prevSeriesEntry?.data.title}</div>
       </a>
     ) : (
       <div class="invisible" />
@@ -30,9 +30,9 @@ const { prevPost, nextPost } = Astro.props;
   }
 
   {
-    nextPost?.id ? (
+    nextSeriesEntry?.id ? (
       <a
-        href={`/blog/${nextPost.id.replace(/\.(md|mdx)$/, "")}`}
+        href={`/series/${nextSeriesEntry.id.replace(/\.(md|mdx)$/, "")}`}
         class="group relative flex grow flex-row-reverse flex-nowrap rounded-lg border border-zinc-200 px-4 py-4 pr-10 no-underline card-interactive hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
       >
         <ArrowIcon
@@ -40,7 +40,7 @@ const { prevPost, nextPost } = Astro.props;
           size={5}
           class="absolute top-1/2 right-2 -translate-y-1/2"
         />
-        <div class="flex items-center text-sm">{nextPost?.data.title}</div>
+        <div class="flex items-center text-sm">{nextSeriesEntry?.data.title}</div>
       </a>
     ) : (
       <div class="invisible" />

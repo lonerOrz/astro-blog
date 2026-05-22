@@ -1,0 +1,112 @@
+---
+import { type CollectionEntry, getCollection, render } from "astro:content";
+import Layout from "@layouts/Layout.astro";
+import Container from "@components/Container.astro";
+import FormattedDate from "@components/FormattedDate.astro";
+import { readingTime } from "@lib/utils";
+import BackToPrevious from "@components/BackToPrevious.astro";
+import TableOfContents from "@components/TableOfContents.astro";
+import SeriesNavigation from "@components/SeriesNavigation.astro";
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection("series");
+  const filteredPosts = allPosts.filter(
+    (post) =>
+      !post.data.draft &&
+      post.id.includes("/") &&
+      !post.id.endsWith("/index.md") &&
+      !post.id.endsWith("/index.mdx"),
+  );
+
+  // Group by series
+  const seriesGroups = new Map<string, typeof filteredPosts>();
+  for (const post of filteredPosts) {
+    const series = post.id.split("/")[0];
+    const group = seriesGroups.get(series) || [];
+    group.push(post);
+    seriesGroups.set(series, group);
+  }
+
+  // Generate paths for each series
+  return Array.from(seriesGroups.entries()).flatMap(([series, posts]) => {
+    const sortedPosts = posts.sort((a, b) => {
+      const aOrder = a.data.seriesOrder ?? Infinity;
+      const bOrder = b.data.seriesOrder ?? Infinity;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return b.data.date.valueOf() - a.data.date.valueOf();
+    });
+
+    return sortedPosts.map((post, index) => {
+      const slug = post.id
+        .split("/")
+        .slice(1)
+        .join("/")
+        .replace(/\.(md|mdx)$/, "");
+      return {
+        params: { series, slug },
+        props: {
+          post,
+          prevPost: index > 0 ? sortedPosts[index - 1] : null,
+          nextPost: index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null,
+        },
+      };
+    });
+  });
+}
+
+type Props = {
+  post: CollectionEntry<"series">;
+  prevPost: CollectionEntry<"series"> | null;
+  nextPost: CollectionEntry<"series"> | null;
+};
+
+const { post, prevPost, nextPost } = Astro.props;
+const seriesName = post.id.split("/")[0];
+const { Content, headings } = await render(post);
+---
+
+<Layout title={post.data.title} description={post.data.description}>
+  <Container>
+    <div class="animate">
+      <BackToPrevious href={`/series/${seriesName}`}>
+        Back to {seriesName}
+      </BackToPrevious>
+    </div>
+
+    <div class="animate my-10 space-y-1">
+      <div class="flex items-center gap-1.5">
+        <a
+          href={`/series/${seriesName}`}
+          class="text-xs font-medium text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
+        >
+          {seriesName}
+        </a>
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <div class="font-base text-sm">
+          <FormattedDate date={post.data.date} />
+        </div>
+        &bull;
+        {
+          post.body && (
+            <div class="font-base text-sm">{readingTime(post.body)}</div>
+          )
+        }
+      </div>
+      <h1 class="text-3xl font-semibold text-black dark:text-white">
+        {post.data.title}
+      </h1>
+    </div>
+
+    <TableOfContents headings={headings} />
+
+    <article class="animate">
+      <Content />
+      {(prevPost || nextPost) && (
+        <SeriesNavigation 
+          prevSeriesEntry={prevPost} 
+          nextSeriesEntry={nextPost} 
+        />
+      )}
+    </article>
+  </Container>
+</Layout>
