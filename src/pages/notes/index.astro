@@ -1,3 +1,27 @@
 ---
-return Astro.redirect("/notes/1");
+import { getCollection } from "astro:content";
+import PageComponent from "./[page].astro";
+
+const allNotes = (await getCollection("notes"))
+  .filter((note) => !note.data.draft)
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const pageSize = 5;
+
+const mockPage = {
+  data: allNotes.slice(0, pageSize),
+  start: 0,
+  end: pageSize - 1,
+  total: allNotes.length,
+  currentPage: 1,
+  size: pageSize,
+  lastPage: Math.ceil(allNotes.length / pageSize),
+  url: {
+    current: "/notes",
+    prev: undefined,
+    next: allNotes.length > pageSize ? "/notes/2" : undefined,
+  },
+};
 ---
+
+<PageComponent page={mockPage} />
