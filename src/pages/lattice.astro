@@ -4,289 +4,306 @@ import Container from "../components/Container.astro";
 ---
 
 <Layout
-  title="Torus Knot"
-  description="Minimal mathematical topology sculpture."
+  title="Torus Knot / Topology"
+  description="High-fidelity mathematical topology visualization."
 >
   <Container>
-    <div class="mx-auto max-w-6xl py-10">
-        <div
-          class="mb-8 flex flex-col gap-6 border-b border-zinc-200 pb-6 md:flex-row md:items-end md:justify-between dark:border-zinc-800"
-        >
-          <div>
-            <div
-              class="mb-4 inline-flex items-center gap-2 border border-zinc-300 bg-zinc-100 px-3 py-1.5 dark:border-zinc-800 dark:bg-zinc-950"
-            >
-              <div class="h-1.5 w-1.5 rounded-full bg-zinc-900 dark:bg-white"></div>
-              <span class="text-[9px] tracking-[0.35em] text-zinc-500 uppercase">
-                TOPOLOGICAL GEOMETRY
+    <div class="mx-auto max-w-6xl py-12 space-y-8" id="knot-container">
+      <header class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-zinc-200 pb-8 dark:border-zinc-800 animate-slide-up">
+        <div class="space-y-4">
+          <div class="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 dark:border-zinc-800 dark:bg-zinc-900">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            <span class="font-mono text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Math Engine v2.0</span>
+          </div>
+          <h1 class="text-4xl font-black tracking-tighter text-zinc-900 uppercase dark:text-white leading-none">
+            Torus <span class="text-zinc-400 dark:text-zinc-600">//</span> Knot
+          </h1>
+          <p class="max-w-md text-[11px] font-bold leading-relaxed tracking-[0.2em] text-zinc-500 uppercase">
+            Parametric curves generated via <span class="text-zinc-900 dark:text-zinc-300">Toroidal Harmonic Motion</span>. Projected in isometric 3D space.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-10 font-mono">
+          <div class="space-y-1">
+            <div class="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">Calculation</div>
+            <div class="text-xs text-zinc-800 dark:text-zinc-200 uppercase">Matrix Projection</div>
+          </div>
+          <div class="space-y-1">
+            <div class="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">Complexity</div>
+            <div class="text-xs text-zinc-800 dark:text-zinc-200 uppercase">Non-Euclidean</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Display -->
+      <main class="relative aspect-video w-full overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-black animate-slide-up" style="--delay: 0.1s">
+        <div class="absolute top-8 left-8 z-20 space-y-4 pointer-events-none">
+          <div class="rounded-2xl border border-zinc-200/50 bg-white/40 p-5 backdrop-blur-xl dark:border-zinc-800/50 dark:bg-black/40 shadow-sm">
+            <div class="text-[8px] font-black tracking-[0.3em] text-zinc-400 uppercase mb-2">Mathematical Formula</div>
+            <div id="formula-readout" class="font-mono text-[10px] font-bold text-zinc-800 dark:text-zinc-200">
+              x = (R + r cos qθ)cos pθ
+            </div>
+          </div>
+        </div>
+
+        <!-- 装饰背景层 -->
+        <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_70%)]"></div>
+        <div class="absolute inset-0 z-0 opacity-20 dark:opacity-40" style="background-image: radial-gradient(circle, #80808022 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+        <!-- 渲染画布 -->
+        <canvas id="math-canvas" class="relative z-10 h-full w-full cursor-move"></canvas>
+
+        <!-- 遮罩渐变 -->
+        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/20 to-transparent dark:from-black dark:via-black/20"></div>
+      </main>
+
+      <!-- Control Interface -->
+      <footer class="grid gap-8 rounded-[2rem] border border-zinc-200 bg-zinc-50/50 p-10 dark:border-zinc-800 dark:bg-zinc-950/50 md:grid-cols-3 animate-slide-up" style="--delay: 0.2s">
+        {[
+          { id: 'p', label: 'Rotational (p)', min: 1, max: 15, step: 1, val: 3 },
+          { id: 'q', label: 'Harmonic (q)', min: 1, max: 20, step: 1, val: 7 },
+          { id: 'r', label: 'Radius Amplitude', min: 0.1, max: 1.5, step: 0.01, val: 0.45 }
+        ].map(item => (
+          <div class="space-y-5">
+            <div class="flex items-center justify-between px-1">
+              <label for={`input-${item.id}`} class="text-[10px] font-black tracking-[0.25em] text-zinc-400 uppercase">
+                {item.label}
+              </label>
+              <span id={`${item.id}-readout`} class="font-mono text-xs font-bold text-blue-600 dark:text-blue-400">
+                {item.val}
               </span>
             </div>
-            <h1
-              class="text-3xl font-black tracking-[0.28em] text-zinc-900 uppercase md:text-4xl dark:text-white"
-            >
-              TORUS // KNOT
-            </h1>
-            <p
-              class="mt-4 max-w-lg text-[10px] leading-relaxed tracking-[0.22em] text-zinc-500 uppercase"
-            >
-              Minimal parametric topology generated through toroidal harmonic
-              motion.
-            </p>
+            <input
+              id={`input-${item.id}`}
+              type="range"
+              min={item.min}
+              max={item.max}
+              step={item.step}
+              value={item.val}
+              class="custom-slider"
+            />
           </div>
-          <div class="grid grid-cols-2 gap-8">
-            <div>
-              <div class="text-[8px] tracking-[0.28em] text-zinc-400 uppercase">
-                Formula
-              </div>
-              <div class="mt-1 font-mono text-[11px] tracking-wide text-zinc-700 dark:text-zinc-300">
-                TORUS KNOT
-              </div>
-            </div>
-            <div>
-              <div class="text-[8px] tracking-[0.28em] text-zinc-400 uppercase">
-                Geometry
-              </div>
-              <div class="mt-1 font-mono text-[11px] tracking-wide text-zinc-700 dark:text-zinc-300">
-                PARAMETRIC
-              </div>
-            </div>
-          </div>
-        </div>
-      <section class="relative overflow-hidden border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-black">
-        <div
-          class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03),transparent_72%)] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.04),transparent_72%)]"
-        >
-        </div>
-        <div
-          class="pointer-events-none absolute inset-0 opacity-[0.04] dark:opacity-[0.02]"
-          style="
-            background-image:
-              linear-gradient(rgba(0,0,0,0.06) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,0,0,0.06) 1px, transparent 1px);
-            background-size: 90px 90px;
-          "
-        >
-        </div>
-        <div
-          class="absolute top-6 left-6 z-10 border border-zinc-200 bg-white/70 px-4 py-3 backdrop-blur-xl dark:border-zinc-800 dark:bg-black/70"
-        >
-          <div class="text-[8px] tracking-[0.3em] text-zinc-400 uppercase">
-            Knot State
-          </div>
-          <div
-            id="formula-readout"
-            class="mt-2 font-mono text-[11px] tracking-wide text-zinc-700 dark:text-zinc-300"
-          >
-            p = 3 / q = 5 / r = 0.32
-          </div>
-        </div>
-        <div class="relative h-[760px] w-full">
-          <canvas id="math-canvas" class="h-full w-full"></canvas>
-        </div>
-        <div
-          class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent dark:from-black"
-        >
-        </div>
-      </section>
-      <section
-        class="mt-6 grid gap-6 border border-zinc-200 bg-zinc-50/50 p-6 backdrop-blur-xl dark:border-zinc-800 dark:bg-zinc-950/50 md:grid-cols-3"
-      >
-        <div>
-          <div class="mb-4 flex items-center justify-between">
-            <div class="text-[10px] tracking-[0.24em] text-zinc-500 uppercase">
-              Rotation
-            </div>
-            <div id="p-readout" class="font-mono text-[11px] text-zinc-900 dark:text-white">3</div>
-          </div>
-          <input
-            id="input-p"
-            type="range"
-            min="1"
-            max="8"
-            step="1"
-            value="3"
-            class="slider"
-          />
-        </div>
-        <div>
-          <div class="mb-4 flex items-center justify-between">
-            <div class="text-[10px] tracking-[0.24em] text-zinc-500 uppercase">
-              Harmonic
-            </div>
-            <div id="q-readout" class="font-mono text-[11px] text-zinc-900 dark:text-white">5</div>
-          </div>
-          <input
-            id="input-q"
-            type="range"
-            min="2"
-            max="12"
-            step="1"
-            value="5"
-            class="slider"
-          />
-        </div>
-        <div>
-          <div class="mb-4 flex items-center justify-between">
-            <div class="text-[10px] tracking-[0.24em] text-zinc-500 uppercase">
-              Radius
-            </div>
-            <div id="r-readout" class="font-mono text-[11px] text-zinc-900 dark:text-white">
-              0.32
-            </div>
-          </div>
-          <input
-            id="input-r"
-            type="range"
-            min="0.1"
-            max="0.8"
-            step="0.01"
-            value="0.32"
-            class="slider"
-          />
-        </div>
-      </section>
+        ))}
+      </footer>
     </div>
   </Container>
 </Layout>
 
 <style is:global>
-  .slider {
+  .custom-slider {
+    -webkit-appearance: none;
     width: 100%;
-    appearance: none;
-    height: 1px;
-    background: rgb(209 213 219);
+    height: 2px;
+    background: #e2e8f0;
     outline: none;
+    border-radius: 2px;
   }
-  :global(.dark) .slider {
-    background: rgb(63 63 70);
-  }
-  .slider::-webkit-slider-thumb {
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 9999px;
-    background: rgb(24 24 27);
-    border: 2px solid white;
+  .dark .custom-slider { background: #27272a; }
+
+  .custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #000;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px #e2e8f0, 0 4px 6px -1px rgba(0,0,0,0.1);
     cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  :global(.dark) .slider::-webkit-slider-thumb {
-    background: white;
-    border-color: black;
+  .dark .custom-slider::-webkit-slider-thumb {
+    background: #fff;
+    border-color: #000;
+    box-shadow: 0 0 0 1px #27272a;
   }
-  .slider::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
-    border-radius: 9999px;
-    background: rgb(24 24 27);
-    border: 2px solid white;
-    cursor: pointer;
+  .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.25); background: #2563eb; }
+
+  /* 入场动画 */
+  .animate-slide-up {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--delay, 0s);
   }
-  :global(.dark) .slider::-moz-range-thumb {
-    background: white;
-    border-color: black;
+
+  @keyframes fadeInUp {
+    to { opacity: 1; transform: translateY(0); }
   }
 </style>
 
-<script is:inline>
-  const canvas = document.getElementById("math-canvas");
-  const ctx = canvas?.getContext("2d", { alpha: false });
-  const inputP = document.getElementById("input-p");
-  const inputQ = document.getElementById("input-q");
-  const inputR = document.getElementById("input-r");
-  const pReadout = document.getElementById("p-readout");
-  const qReadout = document.getElementById("q-readout");
-  const rReadout = document.getElementById("r-readout");
-  const formulaReadout = document.getElementById("formula-readout");
+<script is:inline data-astro-rerun>
+  class TorusVisualizer {
+    constructor() {
+      this.canvas = document.getElementById("math-canvas");
+      if (!this.canvas) return;
+      this.ctx = this.canvas.getContext("2d", { alpha: false });
 
-  let width = 0,
-    height = 0,
-    cx = 0,
-    cy = 0,
-    scale = 0;
+      this.inputs = {
+        p: document.getElementById("input-p"),
+        q: document.getElementById("input-q"),
+        r: document.getElementById("input-r")
+      };
 
-  function resize() {
-    if (!canvas) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    width = canvas.offsetWidth;
-    height = canvas.offsetHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx?.scale(dpr, dpr);
-    cx = width / 2;
-    cy = height / 2;
-    scale = Math.min(width, height) * 0.14;
-  }
+      this.readouts = {
+        p: document.getElementById("p-readout"),
+        q: document.getElementById("q-readout"),
+        r: document.getElementById("r-readout"),
+        formula: document.getElementById("formula-readout")
+      };
 
-  window.addEventListener("resize", resize);
-  resize();
-
-  let t = 0;
-  let lastTime = performance.now();
-
-  function render(now) {
-    if (!canvas || !ctx || !inputP || !inputQ || !inputR) return;
-    const deltaTime = (now - lastTime) / 16.6;
-    lastTime = now;
-    t += 0.002 * deltaTime;
-
-    const density = parseFloat(inputP.value);
-    const layers = parseFloat(inputQ.value);
-    const amplitude = parseFloat(inputR.value);
-
-    if (pReadout) pReadout.textContent = density.toString();
-    if (qReadout) qReadout.textContent = layers.toString();
-    if (rReadout) rReadout.textContent = amplitude.toFixed(2);
-    if (formulaReadout)
-      formulaReadout.textContent = `d = ${density} / l = ${layers} / a = ${amplitude.toFixed(2)}`;
-
-    const isDark = document.documentElement.classList.contains("dark");
-    ctx.fillStyle = isDark ? "#000" : "#fff";
-    ctx.fillRect(0, 0, width, height);
-
-    const rotY = t * 0.22;
-    const rotX = Math.sin(t * 0.4) * 0.25;
-    const cosY = Math.cos(rotY),
-      sinY = Math.sin(rotY);
-    const cosX = Math.cos(rotX),
-      sinX = Math.sin(rotX);
-
-    ctx.lineWidth = 0.7;
-
-    for (let z = -layers; z <= layers; z += 0.4) {
-      const cosZ = Math.cos(z);
-      const sinZ = Math.sin(z);
-      const alpha = 0.04 + ((z + layers) / (layers * 2)) * 0.16;
-      if (isDark) {
-        ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-      } else {
-        ctx.strokeStyle = `rgba(0,0,0,${alpha + 0.04})`;
-      }
-      ctx.beginPath();
-      let started = false;
-      for (let x = -Math.PI; x <= Math.PI; x += 0.06) {
-        const y = Math.sin(x * density + t) * cosZ * amplitude;
-        const gyroid =
-          Math.sin(x) * Math.cos(y) + Math.sin(y) * cosZ + sinZ * Math.cos(x);
-        const px = x * 1.4;
-        const py = gyroid;
-        const pz = z;
-        const rx = px * cosY - pz * sinY;
-        const rz = px * sinY + pz * cosY;
-        const ry = py * cosX - rz * sinX;
-        const finalZ = py * sinX + rz * cosX;
-        const p = 1 / (1 + finalZ * 0.18);
-        const sx = cx + rx * scale * p;
-        const sy = cy + ry * scale * p;
-        if (!started) {
-          ctx.moveTo(sx, sy);
-          started = true;
-        } else {
-          ctx.lineTo(sx, sy);
-        }
-      }
-      ctx.stroke();
+      this.t = 0;
+      this.lastTime = 0;
+      this.isDestroyed = false;
+      this.init();
     }
-    requestAnimationFrame(render);
+
+    init() {
+      this.resize();
+      window.addEventListener("resize", () => this.resize());
+      this.animate();
+    }
+
+    resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.width = this.canvas.offsetWidth;
+      this.height = this.canvas.offsetHeight;
+      this.canvas.width = this.width * dpr;
+      this.canvas.height = this.height * dpr;
+      this.ctx.scale(dpr, dpr);
+      this.scale = Math.min(this.width, this.height) * 0.18;
+    }
+
+    // 3D 空间到 2D 投影
+    project(x, y, z, rotX, rotY) {
+      // 旋转矩阵
+      let y1 = y * Math.cos(rotX) - z * Math.sin(rotX);
+      let z1 = y * Math.sin(rotX) + z * Math.cos(rotX);
+      let x2 = x * Math.cos(rotY) - z1 * Math.sin(rotY);
+      let z2 = x * Math.sin(rotY) + z1 * Math.cos(rotY);
+
+      // 透视计算
+      const perspective = 1 / (1 + z2 * 0.12);
+      return {
+        x: this.width / 2 + x2 * this.scale * perspective,
+        y: this.height / 2 + y1 * this.scale * perspective,
+        z: z2 // 用于深度深度着色
+      };
+    }
+
+    animate(now = 0) {
+      if (this.isDestroyed) return;
+
+      const deltaTime = now - this.lastTime;
+      this.lastTime = now;
+      this.t += 0.004 * (deltaTime / 16.6);
+
+      const p = parseFloat(this.inputs.p.value);
+      const q = parseFloat(this.inputs.q.value);
+      const r = parseFloat(this.inputs.r.value);
+
+      // 同步 UI 读数
+      this.readouts.p.textContent = p;
+      this.readouts.q.textContent = q;
+      this.readouts.r.textContent = r.toFixed(2);
+      this.readouts.formula.textContent = `φ(θ) = [ (2 + ${r.toFixed(2)} cos ${q}θ)cos ${p}θ, ... ]`;
+
+      this.draw(p, q, r);
+      this.frameReq = requestAnimationFrame((t) => this.animate(t));
+    }
+
+    draw(p, q, r) {
+      const { ctx, width, height, t } = this;
+      const isDark = document.documentElement.classList.contains("dark");
+
+      // 清空背景
+      ctx.fillStyle = isDark ? "#000" : "#fff";
+      ctx.fillRect(0, 0, width, height);
+
+      const rotY = t * 0.25;
+      const rotX = Math.PI / 4 + Math.sin(t * 0.12) * 0.15;
+
+      // 1. 绘制底层环面 (Subtle Scaffolding)
+      ctx.lineWidth = 0.5;
+      ctx.strokeStyle = isDark ? "rgba(255,255,255,0.02)" : "rgba(0,0,0,0.04)";
+      for (let u = 0; u < Math.PI * 2; u += Math.PI / 10) {
+        ctx.beginPath();
+        for (let v = 0; v < Math.PI * 2; v += 0.15) {
+          const x = (2.2 + r * Math.cos(v)) * Math.cos(u);
+          const y = (2.2 + r * Math.cos(v)) * Math.sin(u);
+          const z = r * Math.sin(v);
+          const pt = this.project(x, y, z, rotX, rotY);
+          if (v === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+        }
+        ctx.stroke();
+      }
+
+      // 2. 绘制 5 重细丝纽结 (Multistrand Knot)
+      const strands = 5;
+      for (let s = 0; s < strands; s++) {
+        const strandOffset = s * 0.015;
+        ctx.beginPath();
+
+        // 纽结路径：根据 p,q 决定 θ 的终点（为了闭合，通常取 2π）
+        const resolution = 0.01;
+        for (let theta = 0; theta <= Math.PI * 2; theta += resolution) {
+          const R = 2.2;
+          const tr = r + strandOffset;
+
+          // Torus Knot 参数方程
+          const x = (R + tr * Math.cos(q * theta)) * Math.cos(p * theta);
+          const y = (R + tr * Math.cos(q * theta)) * sin(p * theta);
+          const z = tr * Math.sin(q * theta);
+
+          const pt = this.project(x, y, z, rotX, rotY);
+
+          // 基于深度的样式优化
+          const depthAlpha = Math.max(0.05, (pt.z + 2.5) / 5);
+          const hue = (theta / (Math.PI * 2) * 60 + 210) % 360; // 极光蓝调
+
+          if (theta === 0) {
+            ctx.moveTo(pt.x, pt.y);
+          } else {
+            ctx.strokeStyle = isDark
+              ? `hsla(${hue}, 80%, 75%, ${depthAlpha * 0.5})`
+              : `hsla(${hue}, 70%, 45%, ${depthAlpha * 0.7})`;
+            ctx.lineWidth = depthAlpha * 1.8;
+            ctx.lineTo(pt.x, pt.y);
+          }
+
+          // 周期性描绘离散数学结点
+          if (s === 2 && Math.floor(theta * 100) % 50 === 0) {
+            ctx.save();
+            ctx.fillStyle = ctx.strokeStyle;
+            ctx.globalAlpha = depthAlpha;
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, 2 * depthAlpha, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+            ctx.beginPath();
+            ctx.moveTo(pt.x, pt.y);
+          }
+        }
+        ctx.stroke();
+      }
+    }
+
+    destroy() {
+      this.isDestroyed = true;
+      cancelAnimationFrame(this.frameReq);
+    }
   }
-  requestAnimationFrame(render);
+
+  // 这里的 data-astro-rerun 会确保每次页面加载时脚本都会重新执行
+  let visualizer = new TorusVisualizer();
+
+  // 清理 SPA 路由切换残留
+  document.addEventListener("astro:before-swap", () => {
+    if (visualizer) visualizer.destroy();
+  }, { once: true });
+
+  // 内部辅助函数
+  function sin(v) { return Math.sin(v); }
 </script>
