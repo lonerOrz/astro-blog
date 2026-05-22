@@ -16,256 +16,198 @@ const friends = FRIENDS.map((friend) => {
     initial: friend.NAME.slice(0, 1).toUpperCase(),
     avatar: githubUsername
       ? `https://github.com/${githubUsername}.png?size=120`
-      : null,
+      : `https://ui-avatars.com/api/?name=${friend.NAME}&background=random&size=120`,
   };
 });
 ---
 
 <Layout title={FRIENDS_PAGE.TITLE} description={FRIENDS_PAGE.DESCRIPTION}>
   <Container>
-    <div class="mx-auto max-w-6xl space-y-14">
+    <div class="mx-auto max-w-6xl space-y-16">
       <PageHeader
         title="Friends."
         subtitle="A small blogroll for people and websites I want to keep close."
       />
 
-      <section
-        class="animate grid gap-10 lg:grid-cols-[300px_1fr] lg:items-start"
-      >
-        <aside class="space-y-6 lg:sticky lg:top-28">
+      <section class="animate grid gap-12 lg:grid-cols-[340px_1fr] lg:items-start">
+        <!-- Sidebar -->
+        <aside class="space-y-10 lg:sticky lg:top-28">
+          <!-- Intro -->
           <div class="space-y-4">
-            <p
-              class="text-3xl leading-tight font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-            >
-              A quiet corner for friends' sites.
-            </p>
-
-            <p
-              class="text-base leading-relaxed text-zinc-500 dark:text-zinc-400"
-            >
-              This page is for exchanging links with friends. The current
-              entries are placeholders until more personal sites are added here.
+            <h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              Exchange Links
+            </h2>
+            <p class="text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+              If you have a personal blog or a creative space, I'd love to connect. Please make sure your site is active and HTTPS-enabled.
             </p>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
-            <div
-              class="rounded-xl border border-zinc-200 bg-white/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/40"
-            >
-              <p
-                class="font-mono text-[10px] tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
-              >
-                sites
-              </p>
-
-              <p
-                class="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-50"
-              >
-                {String(friends.length).padStart(2, "0")}
-              </p>
+          <!-- Stats Block -->
+          <div class="flex gap-4">
+            <div class="flex-1 rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 dark:border-zinc-800/60 dark:bg-zinc-900/40">
+              <span class="block font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">Directory</span>
+              <span class="mt-1 text-2xl font-bold text-zinc-900 dark:text-zinc-50">{friends.length} <span class="text-xs font-normal text-zinc-400 uppercase">Sites</span></span>
             </div>
-
-            <div
-              class="rounded-xl border border-zinc-200 bg-white/70 p-3 dark:border-zinc-800 dark:bg-zinc-900/40"
-            >
-              <p
-                class="font-mono text-[10px] tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
-              >
-                status
-              </p>
-
-              <p
-                class="mt-1 text-xl font-semibold text-zinc-900 dark:text-zinc-50"
-              >
-                open
-              </p>
+            <div class="flex-1 rounded-2xl border border-zinc-200/60 bg-zinc-50/50 p-4 dark:border-zinc-800/60 dark:bg-zinc-900/40">
+              <span class="block font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">Status</span>
+              <div class="mt-2 flex items-center gap-1.5">
+                <span class="size-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase">Accepting</span>
+              </div>
             </div>
           </div>
 
-          <div
-            class="rounded-2xl border border-zinc-200 bg-zinc-50/70 p-4 dark:border-zinc-800 dark:bg-zinc-900/40"
-          >
-            <p
-              class="font-mono text-[11px] tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
-            >
-              Exchange Links?
-            </p>
-
-            <div
-              class="mt-3 space-y-1.5 font-mono text-xs text-zinc-500 dark:text-zinc-400"
-            >
-              <div>
-                <span class="text-zinc-400 dark:text-zinc-500">title: </span>
-                {SITE.TITLE}
-              </div>
-
-              <div>
-                <span class="text-zinc-400 dark:text-zinc-500">
-                  description:
-                </span>
-                {SITE.DESCRIPTION}
-              </div>
-
-              <div>
-                <span class="text-zinc-400 dark:text-zinc-500">url: </span>
-                {SITE.URL}
-              </div>
+          <!-- Enhanced Metadata Card -->
+          <div class="group relative space-y-4 rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-950">
+            <div class="flex items-center justify-between border-b border-zinc-100 pb-4 dark:border-zinc-900">
+              <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100">My Site Info</h3>
+              <button
+                id="copy-info"
+                class="flex items-center gap-1.5 rounded-lg bg-zinc-100 px-3 py-1.5 text-[11px] font-bold text-zinc-600 transition-all hover:bg-zinc-900 hover:text-white dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-100 dark:hover:text-zinc-900"
+              >
+                <svg class="size-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                COPY
+              </button>
             </div>
 
-            <div class="mt-4 space-y-3">
-              <p
-                class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"
-              >
-                Send me your site information including:
-              </p>
+            <div id="site-metadata" class="space-y-5 py-2">
+              <div class="group/item">
+                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 transition-colors group-hover/item:text-blue-500">Title</p>
+                <p class="mt-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">{SITE.TITLE}</p>
+              </div>
 
-              <div
-                class="space-y-1 font-mono text-xs text-zinc-500 dark:text-zinc-400"
-              >
-                <div>
-                  <span class="text-zinc-400 dark:text-zinc-500">—</span>
-                  site title
-                </div>
+              <div class="group/item">
+                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 transition-colors group-hover/item:text-blue-500">URL</p>
+                <p class="mt-1 break-all text-sm font-medium text-zinc-700 dark:text-zinc-300">{SITE.URL}</p>
+              </div>
 
-                <div>
-                  <span class="text-zinc-400 dark:text-zinc-500">—</span>
-                  description
-                </div>
-
-                <div>
-                  <span class="text-zinc-400 dark:text-zinc-500">—</span>
-                  website URL
-                </div>
-
-                <div>
-                  <span class="text-zinc-400 dark:text-zinc-500">—</span>
-                  GitHub profile
-                </div>
+              <div class="group/item">
+                <p class="font-mono text-[10px] font-bold uppercase tracking-widest text-zinc-400 transition-colors group-hover/item:text-blue-500">Description</p>
+                <p class="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{SITE.DESCRIPTION}</p>
               </div>
             </div>
 
             <Link
               href={`mailto:${SITE.EMAIL}`}
               underline={false}
-              class="btn-interactive mt-5 inline-flex w-fit items-center rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-600 transition-colors duration-150 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-50"
-              >
-              <br/>
-              Send your site →
+              class="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-zinc-900 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02] active:scale-[0.98] dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              Contact Me
             </Link>
           </div>
         </aside>
 
+        <!-- Main Content: Friends Grid -->
         <section>
-          <ul class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <ul class="grid gap-6 sm:grid-cols-2">
             {
               friends.map((friend, i) => (
-                <li class="stagger-item" style={{ '--delay': `${80 + i * 35}ms` }}>
-                  <div class="group relative flex h-full min-h-[240px] flex-col overflow-hidden rounded-3xl border border-zinc-200/60 bg-gradient-to-br from-white/90 to-white/70 p-6 shadow-lg shadow-zinc-950/[0.03] transition-all duration-500 hover:-translate-y-2 hover:border-zinc-300/80 hover:shadow-2xl hover:shadow-zinc-950/[0.08] dark:border-zinc-800/50 dark:from-zinc-900/80 dark:to-zinc-900/50 dark:shadow-black/15 dark:hover:border-zinc-700/70">
-                    <div class="pointer-events-none absolute -right-20 -top-20 size-40 rounded-full bg-gradient-to-br from-blue-400/10 to-purple-500/10 blur-3xl transition-all duration-700 group-hover:scale-150 dark:from-blue-500/5 dark:to-purple-600/5" />
+                <li class="stagger-item group" style={{ '--delay': `${i * 60}ms` }}>
+                  <div class="relative flex h-full flex-col overflow-hidden rounded-[2rem] border border-zinc-200 bg-white p-7 transition-all duration-500 hover:-translate-y-1 hover:border-zinc-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900/40 dark:hover:border-zinc-700">
 
-                    <a
-                      href={friend.HREF}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="absolute inset-0 z-10"
-                      aria-label={`Visit ${friend.NAME}'s website`}
-                    />
-
-                    <div class="relative z-20 flex h-full flex-col">
-                      <div class="flex items-start justify-between gap-4">
-                        <div class="flex min-w-0 items-center gap-4">
-                          <div class="relative shrink-0">
-                            <div class="absolute inset-0 -m-1 rounded-2xl bg-gradient-to-br from-blue-400 to-purple-500 opacity-0 blur-md transition-all duration-500 group-hover:opacity-30" />
-
-                            <div class="relative size-16 overflow-hidden rounded-2xl border border-zinc-200/80 bg-zinc-100 shadow-md shadow-zinc-950/[0.05] dark:border-zinc-800/80 dark:bg-zinc-950 dark:shadow-black/20">
-                              <img
-                                src={friend.avatar}
-                                alt={friend.NAME}
-                                class="size-full object-cover transition-all duration-500 group-hover:scale-110"
-                                loading="lazy"
-                                decoding="async"
-                                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                              />
-
-                              <div class="hidden size-full items-center justify-center font-mono text-sm font-semibold text-zinc-500 dark:text-zinc-400">
-                                {friend.initial}
-                              </div>
-                            </div>
-
-                            <div class="absolute -bottom-0.5 -right-0.5 size-4 rounded-full border-2 border-white bg-emerald-500 shadow-sm dark:border-zinc-900" />
-                          </div>
-
-                          <div class="min-w-0 space-y-1.5">
-                            <div class="flex items-center gap-2">
-                              <h3 class="truncate text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-                                {friend.NAME}
-                              </h3>
-
-                              <ArrowIcon
-                                direction="right"
-                                size={4}
-                                class="shrink-0 text-zinc-300 transition-all duration-500 group-hover:translate-x-1 group-hover:text-blue-500 dark:text-zinc-700 dark:group-hover:text-blue-400"
-                              />
-                            </div>
-
-                            <div class="flex flex-wrap items-center gap-1.5">
-                              <span class="rounded-lg border border-zinc-200/80 bg-zinc-50/80 px-2 py-0.5 font-mono text-[10px] font-medium text-zinc-600 dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:text-zinc-400">
-                                {friend.hostname}
-                              </span>
-                            </div>
-                          </div>
+                    <div class="relative z-10 flex flex-1 flex-col">
+                      <div class="flex items-center justify-between">
+                        <div class="relative shrink-0">
+                          <div class="absolute inset-0 scale-110 rounded-2xl bg-zinc-100 blur-sm dark:bg-zinc-800" />
+                          <img
+                            src={friend.avatar}
+                            alt={friend.NAME}
+                            class="relative size-16 rounded-2xl object-cover shadow-sm transition-transform duration-500 group-hover:scale-105"
+                          />
                         </div>
 
                         {friend.githubUsername && (
                           <a
                             href={`https://github.com/${friend.githubUsername}`}
                             target="_blank"
-                            rel="noopener noreferrer"
-                            class="relative z-30 flex items-center gap-1.5 rounded-xl border border-zinc-200/80 bg-white/95 px-2.5 py-1 font-mono text-[10px] font-medium text-zinc-600 shadow-sm shadow-zinc-950/[0.02] transition-all duration-300 hover:border-gray-300 hover:bg-gray-100 hover:text-gray-900 hover:scale-105 hover:shadow-md dark:border-zinc-800/80 dark:bg-zinc-900/95 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-                            aria-label={`Visit ${friend.NAME}'s GitHub profile`}
+                            class="rounded-2xl bg-zinc-50 p-2.5 text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white dark:bg-zinc-800 dark:hover:bg-zinc-100 dark:hover:text-zinc-900"
                           >
-                            <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor">
+                            <svg class="size-5" fill="currentColor" viewBox="0 0 24 24">
                               <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                             </svg>
-                            <span class="hidden md:inline">@{friend.githubUsername}</span>
                           </a>
                         )}
                       </div>
 
-                      <div class="mt-6 flex-1">
-                        <p class="line-clamp-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                      <!-- Card Body -->
+                      <div class="mt-5 flex-1">
+                        <div class="flex items-baseline gap-2">
+                          <h3 class="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+                            {friend.NAME}
+                          </h3>
+                        </div>
+                        <p class="mt-1 font-mono text-[11px] font-semibold uppercase tracking-widest text-blue-600/80 dark:text-blue-400/80">
+                          {friend.hostname}
+                        </p>
+                        <p class="mt-4 line-clamp-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
                           {friend.DESCRIPTION}
                         </p>
                       </div>
 
-                      <div class="mt-6 flex items-center justify-between border-t border-zinc-100/80 pt-4 dark:border-zinc-800/80">
-                        <div class="flex items-center gap-2">
-                          <div class="relative size-2">
-                            <div class="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
-                            <div class="relative size-2 rounded-full bg-emerald-500" />
-                          </div>
-                          <span class="font-mono text-[10px] font-medium tracking-wide text-zinc-500 dark:text-zinc-500">
-                            active
-                          </span>
+                      <!-- Card Footer -->
+                      <div class="mt-7 flex items-center justify-between border-t border-zinc-100 pt-5 dark:border-zinc-800">
+                        <div class="flex items-center gap-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+                          <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                          Active
                         </div>
 
-                        <span class="group/btn flex items-center gap-1 font-mono text-[10px] font-semibold tracking-widest text-zinc-400 uppercase transition-all duration-500 group-hover:text-blue-500 dark:text-zinc-600 dark:group-hover:text-blue-400">
-                          visit site
-                          <svg class="size-3 transition-transform duration-500 group-hover/btn:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                          </svg>
-                        </span>
+                        <a
+                          href={friend.HREF}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="group/link flex items-center gap-1 text-sm font-bold text-zinc-900 dark:text-white"
+                        >
+                          Explore
+                          <ArrowIcon direction="right" class="size-3.5 transition-transform group-hover/link:translate-x-1" />
+                        </a>
                       </div>
                     </div>
-
-                    <div class="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/50 dark:ring-white/[0.05]" />
                   </div>
                 </li>
-              ))
-            }
+              )
+            )
+          }
           </ul>
         </section>
       </section>
     </div>
   </Container>
 </Layout>
+
+<script is:inline>
+  document.getElementById('copy-info')?.addEventListener('click', function() {
+    const title = "{SITE.TITLE}";
+    const url = "{SITE.URL}";
+    const desc = "{SITE.DESCRIPTION}";
+    const text = `Title: ${title}\nURL: ${url}\nDescription: ${desc}`;
+
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = this;
+      const original = btn.innerHTML;
+      btn.innerHTML = 'DONE!';
+      btn.classList.add('!bg-emerald-500', '!text-white');
+      setTimeout(() => {
+        btn.innerHTML = original;
+        btn.classList.remove('!bg-emerald-500', '!text-white');
+      }, 2000);
+    });
+  });
+</script>
+
+<style>
+  .stagger-item {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInSlide 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes fadeInSlide {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
