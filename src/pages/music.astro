@@ -4,7 +4,6 @@ import Container from "@components/Container.astro";
 import PlaylistSelector from "@components/PlaylistSelector.astro";
 import { MUSIC } from "@consts";
 
-// Playlists available for selection. Replace with actual playlist IDs.
 const PLAYLISTS = [
   { id: "2842079283", label: "Default playlist" },
   { id: "8991745471", label: "Chill (placeholder)" },
@@ -15,9 +14,13 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 ---
 
 <Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION} hideFooter>
+  <!-- 并行预加载资源 -->
+  <link rel="preload" href="/js/aplayer/APlayer.min.js" as="script" />
+  <link rel="preload" href="/js/aplayer/Meting2.min.js" as="script" />
+  <link rel="stylesheet" href="/css/aplayer/APlayer.min.css" />
+
   <Container>
     <main id="anMusic-page">
-      <!-- 动态封面氛围背景 -->
       <div id="an_music_bg" aria-hidden="true"></div>
       <div id="an_music_overlay" aria-hidden="true"></div>
 
@@ -27,7 +30,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         variant="v2"
       />
 
-      <!-- spacer to create visual separation between selector and player (tightened) -->
       <div class="h-2 md:h-3" aria-hidden="true"></div>
 
       <div id="an_music_player_mount">
@@ -43,9 +45,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
   </Container>
 </Layout>
 
-<!-- APlayer CSS — non-blocking load -->
-<link rel="stylesheet" href="/css/aplayer/APlayer.min.css" />
-
 <script is:inline data-astro-rerun>
   (() => {
     const root = document.documentElement;
@@ -59,19 +58,21 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
     let currentPlaylist = null;
     let aplayerReady = false;
+    let picObserver = null;
+    let syncFrame = null;
 
-    /** Dynamically load APlayer + MetingJS scripts (non-blocking). */
+    /** 脚本并行加载 */
     function loadAPlayerScripts() {
-      if (aplayerReady) return Promise.resolve();
-      if (window.APlayer) { aplayerReady = true; return Promise.resolve(); }
-
+      if (window.APlayer && aplayerReady) return Promise.resolve();
       return new Promise((resolve, reject) => {
         const js = document.createElement("script");
         js.src = "/js/aplayer/APlayer.min.js";
+        js.async = true;
         js.onload = () => {
           aplayerReady = true;
           const meting = document.createElement("script");
           meting.src = "/js/aplayer/Meting2.min.js";
+          meting.async = true;
           meting.onload = resolve;
           meting.onerror = reject;
           document.head.appendChild(meting);
@@ -79,15 +80,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         js.onerror = reject;
         document.head.appendChild(js);
       });
-    }
-
-    function createLoadingShell() {
-      const shell = document.createElement("div");
-      shell.id = "an_music_loading";
-      shell.className = "music-loading-shell";
-      shell.innerHTML =
-        '<div class="music-loading-cover"></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
-      return shell;
     }
 
     function createMetingElement(playlistId) {
@@ -104,276 +96,111 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         theme: "#fff",
         volume: "0.5",
       };
-      Object.entries(attrs).forEach(([key, value]) => {
-        player.setAttribute(key, value);
-      });
+      Object.entries(attrs).forEach(([k, v]) => player.setAttribute(k, v));
       return player;
     }
 
-    function removeExistingPlayer() {
-      const existing = mount.querySelector("meting-js");
-      if (existing) existing.remove();
-      document.querySelectorAll(".aplayer").forEach((n) => n.remove());
-    }
-
-    function showShell() {
-      let shell = mount.querySelector("#an_music_loading");
-      if (!shell) {
-        shell = createLoadingShell();
-        mount.appendChild(shell);
-      } else {
-        shell.classList.remove("is-hidden");
-      }
-      return shell;
-    }
-
-    function hideShell(shell) {
-      shell.classList.add("is-hidden");
-      window.setTimeout(() => shell.remove(), 300);
-    }
-
-    function showError() {
-      const err = document.createElement("div");
-      err.className = "music-loading-shell";
-      err.innerHTML = '<div class="music-loading-copy"><p>无法加载歌单</p><span>请检查歌单 ID 是否有效或稍后重试。</span></div>';
-      mount.appendChild(err);
-      window.setTimeout(() => err.remove(), 3500);
-    }
-
-    function disablePlaylistButton(playlistId) {
-      const btn = document.querySelector(`#playlist-selector [data-playlist="${playlistId}"]`);
-      const select = document.querySelector('#playlist-selector select');
-      if (btn) {
-        btn.setAttribute("aria-disabled", "true");
-        btn.disabled = true;
-        btn.classList.add("playlist-disabled");
-      }
-      if (select && select.value === playlistId) {
-        select.setAttribute('aria-disabled', 'true');
-        select.disabled = true;
-        select.classList.add('playlist-disabled');
-      }
-    }
-
-    /** Wait for APlayer DOM to appear using MutationObserver instead of polling. */
-    async function waitForAplayer(shell) {
-      await new Promise((resolve) => {
-        const observer = new MutationObserver((_mutations, obs) => {
-          if (mount.querySelector(".aplayer")) {
-            obs.disconnect();
-            resolve();
-          }
-        });
-        observer.observe(mount, { childList: true, subtree: true });
-        // Safety timeout — if APlayer doesn't appear in 8s, give up
-        window.setTimeout(() => { observer.disconnect(); resolve(); }, 8000);
-      });
-      hideShell(shell);
-    }
-
-    /** Wait for cover image to appear. */
-    function waitForCover() {
-      return new Promise((resolve) => {
-        const observer = new MutationObserver((_mutations, obs) => {
-          const pic = getPic();
-          if (pic) {
-            obs.disconnect();
-            resolve(pic);
-          }
-        });
-        observer.observe(mount, { childList: true, subtree: true, attributes: true });
-        window.setTimeout(() => { observer.disconnect(); resolve(null); }, 8000);
+    /** rAF 驱动封面同步 */
+    function syncCover() {
+      if (syncFrame) cancelAnimationFrame(syncFrame);
+      syncFrame = requestAnimationFrame(() => {
+        const pic = mount.querySelector(".aplayer-pic");
+        if (!pic) return;
+        const cover = pic.style.backgroundImage || window.getComputedStyle(pic).backgroundImage;
+        if (cover && cover !== "none" && bg.dataset.currentCover !== cover) {
+          bg.dataset.currentCover = cover;
+          bg.style.setProperty("--music-cover", cover);
+          bg.classList.add("is-cover-ready");
+        }
       });
     }
 
     function setPlaylist(playlistId) {
-      if (!playlistId) return;
+      if (!playlistId || playlistId === currentPlaylist) return;
       currentPlaylist = playlistId;
 
-      try {
-        localStorage.setItem("an_music_last_playlist", playlistId);
-      } catch (e) { /* ignore */ }
+      try { localStorage.setItem("an_music_last_playlist", playlistId); } catch (e) {}
 
-      // Update selector UI
-      const buttons = document.querySelectorAll("#playlist-selector [data-playlist]");
-      buttons.forEach((b) => {
-        const pressed = b.dataset.playlist === playlistId;
-        if (pressed) {
-          b.classList.add("playlist-active");
-          b.classList.remove("playlist-inactive");
-          b.setAttribute("tabindex", "0");
-        } else {
-          b.classList.remove("playlist-active");
-          b.classList.add("playlist-inactive");
-          b.setAttribute("tabindex", "-1");
-        }
-        b.setAttribute("aria-selected", pressed ? "true" : "false");
-        b.setAttribute("aria-pressed", pressed ? "true" : "false");
+      // 更新 Selector UI
+      document.querySelectorAll("#playlist-selector [data-playlist]").forEach((b) => {
+        const active = b.dataset.playlist === playlistId;
+        b.classList.toggle("playlist-active", active);
+        b.classList.toggle("playlist-inactive", !active);
+        b.setAttribute("aria-selected", String(active));
+        b.tabIndex = active ? 0 : -1;
       });
 
-      const shell = showShell();
-      removeExistingPlayer();
+      // 显示 Loading
+      let shell = mount.querySelector("#an_music_loading");
+      if (!shell) {
+        shell = document.createElement("div");
+        shell.id = "an_music_loading";
+        shell.className = "music-loading-shell";
+        shell.innerHTML = '<div class="music-loading-cover"></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
+        mount.appendChild(shell);
+      }
+      shell.classList.remove("is-hidden");
 
-      // Load APlayer scripts if not yet loaded, then create player
+      // 清理旧播放器
+      document.querySelectorAll("meting-js, .aplayer").forEach(n => n.remove());
+
       loadAPlayerScripts().then(() => {
-        const player = createMetingElement(playlistId);
-        mount.appendChild(player);
-        return waitForAplayer(shell);
-      }).then(() => waitForCover()).then((pic) => {
-        if (pic) {
-          attachCoverObserver(pic);
-          scheduleSync(pic);
-        }
-        // If no .aplayer appeared after 8s, the playlist likely failed
-        if (!mount.querySelector(".aplayer")) {
-          disablePlaylistButton(playlistId);
-          showError();
-        }
-      }).catch(() => {
-        hideShell(shell);
-        showError();
+        mount.appendChild(createMetingElement(playlistId));
+
+        // 监控渲染完成
+        const observer = new MutationObserver((_, obs) => {
+          const aplayer = mount.querySelector(".aplayer");
+          if (aplayer) {
+            obs.disconnect();
+            shell.classList.add("is-hidden");
+            window.setTimeout(() => shell.remove(), 300);
+
+            // 绑定封面监听
+            const pic = aplayer.querySelector(".aplayer-pic");
+            if (pic) {
+              picObserver?.disconnect();
+              picObserver = new MutationObserver(syncCover);
+              picObserver.observe(pic, { attributes: true, attributeFilter: ["style"] });
+              syncCover();
+            }
+          }
+        });
+        observer.observe(mount, { childList: true, subtree: true });
       });
     }
 
-    // Initial mount: defer after paint
+    // 初始执行
     window.requestAnimationFrame(() => {
-      window.setTimeout(() => {
-        const selector = document.getElementById("playlist-selector");
-        let initial = null;
-        try {
-          const saved = localStorage.getItem("an_music_last_playlist");
-          const available = selector?.dataset.playlists
-            ? JSON.parse(selector.dataset.playlists)
-            : null;
-          const defaultFromDOM = selector?.dataset?.default;
-          if (saved && available && available.some((p) => p.id === saved)) {
-            initial = saved;
-          } else if (defaultFromDOM) {
-            initial = defaultFromDOM;
-          } else if (available && available.length) {
-            initial = available[0].id;
-          }
-        } catch (e) { /* ignore */ }
-        if (initial) setPlaylist(initial);
-      }, 0);
+      const selector = document.getElementById("playlist-selector");
+      let initial = null;
+      try {
+        const saved = localStorage.getItem("an_music_last_playlist");
+        const available = selector?.dataset.playlists ? JSON.parse(selector.dataset.playlists) : [];
+        initial = (saved && available.some(p => p.id === saved)) ? saved : selector?.dataset.default;
+      } catch (e) {}
+      if (initial) setPlaylist(initial);
     });
 
-    // Wire playlist selector clicks
+    // 事件委派
     const selector = document.getElementById("playlist-selector");
-    if (selector) {
-      selector.addEventListener("click", (e) => {
-        let node = e.target;
-        if (!(node instanceof Element)) node = node?.parentElement;
-        const btn = node && node.closest ? node.closest("[data-playlist]") : null;
-        if (btn) {
-          const id = btn.dataset.playlist;
-          if (id && id !== currentPlaylist) setPlaylist(id);
-        }
-      });
-
-      selector.addEventListener("keydown", (e) => {
-        const buttons = Array.from(selector.querySelectorAll("[data-playlist]"));
-        if (!buttons.length) return;
-        const idx = buttons.indexOf(document.activeElement);
-        if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-          e.preventDefault();
-          const next = idx > 0 ? idx - 1 : buttons.length - 1;
-          buttons[next].focus();
-        } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-          e.preventDefault();
-          const next = idx < buttons.length - 1 ? idx + 1 : 0;
-          buttons[next].focus();
-        } else if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          const btn = document.activeElement?.closest?.("[data-playlist]") || null;
-          if (btn) {
-            const id = btn.dataset.playlist;
-            if (id && id !== currentPlaylist) setPlaylist(id);
-          }
-        }
-      });
-
-      selector.addEventListener('change', (e) => {
-        const target = e.target;
-        if (target && target.matches && target.matches('select')) {
-          const id = target.value;
-          if (id && id !== currentPlaylist) setPlaylist(id);
-        }
-      });
-    }
-
-    function normalizeCover(background) {
-      if (!background || background === "none") return null;
-      return background;
-    }
-
-    function getPic() {
-      return document.querySelector("#anMusic-page .aplayer-pic");
-    }
-
-    function getCurrentCover(pic = getPic()) {
-      if (!pic) return null;
-      const inlineBackground = normalizeCover(pic.style.backgroundImage);
-      if (inlineBackground) return inlineBackground;
-      const computedBackground = normalizeCover(window.getComputedStyle(pic).backgroundImage);
-      if (computedBackground) return computedBackground;
-      const img = pic.querySelector("img");
-      if (img?.currentSrc || img?.src) return `url("${img.currentSrc || img.src}")`;
-      return null;
-    }
-
-    function syncMusicCoverBackground(pic = getPic()) {
-      const cover = getCurrentCover(pic);
-      if (!cover || bg.dataset.currentCover === cover) return false;
-      bg.dataset.currentCover = cover;
-      bg.style.setProperty("--music-cover", cover);
-      bg.classList.add("is-cover-ready");
-      return true;
-    }
-
-    let frame = 0;
-    function scheduleSync(pic) {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(() => syncMusicCoverBackground(pic));
-    }
-
-    let picObserver = null;
-    function attachCoverObserver(pic) {
-      if (!pic || pic.dataset.coverObserved === "true") return;
-      pic.dataset.coverObserved = "true";
-      picObserver = new MutationObserver(() => scheduleSync(pic));
-      picObserver.observe(pic, {
-        attributes: true,
-        attributeFilter: ["style", "class", "src"],
-        childList: true,
-        subtree: true,
-      });
-      scheduleSync(pic);
-    }
-
-    // Clicking a track updates cover — probe a few times
-    page.addEventListener("click", () => {
-      const pic = getPic();
-      if (pic) attachCoverObserver(pic);
-      scheduleSync(pic);
-      window.setTimeout(() => scheduleSync(getPic()), 120);
-      window.setTimeout(() => scheduleSync(getPic()), 360);
+    selector?.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-playlist]");
+      if (btn) setPlaylist(btn.dataset.playlist);
+    });
+    selector?.addEventListener('change', (e) => {
+      if (e.target.matches('select')) setPlaylist(e.target.value);
     });
 
+    // SPA 清理
     document.addEventListener("astro:before-swap", () => {
       picObserver?.disconnect();
-      window.cancelAnimationFrame(frame);
+      if (syncFrame) cancelAnimationFrame(syncFrame);
       root.classList.remove("music-page-active");
     }, { once: true });
   })();
 </script>
 
 <style is:global>
-  /*
-    Immersive music mode.
-    All global overrides are scoped behind html.music-page-active so the normal
-    blog theme is restored automatically when navigating away.
-  */
   html.music-page-active {
     background: #050505;
   }
@@ -454,11 +281,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     color: rgba(255, 255, 255, 0.5) !important;
   }
 
-  /* 音乐页面背景 */
-  #an_music_bg_wrapper {
-    display: none !important;
-  }
-
   #an_music_bg,
   #an_music_overlay {
     position: fixed;
@@ -467,7 +289,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     pointer-events: none;
   }
 
-  /* Cover-driven atmosphere layer. Updated by JS from the current song cover. */
   #an_music_bg {
     inset: -5vh;
     width: 110vw;
@@ -511,7 +332,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     }
   }
 
-  /* Stable readability layer — keeps text legible regardless of cover color. */
   #an_music_overlay {
     background:
       radial-gradient(
@@ -602,8 +422,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     }
   }
 
-  /* APlayer 结构重组 (安知鱼风格) */
-
   #anMusic-page .aplayer {
     position: relative !important;
     z-index: 1 !important;
@@ -616,7 +434,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     margin: 0 !important;
   }
 
-  /* 彻底消除所有内部边框和横线 */
   #anMusic-page .aplayer * {
     border-top: none !important;
     border-bottom: none !important;
@@ -624,7 +441,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     border-right: none !important;
   }
 
-  /* 歌单区 (左侧 35% - 调窄) */
   #anMusic-page .aplayer-list {
     width: 35% !important;
     display: block !important;
@@ -635,10 +451,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
   #anMusic-page .aplayer-list ol {
     max-height: 100% !important;
-    padding-right: 15px !important; /* 给滚动条留空间 */
+    padding-right: 15px !important;
   }
 
-  /* 自定义滚动条样式 */
   #anMusic-page .aplayer-list ol::-webkit-scrollbar {
     width: 6px !important;
   }
@@ -664,7 +479,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     margin-bottom: 8px !important;
     color: #fff !important;
     transition: background 0.3s !important;
-    padding-left: 15px !important; /* 给指示条留空间 */
+    padding-left: 15px !important;
     position: relative !important;
   }
 
@@ -676,16 +491,14 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     background: rgba(255, 255, 255, 0.2) !important;
   }
 
-  /* 当前歌曲指示条 */
   #anMusic-page .aplayer-list ol li .aplayer-list-cur {
     left: 5px !important;
     top: 8px !important;
     height: 16px !important;
   }
 
-  /* 封面歌词区 (右侧 65% - 调宽) */
   #anMusic-page .aplayer-body {
-    width: 65% !important; /* 修复宽度冲突 */
+    width: 65% !important;
     height: 100% !important;
     flex-direction: column !important;
     display: flex !important;
@@ -693,7 +506,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     box-sizing: border-box !important;
   }
 
-  /* 修复歌曲名称只显示一半的问题 */
   #anMusic-page .aplayer-info {
     margin: 0 !important;
     padding: 10px 20px !important;
@@ -735,27 +547,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
   }
 
-  #anMusic-page .aplayer-info {
-    margin: 0 !important;
-    padding: 0 !important;
-    height: auto !important;
-    text-align: center !important;
-  }
-
-  #anMusic-page .aplayer-info .aplayer-music {
-    margin-bottom: 20px !important;
-  }
-
-  #anMusic-page .aplayer-info .aplayer-music .aplayer-title {
-    font-size: 2rem !important;
-    font-weight: 800 !important;
-    color: #fff !important;
-  }
-
-  /* 歌词区域优化 */
   #anMusic-page .aplayer-lrc {
     height: 300px !important;
-    --lrc-line-height: 40px; /* 歌词行距，可调整 */
+    --lrc-line-height: 40px;
     mask-image: linear-gradient(
       to bottom,
       transparent 0%,
@@ -806,7 +600,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     min-height: 16px !important;
   }
 
-  /* 控制器固定到底部 */
   #anMusic-page .aplayer-info .aplayer-controller {
     position: fixed !important;
     bottom: 40px !important;
@@ -824,14 +617,12 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     z-index: 100 !important;
   }
 
-  /* 进度条区域 - 居中显示 */
   #anMusic-page .aplayer-info .aplayer-controller .aplayer-bar-wrap {
     flex: 1 1 auto !important;
     margin: 0 20px !important;
     min-width: 120px !important;
   }
 
-  /* 时间显示 */
   #anMusic-page .aplayer-info .aplayer-controller .aplayer-time {
     color: #fff !important;
     display: flex !important;
@@ -842,7 +633,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     padding: 0 !important;
   }
 
-  /* 强制显示所有控制按钮 */
   #anMusic-page .aplayer-info .aplayer-controller .aplayer-time .aplayer-icon {
     display: inline-block !important;
     width: 24px !important;
@@ -851,7 +641,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     margin: 0 !important;
   }
 
-  /* 按钮颜色 */
   #anMusic-page .aplayer-played {
     background: #fff !important;
   }
