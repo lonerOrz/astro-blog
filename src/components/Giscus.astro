@@ -1,17 +1,15 @@
 ---
-// Giscus comment system
-// - Loaded on page render — no scroll delay
-// - Theme syncs with blog's html.dark class at load time
-// - Theme updates via postMessage (no iframe reload on toggle)
+// src/components/Giscus.astro
 ---
 
-<div class="giscus-wrapper" data-loaded="false">
-  <!-- Placeholder shown until Giscus loads -->
-  <div class="giscus-placeholder py-10 text-center">
+<div class="giscus-wrapper pt-10" data-pagefind-ignore>
+  <div
+    class="giscus-placeholder flex flex-col items-center justify-center border-t border-zinc-200 py-12 dark:border-zinc-800"
+  >
     <span
-      class="font-mono text-[11px] uppercase tracking-widest text-zinc-300 dark:text-zinc-700"
+      class="animate-pulse font-mono text-[10px] tracking-[0.2em] text-zinc-400 uppercase dark:text-zinc-600"
     >
-      comments
+      Loading Comments...
     </span>
   </div>
 </div>
@@ -19,27 +17,27 @@
 <script is:inline data-astro-rerun>
   (function () {
     const wrapper = document.querySelector(".giscus-wrapper");
-    if (!wrapper || wrapper.dataset.loaded === "true") return;
+    if (!wrapper) return;
 
-    /** Pick the right Giscus theme to match the blog's current mode. */
     function getTheme() {
       return document.documentElement.classList.contains("dark")
-        ? "dark_dimmed"   // soft dark — matches #111111 better than full dark
-        : "light";        // clean GitHub light — matches white/zinc palette
+        ? "dark_dimmed"
+        : "light";
+    }
+
+    function updateGiscusTheme() {
+      const iframe = document.querySelector("iframe.giscus-frame");
+      if (!iframe) return;
+
+      iframe.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: getTheme() } } },
+        "https://giscus.app",
+      );
     }
 
     function loadGiscus() {
       if (wrapper.dataset.loaded === "true") return;
-      wrapper.dataset.loaded = "true";
 
-      const placeholder = wrapper.querySelector(".giscus-placeholder");
-
-      // Mount the <div class="giscus"> that giscus.js will target
-      const container = document.createElement("div");
-      container.className = "giscus";
-      wrapper.appendChild(container);
-
-      // Dynamically inject the giscus script so it only downloads on demand
       const script = document.createElement("script");
       const attrs = {
         src: "https://giscus.app/client.js",
@@ -55,26 +53,36 @@
         "data-theme": getTheme(),
         "data-lang": "en",
         crossorigin: "anonymous",
+        async: "true",
       };
-      Object.entries(attrs).forEach(([k, v]) => script.setAttribute(k, v));
-      script.async = true;
 
-      // Fade out placeholder once script has loaded
-      script.addEventListener("load", () => {
-        if (!placeholder) return;
-        placeholder.style.transition = "opacity 200ms ease-out";
-        placeholder.style.opacity = "0";
-        setTimeout(() => placeholder.remove(), 400);
-      });
+      Object.entries(attrs).forEach(([k, v]) => script.setAttribute(k, v));
+
+      script.onload = () => {
+        wrapper.dataset.loaded = "true";
+        const placeholder = wrapper.querySelector(".giscus-placeholder");
+        if (placeholder) {
+          placeholder.style.transition = "opacity 0.5s ease";
+          placeholder.style.opacity = "0";
+          setTimeout(() => placeholder.remove(), 500);
+        }
+      };
 
       wrapper.appendChild(script);
     }
 
-    // Load immediately when page renders — no scroll delay needed
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", loadGiscus);
-    } else {
-      loadGiscus();
-    }
+    // 初始化加载
+    loadGiscus();
+
+    // 监听主题切换：当 html class 变化时同步更新 Giscus
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          updateGiscusTheme();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
   })();
 </script>
