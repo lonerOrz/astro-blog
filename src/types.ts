@@ -22,6 +22,7 @@ export type Socials = Social[];
 export type Friend = {
   NAME: string;
   HREF: string;
+  GITHUB: string;
   DESCRIPTION: string;
 };
 

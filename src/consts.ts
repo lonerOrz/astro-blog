@@ -26,7 +26,8 @@ export const NOTES: Metadata = {
 
 export const SERIES: Metadata = {
   TITLE: "Series",
-  DESCRIPTION: "A collection of topical series, each containing related articles.",
+  DESCRIPTION:
+    "A collection of topical series, each containing related articles.",
 };
 
 export const ABOUT: Metadata = {
@@ -89,23 +90,15 @@ export const TERMINAL = {
 
 export const FRIENDS: Friends = [
   {
-    NAME: "Astro",
-    HREF: "https://astro.build",
-    DESCRIPTION: "The web framework for content-driven websites.",
-  },
-  {
-    NAME: "Tailwind CSS",
-    HREF: "https://tailwindcss.com",
-    DESCRIPTION: "A utility-first CSS framework.",
-  },
-  {
     NAME: "LonerOrz",
     HREF: "https://astro-blog-rosy.vercel.app",
+    GITHUB: "https://github.com/lonerOrz",
     DESCRIPTION: "The creator of this space.",
   },
   {
     NAME: "Guanran928",
     HREF: "https://blog.ny4.dev/",
+    GITHUB: "https://github.com/Guanran928",
     DESCRIPTION: "Guanran928 的个人博客，记录技术、折腾与日常",
   },
 ];
