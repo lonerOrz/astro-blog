@@ -18,10 +18,10 @@ const mockPage = {
   lastPage: Math.ceil(allNotes.length / pageSize),
   url: {
     current: "/notes",
-    prev: undefined,
-    next: allNotes.length > pageSize ? "/notes/2" : undefined,
+    prev: null,
+    next: allNotes.length > pageSize ? "/notes/2" : null,
   },
 };
 ---
 
-<PageComponent page={mockPage} />
+<PageComponent page={mockPage as any} />
