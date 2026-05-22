@@ -20,18 +20,15 @@ export async function getStaticPaths() {
 }
 
 const { tagName, posts } = Astro.props;
-
 const sortedPosts = posts.sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
-
-// 标题：#标签名
 const formattedTagName = tagName.startsWith("#") ? tagName : `#${tagName}`;
 ---
 
 <Layout
   title={`Topic: ${tagName}`}
-  description={`Browse all articles tagged with ${tagName}`}
+  description={`Articles tagged with ${tagName}`}
 >
   <Container>
     <div class="space-y-10" data-pagefind-ignore>
@@ -39,7 +36,6 @@ const formattedTagName = tagName.startsWith("#") ? tagName : `#${tagName}`;
         <BackToPrevious href="/tags">Back to all tags</BackToPrevious>
       </div>
 
-      <!-- 头部装饰 -->
       <header class="animate space-y-2">
         <div
           class="flex items-center gap-2 text-sm tracking-widest text-zinc-500 uppercase dark:text-zinc-400"
@@ -53,32 +49,27 @@ const formattedTagName = tagName.startsWith("#") ? tagName : `#${tagName}`;
         />
       </header>
 
-      <!-- 文章列表 -->
       <section class="animate">
-        <div class="space-y-4">
-          <ul class="flex flex-col gap-4">
-            {
-              sortedPosts.map((post) => (
-                <li class="group">
-                  <ArrowCard entry={post} />
-                </li>
-              ))
-            }
-          </ul>
-        </div>
+        <ul class="flex flex-col gap-4">
+          {
+            sortedPosts.map((post) => (
+              <li class="group">
+                <ArrowCard entry={post} />
+              </li>
+            ))
+          }
+        </ul>
       </section>
     </div>
   </Container>
 </Layout>
 
 <style>
-  /* 入场动画 */
   .animate {
     opacity: 0;
     transform: translateY(10px);
     animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-
   @keyframes slideIn {
     to {
       opacity: 1;
