@@ -4,108 +4,127 @@ import { SITE } from "@consts";
 import BackToTop from "@components/BackToTop.astro";
 ---
 
-<footer class="animate">
+<footer class="animate pt-20 pb-12">
   <Container>
     <div class="relative">
-      <div class="absolute -top-12 right-0">
+      <div class="absolute -top-16 right-0">
         <BackToTop />
       </div>
     </div>
 
     <div
-      class="flex flex-col gap-6 border-t border-zinc-200 pt-8 dark:border-zinc-800 sm:flex-row sm:items-end sm:justify-between"
+      class="flex flex-col gap-8 border-t border-zinc-200 pt-10 sm:flex-row sm:items-start sm:justify-between dark:border-zinc-800"
     >
-      <div class="space-y-2">
-        <div class="flex items-baseline gap-2">
-          <span class="font-medium text-zinc-900 dark:text-zinc-50">
-            lonerOrz
-          </span>
-          <span class="font-mono text-[11px] text-zinc-400 dark:text-zinc-600">
-            / {new Date().getFullYear()}
-          </span>
+      <!-- Left: Branding & Status -->
+      <div class="space-y-4">
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-2.5">
+            <span
+              class="text-sm font-bold tracking-tighter text-zinc-900 uppercase dark:text-zinc-50"
+            >
+              {SITE.TITLE}
+            </span>
+            <span class="text-zinc-300 dark:text-zinc-700">/</span>
+            <span class="font-mono text-[10px] font-bold text-zinc-400">
+              © {new Date().getFullYear()}
+            </span>
+          </div>
+
+          <!-- System Status Badge -->
+          <div class="flex items-center gap-2">
+            <div class="relative flex size-1.5">
+              <span
+                class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
+              ></span>
+              <span
+                class="relative inline-flex size-1.5 rounded-full bg-emerald-500"
+              ></span>
+            </div>
+            <span
+              class="font-mono text-[9px] font-bold tracking-[0.2em] text-zinc-400 uppercase"
+            >
+              System Operational
+            </span>
+          </div>
         </div>
-        <p class="max-w-sm text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+
+        <p
+          class="max-w-xs text-xs leading-relaxed text-zinc-500 dark:text-zinc-500"
+        >
           {SITE.DESCRIPTION}
         </p>
       </div>
 
-      <div class="flex items-center gap-3">
+      <!-- Right: Theme Panel -->
+      <div class="flex flex-col gap-3 sm:items-end">
         <span
-          class="font-mono text-[11px] uppercase tracking-widest text-zinc-400 dark:text-zinc-600"
+          class="px-1 font-mono text-[9px] font-black tracking-[0.3em] text-zinc-400 uppercase"
         >
-          theme
+          Console / Theme
         </span>
+
+        <!-- 主题切换胶囊仓 -->
         <div
-          class="flex items-center rounded-lg border border-zinc-200 bg-white/70 p-1 shadow-sm shadow-zinc-950/[0.03] dark:border-zinc-800 dark:bg-zinc-900/70 dark:shadow-black/10"
-          aria-label="Theme selector"
+          class="flex items-center gap-1 rounded-xl border border-zinc-200 bg-zinc-50/50 p-1.5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
         >
           <button
             id="light-theme-button"
-            aria-label="Light theme"
-            title="Light theme"
-            class="group btn-interactive flex size-8 items-center justify-center rounded-md text-zinc-500 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800 dark:focus-visible:text-zinc-50"
+            aria-label="Light Mode"
+            class="flex size-8 items-center justify-center rounded-lg text-zinc-400 transition-all hover:bg-white hover:text-zinc-900 hover:shadow-sm active:scale-90 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="17"
-              height="17"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.6"
+              stroke-width="2.5"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="transition-colors duration-150"
             >
               <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              <path
+                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+              ></path>
             </svg>
           </button>
+
           <button
             id="dark-theme-button"
-            aria-label="Dark theme"
-            title="Dark theme"
-            class="group btn-interactive flex size-8 items-center justify-center rounded-md text-zinc-500 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800 dark:focus-visible:text-zinc-50"
+            aria-label="Dark Mode"
+            class="flex size-8 items-center justify-center rounded-lg text-zinc-400 transition-all hover:bg-white hover:text-zinc-900 hover:shadow-sm active:scale-90 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="17"
-              height="17"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.6"
+              stroke-width="2.5"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="transition-colors duration-150"
             >
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           </button>
+
           <button
             id="system-theme-button"
-            aria-label="System theme"
-            title="System theme"
-            class="group btn-interactive flex size-8 items-center justify-center rounded-md text-zinc-500 transition-colors duration-150 hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800 dark:focus-visible:text-zinc-50"
+            aria-label="System Mode"
+            class="flex size-8 items-center justify-center rounded-lg text-zinc-400 transition-all hover:bg-white hover:text-zinc-900 hover:shadow-sm active:scale-90 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="17"
-              height="17"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              stroke-width="1.6"
+              stroke-width="2.5"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="transition-colors duration-150"
             >
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
               <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -114,6 +133,11 @@ import BackToTop from "@components/BackToTop.astro";
           </button>
         </div>
       </div>
+    </div>
+
+    <div
+      class="mt-12 h-px w-full bg-gradient-to-r from-transparent via-zinc-100 to-transparent dark:via-zinc-900"
+    >
     </div>
   </Container>
 </footer>
