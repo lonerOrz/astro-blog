@@ -9,43 +9,80 @@ import PageHeader from "@components/PageHeader.astro";
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
   const tags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
+
   return tags.map((tag) => ({
     params: { id: tag },
     props: {
+      tagName: tag,
       posts: posts.filter((post) => post.data.tags?.includes(tag)),
     },
   }));
 }
 
-const { id } = Astro.params;
-const { posts } = Astro.props;
+const { tagName, posts } = Astro.props;
 
 const sortedPosts = posts.sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
+
+// 标题：#标签名
+const formattedTagName = tagName.startsWith("#") ? tagName : `#${tagName}`;
 ---
 
-<Layout title={`Tag: ${id}`} description={`Posts with the tag: ${id}`}>
+<Layout
+  title={`Topic: ${tagName}`}
+  description={`Browse all articles tagged with ${tagName}`}
+>
   <Container>
     <div class="space-y-10" data-pagefind-ignore>
       <div class="animate">
-        <BackToPrevious href="/tags">All tags</BackToPrevious>
+        <BackToPrevious href="/tags">Back to all tags</BackToPrevious>
       </div>
-      <PageHeader
-        title={`#${id}`}
-        subtitle={`${sortedPosts.length} ${sortedPosts.length === 1 ? "article" : "articles"}`}
-      />
-      <div class="animate border-t border-zinc-200 dark:border-zinc-800">
-        <ul class="not-prose">
-          {
-            sortedPosts.map((post) => (
-              <li>
-                <ArrowCard entry={post} />
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+
+      <!-- 头部装饰 -->
+      <header class="animate space-y-2">
+        <div
+          class="flex items-center gap-2 text-sm tracking-widest text-zinc-500 uppercase dark:text-zinc-400"
+        >
+          <span class="h-[1px] w-8 bg-zinc-300 dark:bg-zinc-700"></span>
+          Category
+        </div>
+        <PageHeader
+          title={formattedTagName}
+          subtitle={`Showing ${sortedPosts.length} ${sortedPosts.length === 1 ? "article" : "articles"}`}
+        />
+      </header>
+
+      <!-- 文章列表 -->
+      <section class="animate">
+        <div class="space-y-4">
+          <ul class="flex flex-col gap-4">
+            {
+              sortedPosts.map((post) => (
+                <li class="group">
+                  <ArrowCard entry={post} />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
     </div>
   </Container>
 </Layout>
+
+<style>
+  /* 入场动画 */
+  .animate {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes slideIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

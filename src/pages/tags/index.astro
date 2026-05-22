@@ -5,34 +5,80 @@ import Container from "@components/Container.astro";
 import PageHeader from "@components/PageHeader.astro";
 import TagPill from "@components/TagPill.astro";
 
+// 获取所有非草稿文章
 const posts = await getCollection("blog", ({ data }) => !data.draft);
-const tags = [...new Set(posts.flatMap((post) => post.data.tags || []))].sort();
+
+const tagMap = new Map<string, number>();
+posts.forEach((post) => {
+  post.data.tags?.forEach((tag) => {
+    tagMap.set(tag, (tagMap.get(tag) || 0) + 1);
+  });
+});
+
+// 按照首字母排序标签
+const sortedTags = [...tagMap.keys()].sort((a, b) => a.localeCompare(b));
+
+// 页面 SEO 信息
+const title = "Tags";
+const description = `Explore ${tagMap.size} different topics across the blog.`;
 ---
 
-<Layout title="Tags" description="List of tags used.">
+<Layout title={title} description={description}>
   <Container>
-    <div class="space-y-10">
-      <PageHeader
-        title="Tags."
-        subtitle={`${tags.length} topics`}
-      />
-      <div class="animate border-t border-zinc-200 dark:border-zinc-800 pt-8 flex flex-wrap gap-3">
-        {
-          tags.map((tag, i) => {
-            const count = posts.filter((post) =>
-              post.data.tags?.includes(tag),
-            ).length;
-            return (
-              <span
-                class="stagger-item"
+    <div class="space-y-12">
+      <div class="animate">
+        <PageHeader
+          title="Browse Topics"
+          subtitle={`A collection of ${tagMap.size} categories and tags.`}
+        />
+      </div>
+
+      <div class="animate space-y-8">
+        <!-- 装饰性分界线 -->
+        <div
+          class="h-[1px] w-full bg-gradient-to-r from-zinc-200 to-transparent dark:from-zinc-800"
+        >
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4">
+          {
+            sortedTags.map((tag, i) => (
+              <div
+                class="stagger-item transition-transform hover:-translate-y-1"
                 style={`--delay: ${100 + i * 30}ms`}
               >
-                <TagPill tag={tag} count={count} />
-              </span>
-            );
-          })
+                <TagPill tag={tag} count={tagMap.get(tag)} showCount={true} />
+              </div>
+            ))
+          }
+        </div>
+
+        {/* 如果标签很多，可以按首字母分区块 */}
+        {
+          sortedTags.length === 0 && (
+            <p class="text-zinc-500 dark:text-zinc-400">No tags found yet.</p>
+          )
         }
       </div>
     </div>
   </Container>
 </Layout>
+
+<style>
+  .stagger-item {
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: var(--delay);
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
