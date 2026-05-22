@@ -5,117 +5,150 @@ import Container from "@components/Container.astro";
 import PageHeader from "@components/PageHeader.astro";
 import FormattedDate from "@components/FormattedDate.astro";
 import BackToPrevious from "@components/BackToPrevious.astro";
+import ArrowIcon from "@components/ArrowIcon.astro";
 
 export async function getStaticPaths() {
   const allEntries = await getCollection("series");
-
-  const allPosts = allEntries.filter(
-    (post) => post.id.includes("/"),
-  );
-  const seriesSet = new Set(allPosts.map((p) => p.id.split("/")[0]));
-  return Array.from(seriesSet).map((series) => ({
-    params: { series },
-    props: { series },
-  }));
+  const allPosts = allEntries.filter(post => post.id.includes("/"));
+  const seriesSet = new Set(allPosts.map(p => p.id.split("/")[0]));
+  return Array.from(seriesSet).map(series => ({ params: { series }, props: { series } }));
 }
 
-type Props = {
-  series: string;
-};
-
 const { series } = Astro.props;
-
 const allEntries = await getCollection("series");
 
-// Series metadata from index file
-const seriesMeta = allEntries.find((p) => {
+const seriesMeta = allEntries.find(p => {
   const name = p.id.split("/")[0].replace(/\.(md|mdx)$/, "");
   const isIndex = !p.id.includes("/") || p.id.endsWith("/index.md") || p.id.endsWith("/index.mdx");
   return name === series && isIndex;
 });
-const { Content: SeriesIntro } = seriesMeta
-  ? await render(seriesMeta)
-  : { Content: undefined };
 
-// Articles (exclude index files)
+const { Content: SeriesIntro } = seriesMeta ? await render(seriesMeta) : { Content: undefined };
+
 const allPosts = allEntries
-  .filter(
-    (post) =>
-      !post.data.draft &&
-      post.id.startsWith(series + "/") &&
-      !post.id.endsWith("/index.md") &&
-      !post.id.endsWith("/index.mdx"),
-  )
-  .sort((a, b) => {
-    const aOrder = a.data.seriesOrder ?? Infinity;
-    const bOrder = b.data.seriesOrder ?? Infinity;
-    if (aOrder !== bOrder) return aOrder - bOrder;
-    return b.data.date.valueOf() - a.data.date.valueOf();
-  });
+  .filter(p => !p.data.draft && p.id.startsWith(series + "/") && !p.id.endsWith("/index.md") && !p.id.endsWith("/index.mdx"))
+  .sort((a, b) => (a.data.seriesOrder ?? Infinity) - (b.data.seriesOrder ?? Infinity));
 
 const pageTitle = seriesMeta?.data.title ?? series;
-const pageDescription =
-  seriesMeta?.data.description ??
-  `${allPosts.length} articles in ${series} series`;
-const pageSubtitle = `${allPosts.length} ${allPosts.length === 1 ? "article" : "articles"}`;
+const pageSubtitle = `${allPosts.length} collected fragments`;
 ---
 
-<Layout title={pageTitle} description={pageDescription}>
+<Layout title={pageTitle} description={seriesMeta?.data.description || "Collection of thoughts."}>
+  <!-- 背景网格 -->
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+  </div>
+
   <Container>
-    <div class="animate">
-      <BackToPrevious href="/series">Back to series</BackToPrevious>
-    </div>
+    <div class="pb-24">
+      <div class="animate mt-8">
+        <BackToPrevious href="/series">Back to directory</BackToPrevious>
+      </div>
 
-    <div class="animate my-10">
-      <PageHeader title={pageTitle} subtitle={pageSubtitle} />
-    </div>
+      <div class="animate mt-12 mb-16 space-y-12">
+        <PageHeader title={pageTitle} subtitle={pageSubtitle} />
 
-    {
-      SeriesIntro && (
-        <div class="animate prose prose-zinc dark:prose-invert mb-12 max-w-none text-sm text-zinc-600 dark:text-zinc-400 [&>:first-child]:mt-0">
-          <SeriesIntro />
-        </div>
-      )
-    }
+        {SeriesIntro && (
+          <div class="relative group overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 shadow-sm">
+            <!-- 右上角工业标签 -->
+            <div class="absolute top-0 right-0 px-6 py-2 bg-zinc-900 dark:bg-zinc-100 rounded-bl-3xl">
+              <span class="font-mono text-[9px] font-black uppercase tracking-[0.3em] text-white dark:text-zinc-900">Briefing</span>
+            </div>
 
-    <ul class="animate not-prose flex flex-col gap-2">
-      {
-        allPosts.map((post, i) => (
-          <li
-            class="stagger-item"
-            style={`--delay: ${150 + i * 60}ms`}
-          >
-            <a
-              href={`/series/${series}/${post.id.split("/").slice(1).join("/").replace(/\.(md|mdx)$/, "")}`}
-              class="group flex items-center gap-4 rounded-xl px-3 py-3.5 transition-all duration-200 active:scale-[0.99] hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
-            >
-              <span class="relative flex h-4 w-4 items-center justify-center font-mono text-xs text-zinc-300 dark:text-zinc-700">
-                <span class="transition-all duration-300 group-hover:scale-0 group-hover:opacity-0">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="absolute h-3.5 w-3.5 scale-0 opacity-0 text-emerald-500 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100 dark:text-emerald-400">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </span>
-
-              <span class="flex-1 truncate text-sm font-medium text-zinc-800 transition-colors group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-zinc-50">
-                {post.data.title}
-              </span>
-
-              <div class="hidden shrink-0 items-center gap-2 sm:flex">
-                {post.data.description && (
-                  <span class="max-w-[200px] truncate text-right text-[11px] text-zinc-400 dark:text-zinc-500">
-                    {post.data.description}
+            <div class="p-8 sm:p-12 space-y-8">
+              <!-- Meta Specs Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 pb-8 border-b border-zinc-100 dark:border-zinc-800/60">
+                <div class="space-y-1">
+                  <span class="block font-mono text-[9px] font-bold uppercase text-zinc-400">Total Parts</span>
+                  <span class="text-lg font-black text-zinc-900 dark:text-zinc-50 tracking-tighter">{allPosts.length.toString().padStart(2, '0')}</span>
+                </div>
+                <div class="space-y-1">
+                  <span class="block font-mono text-[9px] font-bold uppercase text-zinc-400">Category</span>
+                  <span class="text-lg font-black text-zinc-900 dark:text-zinc-50 tracking-tighter uppercase">Series</span>
+                </div>
+                <div class="space-y-1">
+                  <span class="block font-mono text-[9px] font-bold uppercase text-zinc-400">Status</span>
+                  <span class="flex items-center gap-1.5 text-sm font-bold text-emerald-600">
+                    <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span> COMPLETED
                   </span>
-                )}
-                <time class="shrink-0 font-mono text-[11px] text-zinc-400 transition-transform duration-300 group-hover:-translate-x-1 dark:text-zinc-500">
-                  <FormattedDate date={post.data.date} />
-                </time>
+                </div>
+                <div class="space-y-1 text-right sm:text-left">
+                  <span class="block font-mono text-[9px] font-bold uppercase text-zinc-400">Last Commit</span>
+                  <span class="text-sm font-bold text-zinc-900 dark:text-zinc-50 font-mono">
+                    {allPosts[0]?.data.date.toLocaleDateString('zh-CN', {month: '2-digit', day: '2-digit'})}
+                  </span>
+                </div>
               </div>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
+
+              <!-- Markdown Rendered Content -->
+              <div class="prose prose-zinc dark:prose-invert max-w-none
+                prose-p:text-[15px] prose-p:leading-relaxed prose-p:text-zinc-600 dark:prose-p:text-zinc-400
+                prose-headings:font-black prose-headings:tracking-tighter prose-headings:uppercase
+                prose-blockquote:border-l-2 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50/50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:py-1 prose-blockquote:px-5 prose-blockquote:rounded-r-xl
+                prose-li:text-zinc-600 dark:prose-li:text-zinc-400 prose-strong:text-zinc-900 dark:prose-strong:text-zinc-100">
+                <SeriesIntro />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <!-- 章节列表导航 -->
+      <div class="relative animate space-y-6">
+        <div class="flex items-center gap-4 px-4">
+           <h3 class="font-mono text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">Chapters / Path</h3>
+           <div class="h-px flex-1 bg-zinc-100 dark:bg-zinc-800"></div>
+        </div>
+
+        <ul class="flex flex-col gap-4">
+          {allPosts.map((post, i) => (
+            <li class="stagger-item" style={`--delay: ${i * 0.08}s`}>
+              <a href={`/series/${series}/${post.id.split("/").slice(1).join("/").replace(/\.(md|mdx)$/, "")}`}
+                 class="group relative flex items-center gap-6 rounded-[2rem] border border-zinc-200 bg-white p-5 transition-all duration-500 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/5 dark:bg-zinc-900/40 dark:border-zinc-800 dark:hover:border-blue-400/20 translate-gpu">
+
+                <!-- 数字 ID -->
+                <div class="size-12 shrink-0 rounded-2xl bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center font-mono text-xs font-black text-zinc-400 group-hover:bg-zinc-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black transition-all duration-500">
+                  {String(i + 1).padStart(2, "0")}
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-[17px] font-bold text-zinc-900 dark:text-zinc-50 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                    {post.data.title}
+                  </h4>
+                  {post.data.description && (
+                    <p class="truncate text-xs font-medium text-zinc-500 dark:text-zinc-400 mt-0.5">
+                      {post.data.description}
+                    </p>
+                  )}
+                </div>
+
+                <div class="hidden sm:flex items-center gap-4 shrink-0">
+                  <time class="font-mono text-[10px] font-bold text-zinc-300 dark:text-zinc-600">
+                    <FormattedDate date={post.data.date} />
+                  </time>
+                  <div class="size-8 rounded-full border border-zinc-100 flex items-center justify-center text-zinc-300 dark:border-zinc-800 transition-all group-hover:bg-zinc-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-zinc-900 group-hover:scale-110">
+                    <ArrowIcon direction="right" class="size-3" />
+                  </div>
+                </div>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   </Container>
 </Layout>
+
+<style is:global>
+  /* 阶梯入场动画 */
+  .stagger-item {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: slideIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--delay);
+  }
+  @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+
+  /* 隐藏滚动条 */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+</style>
