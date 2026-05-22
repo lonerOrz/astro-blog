@@ -32,6 +32,12 @@ import Link from "@components/Link.astro";
         >
         <span class="text-zinc-300 dark:text-zinc-700">·</span>
         <Link
+          href="/notes"
+          class={`nav-item ${Astro.url.pathname.startsWith("/notes") ? "nav-active" : ""}`}
+          >notes</Link
+        >
+        <span class="text-zinc-300 dark:text-zinc-700">·</span>
+        <Link
           href="/series"
           class={`nav-item ${Astro.url.pathname.startsWith("/series") ? "nav-active" : ""}`}
           >series</Link

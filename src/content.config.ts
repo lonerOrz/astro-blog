@@ -22,4 +22,13 @@ const series = defineCollection({
   }),
 });
 
-export const collections = { blog, series };
+const notes = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/notes" }),
+  schema: z.object({
+    date: z.coerce.date(),
+    draft: z.boolean().optional(),
+    title: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, series, notes };

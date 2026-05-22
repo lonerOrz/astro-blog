@@ -1,0 +1,11 @@
+---
+date: "2025-05-18T14:30:00Z"
+---
+
+Just created this new `Notes` section for the digital garden! 🌱 
+
+This is where I'll be posting quick thoughts, code snippets, and fleeting ideas that don't quite need a full blog post. It's essentially my own little self-hosted timeline.
+
+```javascript
+console.log("Hello, micro-blogging world!");
+```
