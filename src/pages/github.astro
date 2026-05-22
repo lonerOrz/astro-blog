@@ -3,288 +3,134 @@ import Layout from "../layouts/Layout.astro";
 import Container from "@components/Container.astro";
 import PageHeader from "@components/PageHeader.astro";
 import Link from "@components/Link.astro";
+import ArrowIcon from "@components/ArrowIcon.astro";
 
 const GITHUB_USERNAME = "lonerOrz";
 ---
 
-<Layout
-  title="GitHub Stats"
-  description="A polished GitHub dashboard with contribution heatmap, top repositories, stars, and forks."
->
-  <Container>
-    <div
-      class="mx-auto max-w-6xl space-y-10 pb-8"
-      data-github-user={GITHUB_USERNAME}
-    >
-      <PageHeader
-        title="GitHub."
-        subtitle={`/ ${GITHUB_USERNAME}`}
-        class="animate space-y-1.5"
-      />
+<Layout title="GitHub Engineering Dashboard">
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] dark:opacity-20"></div>
+    <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] dark:opacity-[0.03] contrast-125"></div>
+  </div>
 
-      <section class="animate grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-        <div
-          class="flex flex-col justify-between overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-zinc-50/50 to-white p-6 shadow-sm shadow-zinc-950/[0.04] sm:p-8 dark:border-zinc-800/80 dark:from-zinc-900/50 dark:to-zinc-950"
-        >
-          <div
-            class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between"
-          >
-            <div class="flex items-start gap-4">
-                <img
-                  id="gh-avatar"
-                  src={`https://github.com/${GITHUB_USERNAME}.png`}
-                  alt="avatar"
-                  class="h-16 w-16 flex-shrink-0 rounded-2xl border border-zinc-200 object-cover shadow-sm transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] dark:border-zinc-800 gh-avatar-hover"
-                  width="64"
-                  height="64"
-                  decoding="async"
-                />
+  <Container>
+    <div class="mx-auto max-w-6xl space-y-12 pb-24" data-github-user={GITHUB_USERNAME}>
+
+      <!-- Header -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-slide-up" style="--delay: 0.1s">
+        <PageHeader title="Engineering." subtitle={`System status: Online`} />
+        <!-- Verified Badge SVG -->
+        <div class="relative group hidden md:block select-none pointer-events-none">
+          <svg class="size-24" viewBox="0 0 100 100">
+            <path id="curve" fill="none" d="M 10,50 A 40,40 0 1,1 90,50 A 40,40 0 1,1 10,50" />
+            <text class="text-[10px] font-bold uppercase tracking-[0.22em] fill-zinc-300 dark:fill-zinc-600">
+              <textPath href="#curve"> • Github Verified Contributor • Creative Coder </textPath>
+            </text>
+            <circle cx="50" cy="50" r="30" class="fill-blue-500/5 dark:fill-blue-500/10 stroke-1 stroke-blue-500/10" />
+            <path d="M42 50 L48 56 L58 44" class="stroke-blue-500 stroke-[3] fill-none" style="stroke-dasharray: 30; stroke-dashoffset: 30; animation: draw 1.2s ease forwards 0.8s;" />
+          </svg>
+        </div>
+      </div>
+
+      <section class="animate-slide-up grid gap-6 lg:grid-cols-12" style="--delay: 0.2s">
+        <!-- Profile Box -->
+        <div class="relative col-span-full rounded-[2.5rem] border border-zinc-200 bg-zinc-50 p-8 lg:col-span-8 dark:border-zinc-800 dark:bg-zinc-900">
+          <div class="absolute top-0 right-0 p-8">
+             <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/5 border border-emerald-500/10 text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">
+                <span class="size-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Active
+             </div>
+          </div>
+
+          <div class="relative z-10 space-y-8" id="profile-area">
+            <div class="flex items-center gap-6">
+              <div class="relative size-24 shrink-0">
+                <div class="absolute inset-0 rounded-[2rem] bg-zinc-200/50 dark:bg-zinc-800 animate-pulse" id="avatar-skeleton"></div>
+                <img id="gh-avatar" src={`https://github.com/${GITHUB_USERNAME}.png?size=200`} class="relative size-full rounded-[2rem] border border-white dark:border-zinc-800 shadow-lg opacity-0 transition-opacity duration-500" onload="this.classList.remove('opacity-0'); document.getElementById('avatar-skeleton').remove();" />
+              </div>
               <div class="space-y-3">
-                <div class="space-y-1">
-                  <h2
-                    id="gh-name"
-                    class="text-2xl font-semibold tracking-tight text-zinc-900 opacity-40 transition-opacity duration-300 dark:text-zinc-50"
-                  >
-                    {GITHUB_USERNAME}
-                  </h2>
-                  <p class="font-mono text-sm text-zinc-500 dark:text-zinc-400">
-                    @{GITHUB_USERNAME}
-                  </p>
+                <h2 id="gh-name" class="text-4xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50 italic uppercase leading-none min-h-[1em]">
+                  <div class="h-9 w-48 bg-zinc-200/50 dark:bg-zinc-800 animate-pulse rounded-lg"></div>
+                </h2>
+                <div class="flex items-center gap-3">
+                  <span class="font-mono text-sm font-bold text-blue-600 dark:text-blue-400">@{GITHUB_USERNAME}</span>
+                  <div id="gh-location" class="text-[10px] font-black uppercase text-zinc-400 tracking-widest italic"></div>
                 </div>
-                <p
-                  id="gh-bio"
-                  class="max-w-2xl text-sm leading-6 text-zinc-600 opacity-40 transition-opacity duration-300 dark:text-zinc-400"
-                >
-                  Loading profile context...
-                </p>
               </div>
             </div>
 
-            <div class="flex flex-wrap gap-2 sm:justify-end">
-              <Link
-                href={`https://github.com/${GITHUB_USERNAME}`}
-                external
-                underline={false}
-                class="btn-interactive inline-flex items-center rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm shadow-zinc-950/[0.03] dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
-              >
-                View profile
-              </Link>
-            </div>
-          </div>
+            <p id="gh-bio" class="text-lg font-medium leading-relaxed text-zinc-600 dark:text-zinc-300 max-w-xl min-h-[3em]">
+               <div class="space-y-2 animate-pulse">
+                 <div class="h-4 w-full bg-zinc-200/30 dark:bg-zinc-800/50 rounded"></div>
+                 <div class="h-4 w-2/3 bg-zinc-200/30 dark:bg-zinc-800/50 rounded"></div>
+               </div>
+            </p>
 
-          <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div
-              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] dark:border-zinc-800/60 dark:bg-zinc-950/40"
-            >
-              <p
-                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
-              >
-                Public repos
-              </p>
-              <p
-                id="stat-repos"
-                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-              >
-                <span class="skeleton">&nbsp;</span>
-              </p>
-            </div>
-            <div
-              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] dark:border-zinc-800/60 dark:bg-zinc-950/40"
-            >
-              <p
-                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
-              >
-                Followers
-              </p>
-              <p
-                id="stat-followers"
-                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-              >
-                <span class="skeleton">&nbsp;</span>
-              </p>
-            </div>
-            <div
-              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] dark:border-zinc-800/60 dark:bg-zinc-950/40"
-            >
-              <p
-                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
-              >
-                Following
-              </p>
-              <p
-                id="stat-following"
-                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-              >
-                <span class="skeleton">&nbsp;</span>
-              </p>
-            </div>
-            <div
-              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 shadow-sm shadow-zinc-950/[0.02] dark:border-zinc-800/60 dark:bg-zinc-950/40"
-            >
-              <p
-                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
-              >
-                Featured repos
-              </p>
-              <p
-                id="stat-featured"
-                class="mt-3 font-mono text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-              >
-                <span class="skeleton">&nbsp;</span>
-              </p>
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4 pt-4 border-t border-zinc-200 dark:border-zinc-800 font-mono">
+              {['Repos', 'Followers', 'Following', 'Stars'].map(label => (
+                <div class="space-y-0.5">
+                  <span class="block text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">{label}</span>
+                  <span id={`stat-${label.toLowerCase()}`} class="text-3xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50">00</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        <aside
-          class="flex flex-col justify-between overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-50/40 p-6 shadow-sm shadow-zinc-950/[0.01] sm:p-8 dark:border-zinc-800/80 dark:bg-zinc-900/10"
-        >
-          <div class="flex items-center justify-between gap-4">
-            <div class="space-y-0.5">
-              <p
-                class="text-[12px] font-medium tracking-tight text-zinc-400 dark:text-zinc-500"
-              >
-                Contribution heatmap
-              </p>
-              <h3
-                class="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-              >
-                Year in review
-              </h3>
-            </div>
-
-            <div
-              class="inline-flex items-center gap-2 rounded-full border border-zinc-200/80 bg-white px-2.5 py-1 font-mono text-[11px] font-medium text-zinc-500 shadow-sm shadow-zinc-950/[0.01] dark:border-zinc-800 dark:bg-zinc-950/40 dark:text-zinc-400"
-            >
-              <span class="relative flex h-1.5 w-1.5">
-                <span
-                  class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"
-                ></span>
-                <span
-                  class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"
-                ></span>
-              </span>
-              <span>LIVE</span>
-            </div>
+        <!-- Tech Stack Card -->
+        <div class="col-span-full flex flex-col justify-between rounded-[2.5rem] border border-zinc-200 bg-white p-8 lg:col-span-4 dark:border-zinc-800 dark:bg-black transition-all">
+          <div class="space-y-2">
+            <h3 class="text-sm font-black uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500">Core Stack</h3>
+            <p class="text-xl font-bold italic text-zinc-900 dark:text-zinc-50">Analysis</p>
           </div>
 
-          <div
-            class="mt-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800/60 dark:bg-zinc-950/30"
-          >
-            <img
-              src={`https://ghchart.rshah.org/${GITHUB_USERNAME}`}
-              alt="GitHub contribution heatmap"
-              class="h-auto w-full dark:opacity-85"
-              loading="lazy"
-              decoding="async"
-              onerror="this.style.display='none';this.parentElement.innerHTML='<p class=text-sm text-zinc-400 py-8 text-center>Heatmap unavailable</p>';"
-            />
+          <div id="lang-container" class="space-y-6 my-8">
+            <!-- Loading Skeletons -->
+            {[1, 2, 3].map(() => <div class="h-1.5 w-full bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-full"></div>)}
           </div>
 
-          <div
-            class="mt-5 grid grid-cols-2 gap-3 text-sm text-zinc-600 dark:text-zinc-400"
-          >
-            <div
-              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 dark:border-zinc-800/60 dark:bg-zinc-950/20"
-            >
-              <p
-                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
-              >
-                Public repos
-              </p>
-              <p
-                id="side-repos"
-                class="mt-1.5 font-mono text-base font-semibold text-zinc-900 dark:text-zinc-50"
-              >
-                <span class="skeleton">&nbsp;</span>
-              </p>
-            </div>
-            <div
-              class="card-interactive flex flex-col justify-between rounded-2xl border border-zinc-200 bg-white/60 p-4 dark:border-zinc-800/60 dark:bg-zinc-950/20"
-            >
-              <p
-                class="text-[12px] font-medium tracking-tight whitespace-nowrap text-zinc-400 dark:text-zinc-500"
-              >
-                Top repo stars
-              </p>
-              <p
-                id="side-stars"
-                class="mt-1.5 font-mono text-base font-semibold text-zinc-900 dark:text-zinc-50"
-              >
-                <span class="skeleton">&nbsp;</span>
-              </p>
-            </div>
-          </div>
-        </aside>
+          <Link href={`https://github.com/${GITHUB_USERNAME}`} external underline={false} class="group flex items-center justify-between rounded-2xl bg-zinc-900 dark:bg-white/10 px-6 py-4 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-blue-600 dark:hover:bg-white dark:hover:text-zinc-900 active:scale-95">
+            Visit Hub
+            <ArrowIcon direction="right" class="size-3 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
       </section>
 
-      <section
-        class="animate space-y-6 border-t border-zinc-200 pt-8 dark:border-zinc-800"
-      >
-        <div
-          class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between"
-        >
-          <div class="space-y-2">
-            <p
-              class="text-[12px] font-medium tracking-tight text-zinc-400 dark:text-zinc-500"
-            >
-              Top repositories
-            </p>
-            <h3
-              class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
-            >
-              Stars, forks, and a little more context
-            </h3>
-          </div>
-          <p
-            class="max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400"
-          >
-            Sorted by stars. Each card surfaces the signals people usually care
-            about first.
-          </p>
+      <!-- 全宽热力图 -->
+      <section class="animate-slide-up rounded-[2.5rem] border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900/40" style="--delay: 0.3s">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+           <div class="space-y-1">
+             <h3 class="text-2xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50 uppercase leading-none">Matrix.</h3>
+             <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest italic">Annual Activity Logs</p>
+           </div>
+           <div class="flex items-center gap-4 font-mono text-[10px] text-zinc-400">
+              <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm bg-zinc-100 dark:bg-zinc-800 border dark:border-zinc-700"></span> Empty</span>
+              <div class="flex gap-1.5">
+                {[1, 2, 3, 4].map(i => <div class="size-2.5 rounded-sm bg-blue-500" style={`opacity: ${0.2 * i}`}></div>)}
+              </div>
+              <span class="flex items-center gap-1.5">Full <span class="size-2.5 rounded-sm bg-blue-600 shadow-sm"></span></span>
+           </div>
         </div>
 
-        <div
-          id="repos-container"
-          class="grid min-h-[200px] gap-4 transition-opacity duration-300 md:grid-cols-2 xl:grid-cols-3"
-        >
-          <!-- Skeleton repo cards -->
-          <div class="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
-            <div class="flex h-full flex-col justify-between gap-4">
-              <div class="space-y-2">
-                <div class="h-5 w-28 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-                <div class="h-3 w-48 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
-              <div class="flex items-center gap-3 border-t border-zinc-100/80 pt-3 dark:border-zinc-800/50">
-                <div class="h-3 w-16 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-                <div class="h-3 w-20 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
-            </div>
+        <div class="relative group overflow-x-auto pb-4 scrollbar-hide">
+          <div class="min-w-[800px] origin-left transition-all duration-700 group-hover:scale-[1.005]">
+            <img id="heatmap-img" src={`https://ghchart.rshah.org/3b82f6/${GITHUB_USERNAME}`} alt="Heatmap" class="gh-chart w-full opacity-0 transition-opacity duration-1000" onload="this.classList.add('opacity-100')" />
           </div>
-          <div class="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
-            <div class="flex h-full flex-col justify-between gap-4">
-              <div class="space-y-2">
-                <div class="h-5 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-                <div class="h-3 w-40 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
-              <div class="flex items-center gap-3 border-t border-zinc-100/80 pt-3 dark:border-zinc-800/50">
-                <div class="h-3 w-14 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-                <div class="h-3 w-18 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
-            </div>
-          </div>
-          <div class="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800/80 dark:bg-zinc-900">
-            <div class="flex h-full flex-col justify-between gap-4">
-              <div class="space-y-2">
-                <div class="h-5 w-32 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-                <div class="h-3 w-44 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
-              <div class="flex items-center gap-3 border-t border-zinc-100/80 pt-3 dark:border-zinc-800/50">
-                <div class="h-3 w-16 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-                <div class="h-3 w-20 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800"></div>
-              </div>
-            </div>
-          </div>
+        </div>
+      </section>
+
+      <!-- 精选 仓库 -->
+      <section class="animate-slide-up space-y-10" style="--delay: 0.4s">
+        <div class="flex items-center gap-6 px-4">
+           <h3 class="shrink-0 text-sm font-black uppercase tracking-[0.4em] text-zinc-400 font-mono">Repositories</h3>
+           <div class="h-px flex-1 bg-gradient-to-r from-zinc-100 via-zinc-200 to-zinc-100 dark:from-zinc-900 dark:via-zinc-800 dark:to-zinc-900 opacity-50"></div>
+        </div>
+
+        <div id="repos-container" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map(() => (
+            <div class="h-64 rounded-[2.5rem] border border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/20 animate-pulse" />
+          ))}
         </div>
       </section>
     </div>
@@ -292,243 +138,125 @@ const GITHUB_USERNAME = "lonerOrz";
 </Layout>
 
 <script is:inline>
-  async function fetchWithTimeout(url, timeout = 8000) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeout);
-    try {
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timer);
-      return res;
-    } catch (e) {
-      clearTimeout(timer);
-      throw e;
-    }
-  }
-
-  async function initGitHubDashboard() {
+  async function initGitHub() {
     const root = document.querySelector("[data-github-user]");
-    if (!root) return;
-
-    const username = root.getAttribute("data-github-user");
-    const numberFormatter = new Intl.NumberFormat("en-US");
-    const dateFormatter = new Intl.DateTimeFormat("zh-CN", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    const username = root?.getAttribute("data-github-user");
+    if (!username) return;
 
     try {
-      const [userRes, reposRes] = await Promise.all([
-        fetchWithTimeout(`https://api.github.com/users/${username}`),
-        fetchWithTimeout(
-          `https://api.github.com/users/${username}/repos?type=owner&per_page=100`,
-        ),
+      const [user, repos] = await Promise.all([
+        fetch(`https://api.github.com/users/${username}`).then(r => r.json()),
+        fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`).then(r => r.json())
       ]);
 
-      if (!userRes.ok || !reposRes.ok) throw new Error("API Fetch Failed");
+      // 1. Data Injection
+      document.getElementById('gh-name').textContent = user.name || username;
+      document.getElementById('gh-bio').textContent = user.bio || "Crafting digital experiences through elegant code.";
+      document.getElementById('gh-location').textContent = user.location ? `// ${user.location.toUpperCase()}` : 'LOCATION: ENCRYPTED';
 
-      const userData = await userRes.json();
-      const repos = await reposRes.json();
-
-      const allRepos = Array.isArray(repos) ? repos : [];
-      allRepos.sort(
-        (a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0),
-      );
-      const topRepos = allRepos.slice(0, 8);
-      const totalStars = topRepos.reduce(
-        (sum, repo) => sum + (repo.stargazers_count ?? 0),
-        0,
-      );
-
-      const updateText = (id, val) => {
-        const el = document.getElementById(id);
-        if (el) {
-          el.textContent = String(val);
-          const skeleton = el.querySelector(".skeleton");
-          if (skeleton) skeleton.remove();
-        }
+      // 2. Rolling Counter
+      const animateValue = (id, end) => {
+        const obj = document.getElementById(id);
+        let startTimestamp = null;
+        const duration = 1200;
+        const step = (timestamp) => {
+          if (!startTimestamp) startTimestamp = timestamp;
+          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+          obj.innerText = Math.floor(progress * end);
+          if (progress < 1) window.requestAnimationFrame(step);
+          else obj.innerText = end;
+        };
+        window.requestAnimationFrame(step);
       };
 
-      if (userData.avatar_url) {
-        document
-          .getElementById("gh-avatar")
-          ?.setAttribute("src", userData.avatar_url);
-      }
-      updateText("gh-name", userData.name || username);
-      updateText("gh-bio", userData.bio || "No profile bio provided.");
+      const topRepos = repos.filter(r => !r.fork).sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 6);
+      const totalStars = repos.reduce((acc, curr) => acc + curr.stargazers_count, 0);
 
-      updateText(
-        "stat-repos",
-        numberFormatter.format(userData.public_repos ?? 0),
-      );
-      updateText(
-        "stat-followers",
-        numberFormatter.format(userData.followers ?? 0),
-      );
-      updateText(
-        "stat-following",
-        numberFormatter.format(userData.following ?? 0),
-      );
-      updateText("stat-featured", numberFormatter.format(topRepos.length));
+      animateValue('stat-repos', user.public_repos);
+      animateValue('stat-followers', user.followers);
+      animateValue('stat-following', user.following);
+      animateValue('stat-stars', totalStars);
 
-      updateText(
-        "side-repos",
-        numberFormatter.format(userData.public_repos ?? 0),
-      );
-      updateText("side-stars", numberFormatter.format(totalStars));
+      // 3. Languages
+      const langs = {};
+      repos.slice(0, 15).forEach(r => { if(r.language) langs[r.language] = (langs[r.language] || 0) + 1 });
+      const sortedLangs = Object.entries(langs).sort((a,b) => b[1]-a[1]).slice(0, 4);
 
-      const container = document.getElementById("repos-container");
-      if (container) {
-        if (topRepos.length > 0) {
-          container.innerHTML = topRepos
-            .map(
-              (repo, index) => `
-            <article class="card-interactive group rounded-2xl border border-zinc-200 bg-white/50 p-4 shadow-sm shadow-zinc-950/[0.02] dark:border-zinc-800/80 dark:bg-zinc-900/40 opacity-0 transform translate-y-2" style="animation: fadeInUp 0.4s ease-out forwards ${index * 60}ms">
-              <div class="flex h-full flex-col justify-between gap-4">
-                <div class="space-y-2 min-w-0">
-                  <div class="flex items-start justify-between gap-3">
-                    <h4 class="text-base font-medium tracking-tight text-zinc-800 transition-colors duration-200 md:group-hover:text-zinc-950 dark:text-zinc-200 dark:md:group-hover:text-zinc-50 truncate">
-                      ${repo.name}
-                    </h4>
-                    <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="btn-interactive inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-zinc-50/50 px-2 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950/50 dark:text-zinc-400">
-                      <span>Open</span>
-                      <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" class="text-zinc-400 transition-transform duration-200 md:group-hover:-translate-y-0.5 md:group-hover:translate-x-0.5 dark:text-zinc-500">
-                        <path d="M14 3h7v7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        <path d="M10 14L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                    </a>
-                  </div>
-                  ${repo.description ? `<p class="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed">${repo.description}</p>` : ""}
-                </div>
-                <div class="flex items-center justify-between gap-3 text-xs border-t border-zinc-100/80 pt-3 dark:border-zinc-800/50">
-                  <div class="flex items-center gap-3 text-zinc-500 dark:text-zinc-400">
-                    ${
-                      repo.language
-                        ? `
-                      <span class="flex items-center gap-1.5">
-                        <span class="inline-block h-2 w-2 rounded-full bg-zinc-400 dark:bg-zinc-500 opacity-80"></span>
-                        <span>${repo.language}</span>
-                      </span>`
-                        : ""
-                    }
-                    <span class="text-zinc-400 dark:text-zinc-500 font-mono">Updated ${dateFormatter.format(new Date(repo.pushed_at))}</span>
-                  </div>
-                  <div class="flex items-center gap-2.5 text-zinc-500 dark:text-zinc-400 font-mono">
-                    <span class="flex items-center gap-1">
-                      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" class="text-zinc-400 fill-current transition-colors duration-200 md:group-hover:text-amber-500/90"><path d="M12 .587l3.668 7.431L24 9.748l-6 5.854 1.416 8.262L12 18.896 4.584 23.864 6 15.602 0 9.748l8.332-1.73L12 .587z"/></svg>
-                      <span>${numberFormatter.format(repo.stargazers_count ?? 0)}</span>
-                    </span>
-                    <span class="flex items-center gap-1">
-                      <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-400"><path d="M6 3v12a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V3"/><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/></svg>
-                      <span>${numberFormatter.format(repo.forks_count ?? 0)}</span>
-                    </span>
-                  </div>
-                </div>
+      document.getElementById('lang-container').innerHTML = sortedLangs.map(([name, count]) => `
+        <div class="group/lang">
+          <div class="flex justify-between text-[10px] font-black uppercase text-zinc-400 dark:text-zinc-500 mb-1.5 transition-colors group-hover/lang:text-blue-600 dark:group-hover/lang:text-blue-400">
+            <span>${name}</span>
+            <span>${Math.round((count/15)*100)}%</span>
+          </div>
+          <div class="h-1 w-full bg-zinc-100 dark:bg-white/5 rounded-full overflow-hidden">
+            <div class="h-full bg-zinc-900 dark:bg-blue-500 transition-all duration-1000" style="width: ${(count/15)*100}%"></div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('repos-container').innerHTML = topRepos.map(repo => `
+        <a href="${repo.html_url}" target="_blank"
+           class="group relative flex flex-col justify-between rounded-[2.5rem] border border-zinc-200 bg-white p-8 transition-all duration-500 hover:-translate-y-1.5 hover:border-blue-500/40 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:border-blue-500/30 dark:hover:shadow-none translate-gpu">
+          <div class="space-y-6">
+            <div class="flex items-center justify-between">
+              <!-- 精致 Repo 图标：响应式 Hover 背景 -->
+              <div class="size-11 rounded-2xl bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center transition-all duration-500 group-hover:bg-blue-600 dark:group-hover:bg-blue-500 group-hover:scale-105">
+                <svg class="size-5 text-zinc-400 dark:text-zinc-500 group-hover:text-white transition-colors" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 1 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.708A2.486 2.486 0 0 1 4.5 9h8ZM5 12.25a.25.25 0 0 1 .25-.25h3.5a.25.25 0 0 1 .25.25v3.25a.25.25 0 0 1-.4.2l-1.45-1.087a.249.249 0 0 0-.3 0L5.4 15.7a.25.25 0 0 1-.4-.2Z"></path>
+                </svg>
               </div>
-            </article>
-          `,
-            )
-            .join("");
-        } else {
-          container.innerHTML = `<div class="col-span-full rounded-3xl border border-dashed border-zinc-300 bg-zinc-50/70 p-8 text-sm text-zinc-500 dark:border-zinc-700 dark:bg-zinc-950/40 dark:text-zinc-400">No repositories found.</div>`;
-        }
-      }
+              <div class="flex items-center gap-1.5 font-mono text-[10px] font-black text-amber-600 dark:text-amber-500">
+                <svg class="size-3 fill-current" viewBox="0 0 24 24"><path d="M12 .587l3.668 7.431L24 9.748l-6 5.854 1.416 8.262L12 18.896 4.584 23.864 6 15.602 0 9.748l8.332-1.73L12 .587z"/></svg>
+                ${repo.stargazers_count}
+              </div>
+            </div>
+            <div class="space-y-3">
+              <h4 class="text-xl font-black tracking-tighter text-zinc-900 dark:text-zinc-50 group-hover:text-blue-600 dark:group-hover:text-blue-500 transition-colors uppercase leading-none">${repo.name}</h4>
+              <p class="line-clamp-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 font-medium">${repo.description || 'System module documentation is currently being synchronized.'}</p>
+            </div>
+          </div>
+          <div class="mt-8 flex items-center justify-between pt-6 border-t border-zinc-100 dark:border-zinc-800/80">
+            <span class="font-mono text-[9px] font-black uppercase tracking-widest text-zinc-400">${repo.language || 'Module'}</span>
+            <span class="text-[10px] font-black uppercase tracking-widest text-zinc-900 dark:text-white flex items-center gap-1 group-hover:gap-2 transition-all">
+              Inspect <ArrowIcon direction="right" class="size-3" />
+            </span>
+          </div>
+        </a>
+      `).join('');
+
     } catch (e) {
-      const container = document.getElementById("repos-container");
-      if (container)
-        container.innerHTML = `<div class="col-span-full text-sm text-red-500 dark:text-red-400 font-mono">Failed to sync profile data from GitHub.</div>`;
+      console.error(e);
     }
   }
 
-  initGitHubDashboard();
-  document.addEventListener("astro:after-swap", initGitHubDashboard);
+  initGitHub();
+  document.addEventListener("astro:after-swap", initGitHub);
 </script>
 
 <style>
-  .card-interactive {
-    transition:
-      transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
-      background-color 250ms cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  :global(.dark) .gh-chart {
+    filter: invert(0.9) hue-rotate(180deg) brightness(1.2);
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .card-interactive:hover {
-      transform: translateY(-2px);
-      border-color: #d4d4d8;
-      background-color: #ffffff;
-      box-shadow:
-        0 10px 20px -5px rgba(9, 9, 11, 0.03),
-        0 4px 8px -4px rgba(9, 9, 11, 0.03);
-    }
-    :global(.dark) .card-interactive:hover {
-      border-color: #3f3f46;
-      background-color: #09090b;
-      box-shadow: none;
-    }
+  .animate-slide-up {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: var(--delay, 0s);
   }
 
-  .card-interactive:active {
-    transform: translateY(0px) scale(0.985);
-    transition: transform 80ms cubic-bezier(0.16, 1, 0.3, 1);
+  @keyframes slideUp {
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .btn-interactive {
-    transition:
-      transform 200ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
-      background-color 200ms cubic-bezier(0.16, 1, 0.3, 1),
-      color 200ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .btn-interactive:hover {
-      border-color: #d4d4d8;
-      background-color: #f4f4f5;
-      color: #09090b;
-    }
-    :global(.dark) .btn-interactive:hover {
-      border-color: #3f3f46;
-      background-color: #18181b;
-      color: #f4f4f5;
-    }
-  }
-  .btn-interactive:active {
-    transform: scale(0.96);
-    transition: transform 60ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Avatar hover — gated behind hover-capable devices only */
-  @media (hover: hover) and (pointer: fine) {
-    .gh-avatar-hover:hover {
-      transform: scale(1.04);
-      border-radius: 9999px;
-    }
-  }
-
-  /* Respect reduced motion preference */
-  @media (prefers-reduced-motion: reduce) {
-    .card-interactive,
-    .btn-interactive {
-      transition-duration: 0ms !important;
-    }
-    .card-interactive:active,
-    .btn-interactive:active {
-      transform: none;
-    }
-    .gh-avatar-hover {
-      transition-duration: 0ms;
-    }
-    .gh-avatar-hover:hover {
-      transform: none;
-      border-radius: 1rem;
-    }
+  .translate-gpu {
+    transform: translateZ(0);
+    will-change: transform, border-color;
+    backface-visibility: hidden;
   }
 </style>
