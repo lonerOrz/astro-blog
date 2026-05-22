@@ -8,7 +8,10 @@ import ArrowIcon from "@components/ArrowIcon.astro";
 const GITHUB_USERNAME = "lonerOrz";
 ---
 
-<Layout title="GitHub Engineering Dashboard">
+<Layout
+  title="GitHub Engineering Dashboard"
+  description="Explore the open-source projects and technical contributions of lonerOrz."
+>
   <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
     <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] dark:opacity-20"></div>
     <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] dark:opacity-[0.03] contrast-125"></div>
@@ -79,7 +82,7 @@ const GITHUB_USERNAME = "lonerOrz";
         </div>
 
         <!-- Tech Stack Card -->
-        <div class="col-span-full flex flex-col justify-between rounded-[2.5rem] border border-zinc-200 bg-white p-8 lg:col-span-4 dark:border-zinc-800 dark:bg-black transition-all">
+        <div class="col-span-full flex flex-col justify-between rounded-[2.5rem] border border-zinc-200 bg-white p-8 lg:col-span-4 dark:border-zinc-800 dark:bg-zinc-900 transition-all">
           <div class="space-y-2">
             <h3 class="text-sm font-black uppercase tracking-[0.3em] text-zinc-400 dark:text-zinc-500">Core Stack</h3>
             <p class="text-xl font-bold italic text-zinc-900 dark:text-zinc-50">Analysis</p>
