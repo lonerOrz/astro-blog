@@ -3,97 +3,93 @@ import Container from "@components/Container.astro";
 import Link from "@components/Link.astro";
 ---
 
-<header transition:persist class="py-3">
+<header
+  transition:persist
+  class="sticky top-0 z-[60] border-b border-transparent bg-zinc-50/0 py-4 backdrop-blur-none transition-all duration-300"
+  id="site-header"
+>
   <Container>
     <div class="flex items-center justify-between gap-6">
-      <Link href="/" underline={false}>
+      <Link href="/" underline={false} class="group">
         <div
-          class="flex items-center gap-2 text-lg font-semibold text-zinc-900 dark:text-zinc-50"
+          class="flex items-center gap-2.5 text-lg font-bold tracking-tighter text-zinc-900 dark:text-zinc-50"
         >
-          <img
-            src="/site/adorable.png"
-            alt="logo"
-            class="h-6 w-6 flex-shrink-0"
-          />
-          lonerOrz
+          <div
+            class="relative size-7 shrink-0 overflow-hidden rounded-lg border border-zinc-200 shadow-sm transition-transform group-hover:scale-110 dark:border-zinc-800"
+          >
+            <img
+              src="/site/adorable.png"
+              alt="logo"
+              class="size-full object-cover"
+            />
+          </div>
+          <span
+            class="transition-colors group-hover:text-zinc-600 dark:group-hover:text-zinc-400"
+            >lonerOrz</span
+          >
         </div>
       </Link>
-      <nav class="flex items-center gap-1 text-sm">
-        <Link
-          href="/"
-          class={`nav-item ${Astro.url.pathname === "/" ? "nav-active" : ""}`}
-          >home</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/blog"
-          class={`nav-item ${Astro.url.pathname.startsWith("/blog") ? "nav-active" : ""}`}
-          >blog</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/notes"
-          class={`nav-item ${Astro.url.pathname.startsWith("/notes") ? "nav-active" : ""}`}
-          >notes</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/series"
-          class={`nav-item ${Astro.url.pathname.startsWith("/series") ? "nav-active" : ""}`}
-          >series</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/github"
-          class={`nav-item ${Astro.url.pathname === "/github" ? "nav-active" : ""}`}
-          >github</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/lattice"
-          class={`nav-item ${Astro.url.pathname === "/lattice" ? "nav-active" : ""}`}
-          >lattice</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/music"
-          class={`nav-item ${Astro.url.pathname === "/music" ? "nav-active" : ""}`}
-          >music</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/friends"
-          class={`nav-item ${Astro.url.pathname === "/friends" ? "nav-active" : ""}`}
-          >friends</Link
-        >
-        <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <Link
-          href="/about"
-          class={`nav-item ${Astro.url.pathname === "/about" ? "nav-active" : ""}`}
-          >about</Link
-        >
+
+      <nav class="flex items-center gap-1.5 text-sm font-medium">
+        {
+          [
+            ["home", "/"],
+            ["blog", "/blog"],
+            ["notes", "/notes"],
+            ["series", "/series"],
+            ["github", "/github"],
+            ["lattice", "/lattice"],
+            ["music", "/music"],
+            ["friends", "/friends"],
+            ["about", "/about"],
+          ].map(([label, href]) => {
+            const isActive =
+              href === "/"
+                ? Astro.url.pathname === "/"
+                : Astro.url.pathname.startsWith(href);
+            return (
+              <>
+                <Link
+                  href={href}
+                  class:list={[
+                    "nav-item rounded-md px-2 py-1 transition-all",
+                    isActive
+                      ? "font-bold text-zinc-950 dark:text-white"
+                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+                  ]}
+                >
+                  {label}
+                </Link>
+                {label !== "about" && (
+                  <span class="text-zinc-200 select-none dark:text-zinc-800">
+                    /
+                  </span>
+                )}
+              </>
+            );
+          })
+        }
+
+        <!-- 搜索按钮 -->
         <button
           id="magnifying-glass"
           aria-label="Search"
-          class="btn-interactive ml-2 inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white/70 px-2.5 py-1.5 text-sm text-zinc-500 shadow-sm shadow-zinc-950/[0.03] transition-colors duration-150 hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900 focus-visible:border-zinc-300 focus-visible:bg-zinc-50 focus-visible:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-400 dark:shadow-black/10 dark:hover:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:border-zinc-700 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
+          class="ml-3 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-1.5 text-xs font-bold text-zinc-500 shadow-sm transition-all hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-950 active:scale-95 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
         >
           <svg
-            aria-hidden="true"
-            height="15"
-            stroke-linejoin="round"
-            viewBox="0 0 16 16"
-            width="15"
-            class="shrink-0"
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="3"
           >
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M3.5 7C3.5 5.067 5.067 3.5 7 3.5C8.933 3.5 10.5 5.067 10.5 7C10.5 7.88461 10.1718 8.69256 9.63058 9.30876L9.30876 9.63058C8.69256 10.1718 7.88461 10.5 7 10.5C5.067 10.5 3.5 8.933 3.5 7ZM9.96544 11.0261C9.13578 11.6382 8.11014 12 7 12C4.23858 12 2 9.76142 2 7C2 4.23858 4.23858 2 7 2C9.76142 2 12 4.23858 12 7C12 8.11014 11.6382 9.13578 11.0261 9.96544L14.0303 12.9697L14.5607 13.5L13.5 14.5607L12.9697 14.0303L9.96544 11.0261Z"
-              fill="currentColor"></path>
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
           </svg>
-          <span>Search</span>
+          <span class="hidden tracking-tighter uppercase sm:inline">Search</span
+          >
           <kbd
-            class="hidden rounded border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-mono text-[10px] leading-none text-zinc-400 sm:inline-flex dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
+            class="hidden rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-mono text-[9px] tracking-widest text-zinc-400 uppercase sm:inline-block dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-500"
             >/</kbd
           >
         </button>
@@ -101,3 +97,88 @@ import Link from "@components/Link.astro";
     </div>
   </Container>
 </header>
+
+<script is:inline>
+  function initHeader() {
+    const header = document.getElementById("site-header");
+    const navItems = document.querySelectorAll(".nav-item");
+
+    // 滚动效果
+    const updateHeader = () => {
+      if (window.scrollY > 20) {
+        header.classList.add(
+          "bg-white/80",
+          "dark:bg-[#050505]/80",
+          "backdrop-blur-md",
+          "border-zinc-200/50",
+          "dark:border-zinc-800/50",
+          "py-3",
+        );
+        header.classList.remove("bg-zinc-50/0", "py-4", "border-transparent");
+      } else {
+        header.classList.remove(
+          "bg-white/80",
+          "dark:bg-[#050505]/80",
+          "backdrop-blur-md",
+          "border-zinc-200/50",
+          "dark:border-zinc-800/50",
+          "py-3",
+        );
+        header.classList.add("bg-zinc-50/0", "py-4", "border-transparent");
+      }
+    };
+
+    // 活动项高亮
+    const updateActiveLink = () => {
+      const currentPath = window.location.pathname;
+      navItems.forEach((item) => {
+        const href = item.getAttribute("href");
+        const isActive =
+          href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+
+        if (isActive) {
+          item.classList.add(
+            "font-bold",
+            "text-zinc-950",
+            "dark:text-white",
+            "nav-active",
+          );
+          item.classList.remove("text-zinc-500", "dark:text-zinc-400");
+        } else {
+          item.classList.remove(
+            "font-bold",
+            "text-zinc-950",
+            "dark:text-white",
+            "nav-active",
+          );
+          item.classList.add("text-zinc-500", "dark:text-zinc-400");
+        }
+      });
+    };
+
+    window.addEventListener("scroll", updateHeader);
+    updateHeader();
+    updateActiveLink();
+  }
+
+  initHeader();
+  document.addEventListener("astro:after-swap", initHeader);
+</script>
+
+<style>
+  .nav-item {
+    position: relative;
+  }
+  /* 活动项的微弱指示器 */
+  .nav-active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 99px;
+    opacity: 0.8;
+  }
+</style>
