@@ -18,7 +18,6 @@ export async function getStaticPaths() {
       !post.id.endsWith("/index.mdx"),
   );
 
-  // Group by series
   const seriesGroups = new Map<string, typeof filteredPosts>();
   for (const post of filteredPosts) {
     const series = post.id.split("/")[0];
@@ -27,7 +26,6 @@ export async function getStaticPaths() {
     seriesGroups.set(series, group);
   }
 
-  // Generate paths for each series
   return Array.from(seriesGroups.entries()).flatMap(([series, posts]) => {
     const sortedPosts = posts.sort((a, b) => {
       const aOrder = a.data.seriesOrder ?? Infinity;
@@ -37,11 +35,7 @@ export async function getStaticPaths() {
     });
 
     return sortedPosts.map((post, index) => {
-      const slug = post.id
-        .split("/")
-        .slice(1)
-        .join("/")
-        .replace(/\.(md|mdx)$/, "");
+      const slug = post.id.split("/").slice(1).join("/").replace(/\.(md|mdx)$/, "");
       return {
         params: { series, slug },
         props: {
@@ -65,48 +59,107 @@ const seriesName = post.id.split("/")[0];
 const { Content, headings } = await render(post);
 ---
 
-<Layout title={post.data.title} description={post.data.description}>
+<Layout
+  title={post.data.title}
+  description={post.data.description || `Reading ${post.data.title} in ${seriesName}`}
+>
+  <div id="read-progress" class="fixed top-0 left-0 h-[2px] w-0 bg-zinc-900 dark:bg-white z-[100] transition-all duration-150 ease-out"></div>
+
+  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+    <div class="absolute inset-0 bg-zinc-50 dark:bg-zinc-950 transition-colors duration-500"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+  </div>
+
   <Container>
-    <div class="animate">
+    <div class="animate mt-8">
       <BackToPrevious href={`/series/${seriesName}`}>
-        Back to {seriesName}
+        Back to <span class="font-bold uppercase tracking-tight">{seriesName}</span>
       </BackToPrevious>
     </div>
 
-    <div class="animate my-10 space-y-1">
-      <div class="flex items-center gap-1.5">
-        <a
-          href={`/series/${seriesName}`}
-          class="text-xs font-medium text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
-        >
+    <div class="animate mt-12 mb-10 space-y-4">
+      <div class="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 font-medium">
+        <a href={`/series/${seriesName}`} class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">
           {seriesName}
         </a>
         <span class="text-zinc-300 dark:text-zinc-700">·</span>
-        <div class="font-base text-sm">
-          <FormattedDate date={post.data.date} />
-        </div>
-        &bull;
-        {
-          post.body && (
-            <div class="font-base text-sm">{readingTime(post.body)}</div>
-          )
-        }
+        <FormattedDate date={post.data.date} />
+        <span class="opacity-40">&bull;</span>
+        {post.body && <span>{readingTime(post.body)}</span>}
       </div>
-      <h1 class="text-3xl font-semibold text-black dark:text-white">
+
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 leading-tight">
         {post.data.title}
       </h1>
     </div>
 
-    <TableOfContents headings={headings} />
+    {headings && headings.length > 0 && (
+      <div class="animate mb-12">
+        <TableOfContents headings={headings} />
+      </div>
+    )}
 
-    <article class="animate">
-      <Content />
-      {(prevPost || nextPost) && (
-        <SeriesNavigation 
-          prevSeriesEntry={prevPost} 
-          nextSeriesEntry={nextPost} 
-        />
-      )}
+    <article class="animate min-w-0">
+      <div class="prose prose-neutral prose-lg max-w-none dark:prose-invert
+        prose-p:leading-relaxed prose-p:text-zinc-700 dark:prose-p:text-zinc-300
+        prose-headings:text-zinc-900 dark:prose-headings:text-zinc-50
+        prose-a:text-blue-600 dark:prose-a:text-blue-400
+        prose-img:rounded-3xl prose-img:border prose-img:border-zinc-200 dark:prose-img:border-zinc-800
+        pb-24">
+        <Content />
+      </div>
+
+      <footer class="mt-16 border-t border-zinc-100 dark:border-zinc-800 pt-12">
+        {(prevPost || nextPost) && (
+          <SeriesNavigation
+            prevSeriesEntry={prevPost}
+            nextSeriesEntry={nextPost}
+          />
+        )}
+      </footer>
     </article>
   </Container>
 </Layout>
+
+<script is:inline>
+  function initProgress() {
+    const bar = document.getElementById('read-progress');
+    if (!bar) return;
+
+    const update = () => {
+      const scrollY = window.scrollY;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      if (height <= 0) return;
+      bar.style.width = (scrollY / height) * 100 + "%";
+    };
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+
+    document.addEventListener('astro:before-swap', () => {
+      window.removeEventListener('scroll', update);
+    }, { once: true });
+  }
+
+  initProgress();
+  document.addEventListener("astro:after-swap", initProgress);
+</script>
+
+<style is:global>
+  .animate {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  :global(.dark) #read-progress {
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+</style>
