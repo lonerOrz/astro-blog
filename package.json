@@ -8,7 +8,9 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "new": "node scripts/new.mjs"
+    "new": "node scripts/new.mjs",
+    "clean": "node scripts/clean.mjs",
+    "format": "prettier --write . --ignore-path .gitignore"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.9",
