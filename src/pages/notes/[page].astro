@@ -173,9 +173,26 @@ function formatMomentsDate(date: Date) {
                             </span>
                           </div>
                         </div>
-                        <div class="font-mono text-[11px] font-bold text-zinc-300 dark:text-zinc-700 tracking-tighter">
-                          LOG.#{absoluteId}
+
+                        <!-- LOG ID 和 带 Tooltip 的分享按钮 -->
+                        <div class="flex items-center gap-3">
+                          <div class="font-mono text-[11px] font-bold text-zinc-300 dark:text-zinc-700 tracking-tighter">
+                            LOG.#{absoluteId}
+                          </div>
+                          <button
+                            class="share-note-btn tooltip-trigger flex items-center justify-center size-7 rounded-lg text-zinc-400 hover:text-purple-600 hover:bg-purple-50 dark:text-zinc-600 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/40 transition-all duration-300 relative"
+                            data-note-id={`note-${absoluteId}`}
+                            data-tooltip="Copy link"
+                            aria-label="Share note"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                            </svg>
+                          </button>
                         </div>
+                        <!-- 修改部分结束 -->
+
                       </div>
 
                       <div class="pl-1 sm:pl-8">
@@ -223,13 +240,103 @@ function formatMomentsDate(date: Date) {
     transform: scale(1.2);
     box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
   }
+
+  /* --- Tooltip 样式 --- */
+  .tooltip-trigger::before {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    padding: 6px 10px;
+    background-color: #18181b; /* zinc-900 */
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+    border-radius: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 50;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+
+  .tooltip-trigger::after {
+    content: "";
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #18181b transparent transparent transparent;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 50;
+  }
+
+  .tooltip-trigger:hover::before,
+  .tooltip-trigger:hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Tooltip 暗色模式适配 */
+  .dark .tooltip-trigger::before {
+    background-color: #312e81; /* indigo-900 */
+    border: 1px solid rgba(129, 140, 248, 0.2);
+    color: #e0e7ff;
+  }
+  .dark .tooltip-trigger::after {
+    border-color: #312e81 transparent transparent transparent;
+  }
 </style>
 
 <script>
   function initNoteSystem() {
+    // 1. 如果通过分享链接进入，平滑滚动到目标锚点
+    if (window.location.hash) {
+      const targetElement = document.querySelector(window.location.hash);
+      if (targetElement) {
+        setTimeout(() => {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+      }
+    }
+
     const liveTree = document.getElementById('js-live-tree');
     const noteCards = document.querySelectorAll('[data-note-id]');
     const navLinks = document.querySelectorAll('[data-index-link]');
+
+    // 2. 绑定复制链接功能
+    const shareButtons = document.querySelectorAll('.share-note-btn');
+    shareButtons.forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const noteId = btn.getAttribute('data-note-id');
+        const url = new URL(window.location.href);
+        url.hash = noteId || '';
+        const shareUrl = url.toString();
+
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+
+          // 反馈：变更 Tooltip 文字和图标
+          btn.setAttribute('data-tooltip', 'Copied!');
+          const originalInner = btn.innerHTML;
+          btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 dark:text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+          setTimeout(() => {
+            btn.innerHTML = originalInner;
+            btn.setAttribute('data-tooltip', 'Copy link');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy text: ', err);
+        }
+      });
+    });
 
     if (!liveTree) return;
 
@@ -266,7 +373,6 @@ function formatMomentsDate(date: Date) {
 
     noteCards.forEach(card => observer.observe(card));
 
-    // 清理机制
     document.addEventListener('astro:before-swap', () => {
       observer.disconnect();
     }, { once: true });
