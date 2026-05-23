@@ -9,6 +9,7 @@ import BackToPrevious from "@components/BackToPrevious.astro";
 import PostNavigation from "@components/PostNavigation.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import Giscus from "@components/Giscus.astro";
+import MarkdownImage from "@components/MarkdownImage.astro";
 
 export async function getStaticPaths() {
   const posts = (await getCollection("blog"))
@@ -99,10 +100,11 @@ const { Content, headings } = await render(post);
         prose-p:leading-relaxed prose-p:text-zinc-700 dark:prose-p:text-zinc-300
         prose-headings:font-bold prose-headings:tracking-tight
         prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
-        prose-img:rounded-3xl prose-img:border prose-img:border-zinc-200 dark:prose-img:border-zinc-800
         prose-code:text-zinc-800 dark:prose-code:text-zinc-200 prose-code:bg-zinc-100 dark:prose-code:bg-zinc-800/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
         pb-24">
-        <Content />
+
+        <Content components={{ img: MarkdownImage }} />
+
       </div>
 
       <!-- 页尾装饰 -->
@@ -164,13 +166,6 @@ const { Content, headings } = await render(post);
       opacity: 1;
       transform: translateY(0);
     }
-  }
-
-  article img {
-    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  article img:hover {
-    transform: scale(1.01);
   }
 
   :global(.dark) #read-progress-bar {

@@ -1,0 +1,152 @@
+---
+/**
+ * MarkdownImage.astro
+ *
+ * 尺寸指令：#small (320px), #medium (640px), #wide (超宽), #full (突破容器)
+ * 形状指令：#circle (圆形), #square (直角), #portrait (纵向比例)
+ * 效果指令：#grayscale (黑白), #sepia (怀旧), #blur (模糊), #noshadow (无阴影)
+ * 布局指令：#left (左对齐), #right (右对齐)
+ * 特殊指令：#polaroid (拍立得风格)
+ */
+import { Image } from "astro:assets";
+
+interface Props {
+  src: string | any;
+  alt?: string;
+  title?: string;
+  [key: string]: any;
+}
+
+const { src, alt = "", title, ...props } = Astro.props;
+
+// 解析 Hash
+const rawSrc = typeof src === "string" ? src : (src as any).src || "";
+const tags = rawSrc.split("#").slice(1);
+const has = (tag: string) => tags.includes(tag);
+
+// 预设逻辑
+const isSmall = has("small");
+const isMedium = has("medium");
+const isWide = has("wide");
+const isFull = has("full");
+const isCircle = has("circle");
+const isSquare = has("square");
+const isPortrait = has("portrait");
+const isGrayscale = has("grayscale");
+const isSepia = has("sepia");
+const isBlur = has("blur");
+const isPolaroid = has("polaroid");
+const noShadow = has("noshadow");
+const isLeft = has("left");
+const isRight = has("right");
+
+// 清理路径
+let cleanSrc = src;
+if (typeof src === "string") {
+  cleanSrc = src.split("#")[0];
+} else if (typeof src === "object") {
+  cleanSrc = { ...src, src: src.src.split("#")[0] };
+}
+
+const imageAlt = alt || title || "";
+---
+
+<figure
+  class:list={[
+    "not-prose group my-12 flex flex-col transition-all duration-500",
+    // 宽度控制
+    isSmall && "max-w-xs",
+    isMedium && "max-w-2xl",
+    isWide && "-mx-[5%] w-[110%]",
+    isFull && "-mx-[10%] w-[120%]",
+    !isSmall && !isMedium && !isWide && !isFull && "w-full",
+    // 对齐控制
+    isLeft ? "mr-auto" : isRight ? "ml-auto" : "mx-auto",
+  ]}
+>
+  <div
+    class:list={[
+      "relative w-full overflow-hidden transition-all duration-700",
+      // 形状
+      isCircle
+        ? "aspect-square rounded-full"
+        : isSquare
+          ? "rounded-none"
+          : "rounded-[2rem]",
+      isPortrait && "aspect-[3/4]",
+      // 边框与背景
+      isPolaroid
+        ? "rotate-1 border border-zinc-100 bg-white p-3 pb-12 shadow-xl"
+        : "border border-zinc-200/50 dark:border-zinc-800",
+      !isPolaroid &&
+        !noShadow &&
+        "shadow-sm group-hover:shadow-2xl group-hover:shadow-purple-500/10",
+      "bg-zinc-50 dark:bg-zinc-950",
+    ]}
+  >
+    {
+      typeof cleanSrc === "object" ? (
+        <Image
+          src={cleanSrc}
+          alt={imageAlt}
+          class:list={[
+            "h-full w-full object-cover transition-all duration-700 ease-in-out",
+            !isPolaroid && "group-hover:scale-105",
+            isGrayscale && "grayscale hover:grayscale-0",
+            isSepia && "sepia hover:sepia-0",
+            isBlur && "blur-sm hover:blur-none",
+          ]}
+          {...props}
+        />
+      ) : (
+        <img
+          src={cleanSrc}
+          alt={imageAlt}
+          loading="lazy"
+          decoding="async"
+          class:list={[
+            "h-full w-full object-cover transition-all duration-700 ease-in-out",
+            !isPolaroid && "group-hover:scale-105",
+            isGrayscale && "grayscale hover:grayscale-0",
+            isSepia && "sepia hover:sepia-0",
+            isBlur && "blur-sm hover:blur-none",
+          ]}
+          {...props}
+        />
+      )
+    }
+
+    {
+      isPolaroid && (
+        <div class="font-handwriting absolute right-0 bottom-4 left-0 text-center text-xs text-zinc-400 italic">
+          {imageAlt}
+        </div>
+      )
+    }
+  </div>
+
+  {
+    imageAlt && !isPolaroid && (
+      <figcaption
+        class:list={[
+          "mt-5 px-6 text-zinc-500 dark:text-zinc-500",
+          isLeft ? "text-left" : isRight ? "text-right" : "text-center",
+        ]}
+      >
+        <span class="inline-block rounded-full border border-zinc-200/50 bg-zinc-100/50 px-3 py-1 text-[10px] font-bold tracking-widest uppercase backdrop-blur-sm dark:border-zinc-800/50 dark:bg-zinc-900/50">
+          {imageAlt}
+        </span>
+      </figcaption>
+    )
+  }
+</figure>
+
+<style>
+  img {
+    content-visibility: auto;
+  }
+  /* 如果有手写体字体可以定义在这里，否则退回到普通斜体 */
+  .font-handwriting {
+    font-family: "Comic Sans MS", cursive, sans-serif;
+  }
+</style>

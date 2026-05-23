@@ -5,6 +5,7 @@ import Layout from "@layouts/Layout.astro";
 import Container from "@components/Container.astro";
 import PageHeader from "@components/PageHeader.astro";
 import { NOTES } from "@consts";
+import MarkdownImage from "@components/MarkdownImage.astro";
 
 export async function getStaticPaths({ paginate }: { paginate: any }) {
   const allNotes = (await getCollection("notes"))
@@ -197,7 +198,7 @@ function formatMomentsDate(date: Date) {
 
                       <div class="pl-1 sm:pl-8">
                         <div class="prose prose-zinc prose-base max-w-none dark:prose-invert prose-p:leading-relaxed prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-a:text-purple-600 dark:prose-a:text-indigo-400 prose-strong:text-purple-900 dark:prose-strong:text-indigo-100">
-                          <note.Content />
+                          <note.Content components={{ img: MarkdownImage }} />
                         </div>
 
                         <div class="mt-12 flex items-center justify-between opacity-30 group-hover:opacity-100 transition-opacity duration-500">

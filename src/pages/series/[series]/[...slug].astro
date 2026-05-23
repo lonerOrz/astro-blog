@@ -7,6 +7,7 @@ import { readingTime } from "@lib/utils";
 import BackToPrevious from "@components/BackToPrevious.astro";
 import TableOfContents from "@components/TableOfContents.astro";
 import SeriesNavigation from "@components/SeriesNavigation.astro";
+import MarkdownImage from "@components/MarkdownImage.astro";
 
 export async function getStaticPaths() {
   const allPosts = await getCollection("series");
@@ -128,9 +129,9 @@ const { Content, headings } = await render(post);
 
     <article class="animate min-w-0">
       <div
-        class="prose prose-neutral prose-lg dark:prose-invert prose-p:leading-relaxed prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-headings:text-zinc-900 dark:prose-headings:text-zinc-50 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-3xl prose-img:border prose-img:border-zinc-200 dark:prose-img:border-zinc-800 max-w-none pb-24"
+        class="prose prose-neutral prose-lg dark:prose-invert prose-p:leading-relaxed prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-headings:text-zinc-900 dark:prose-headings:text-zinc-50 prose-a:text-blue-600 dark:prose-a:text-blue-400 max-w-none pb-24"
       >
-        <Content />
+        <Content components={{ img: MarkdownImage }} />
       </div>
 
       <footer class="mt-16 border-t border-zinc-100 pt-12 dark:border-zinc-800">

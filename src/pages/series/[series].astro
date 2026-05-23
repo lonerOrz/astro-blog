@@ -6,6 +6,7 @@ import PageHeader from "@components/PageHeader.astro";
 import FormattedDate from "@components/FormattedDate.astro";
 import BackToPrevious from "@components/BackToPrevious.astro";
 import ArrowIcon from "@components/ArrowIcon.astro";
+import MarkdownImage from "@components/MarkdownImage.astro";
 
 export async function getStaticPaths() {
   const allEntries = await getCollection("series");
@@ -86,7 +87,7 @@ const pageSubtitle = `${allPosts.length} collected fragments`;
                 prose-headings:font-black prose-headings:tracking-tighter prose-headings:uppercase
                 prose-blockquote:border-l-2 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50/50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:py-1 prose-blockquote:px-5 prose-blockquote:rounded-r-xl
                 prose-li:text-zinc-600 dark:prose-li:text-zinc-400 prose-strong:text-zinc-900 dark:prose-strong:text-zinc-100">
-                <SeriesIntro />
+                <SeriesIntro components={{ img: MarkdownImage }} />
               </div>
             </div>
           </div>
