@@ -7,11 +7,7 @@ type Props = {
   class?: string;
 };
 
-const {
-  direction = "right",
-  size = 5,
-  class: className,
-} = Astro.props;
+const { direction = "right", size = 5, class: className } = Astro.props;
 
 const isLeft = direction === "left" || direction === "up";
 
@@ -29,7 +25,12 @@ const rotateClass = direction === "up" ? "rotate-90" : "";
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
-  class:list={[sizeClass, rotateClass, "fill-none stroke-current stroke-2", className]}
+  class:list={[
+    sizeClass,
+    rotateClass,
+    "fill-none stroke-current stroke-2",
+    className,
+  ]}
 >
   <line
     x1="5"
@@ -38,16 +39,14 @@ const rotateClass = direction === "up" ? "rotate-90" : "";
     y2="12"
     class:list={[
       lineOffset,
-      "scale-x-0 transition-transform duration-200 ease-emphasis group-hover:translate-x-0 group-hover:scale-x-100 group-focus-visible:translate-x-0 group-focus-visible:scale-x-100",
-    ]}
-  />
+      "ease-emphasis scale-x-0 transition-transform duration-200 group-hover:translate-x-0 group-hover:scale-x-100 group-focus-visible:translate-x-0 group-focus-visible:scale-x-100",
+    ]}></line>
   <polyline
     points={points}
     class:list={[
       polyOffset,
-      "transition-transform duration-200 ease-emphasis group-hover:translate-x-0 group-focus-visible:translate-x-0",
-    ]}
-  />
+      "ease-emphasis transition-transform duration-200 group-hover:translate-x-0 group-focus-visible:translate-x-0",
+    ]}></polyline>
 </svg>
 
 <style>

@@ -99,14 +99,14 @@ Wayland 下：
 
 ```bash id="mzw2km"
 export XMODIFIERS=@im=fcitx
-````
+```
 
 因为大量应用：
 
-* Electron
-* Chromium
-* Qt4
-* X11 程序
+- Electron
+- Chromium
+- Qt4
+- X11 程序
 
 仍依赖 XIM。
 
@@ -126,8 +126,8 @@ GTK_IM_MODULE=fcitx
 
 更推荐：
 
-* Gtk3/4 使用 Wayland text-input
-* Gtk2 使用 fcitx 模块
+- Gtk3/4 使用 Wayland text-input
+- Gtk2 使用 fcitx 模块
 
 ---
 
@@ -201,8 +201,8 @@ Qt 在 Wayland 下情况最复杂。
 
 KWin 支持：
 
-* text-input-v2
-* text-input-v4
+- text-input-v2
+- text-input-v4
 
 因此：
 
@@ -236,10 +236,10 @@ export QT_IM_MODULE=fcitx
 
 部分软件：
 
-* WPS
-* DaVinci Resolve
-* Mathematica
-* Anki
+- WPS
+- DaVinci Resolve
+- Mathematica
+- Anki
 
 输入法兼容很差。
 
@@ -289,9 +289,9 @@ QT_IM_MODULES="wayland;fcitx;ibus"
 
 这样：
 
-* Wayland 不可用
-* 自动回退 fcitx
-* 最后使用 ibus
+- Wayland 不可用
+- 自动回退 fcitx
+- 最后使用 ibus
 
 ---
 
@@ -299,16 +299,16 @@ QT_IM_MODULES="wayland;fcitx;ibus"
 
 大量应用仍运行在：
 
-* XWayland
-* X11
+- XWayland
+- X11
 
 例如：
 
-* Electron
-* Chromium
-* SDL2
-* Qt4
-* 老 GTK2
+- Electron
+- Chromium
+- SDL2
+- Qt4
+- 老 GTK2
 
 ---
 
@@ -364,9 +364,7 @@ code \
 
 ---
 
-<Callout>
-  Chromium 的 text-input-v1 支持并不稳定，可能出现随机崩溃。
-</Callout>
+<Callout>Chromium 的 text-input-v1 支持并不稳定，可能出现随机崩溃。</Callout>
 
 ---
 
@@ -383,8 +381,8 @@ chromium \
 
 但：
 
-* Electron 不支持
-* GNOME 下候选框位置可能异常
+- Electron 不支持
+- GNOME 下候选框位置可能异常
 
 ---
 
@@ -408,9 +406,9 @@ export XMODIFIERS=@im=fcitx
 
 不要设置：
 
-* `GTK_IM_MODULE`
-* `QT_IM_MODULE`
-* `SDL_IM_MODULE`
+- `GTK_IM_MODULE`
+- `QT_IM_MODULE`
+- `SDL_IM_MODULE`
 
 ---
 
@@ -461,8 +459,8 @@ export QT_IM_MODULE=fcitx
 
 推荐：
 
-* XWayland
-* GTK_IM_MODULE=fcitx
+- XWayland
+- GTK_IM_MODULE=fcitx
 
 ---
 
@@ -476,7 +474,7 @@ GNOME 存在：
 
 使用：
 
-* kimpanel 扩展
+- kimpanel 扩展
 
 ---
 
@@ -486,13 +484,13 @@ GNOME 存在：
 
 包括：
 
-* Sway
-* Hyprland
-* River
+- Sway
+- Hyprland
+- River
 
 通常支持：
 
-* text-input-v3
+- text-input-v3
 
 但：
 
@@ -527,7 +525,7 @@ Weston：
 
 只支持：
 
-* text-input-v1
+- text-input-v1
 
 因此必须：
 
@@ -574,10 +572,10 @@ Wayland：
 
 不同环境：
 
-* XWayland：正常
-* KDE：text-input-v2
-* GNOME：kimpanel
-* Gtk/Qt：客户端内嵌 popup
+- XWayland：正常
+- KDE：text-input-v2
+- GNOME：kimpanel
+- Gtk/Qt：客户端内嵌 popup
 
 ---
 
@@ -591,7 +589,7 @@ Wayland 下：
 
 可以做到：
 
-* 每窗口独立输入法状态
+- 每窗口独立输入法状态
 
 ---
 
@@ -605,8 +603,8 @@ Wayland 没有统一 XKB API。
 
 仅：
 
-* KDE Plasma
-* GNOME
+- KDE Plasma
+- GNOME
 
 能较好支持。
 
@@ -618,8 +616,8 @@ Gtk3 / Qt5：
 
 popup 会：
 
-* show/hide
-* 频繁重定位
+- show/hide
+- 频繁重定位
 
 可能导致闪烁。
 
@@ -678,16 +676,16 @@ Wayland 下：
 
 目前：
 
-* KDE Plasma 兼容最好
-* GNOME 依赖 ibus
-* wlroots 环境需要更多手动配置
-* Qt Wayland 支持仍存在大量问题
+- KDE Plasma 兼容最好
+- GNOME 依赖 ibus
+- wlroots 环境需要更多手动配置
+- Qt Wayland 支持仍存在大量问题
 
 对于：
 
-* Hyprland
-* Sway
-* River
+- Hyprland
+- Sway
+- River
 
 通常推荐：
 

@@ -244,7 +244,9 @@ pre.astro-code::after {
   height: 12px;
   border-radius: 50%;
   background: #ff5f57;
-  box-shadow: 18px 0 0 #febc2e, 36px 0 0 #28c840;
+  box-shadow:
+    18px 0 0 #febc2e,
+    36px 0 0 #28c840;
 }
 
 /* Shiki dual-theme: switch to dark theme when .dark class is active */

@@ -26,7 +26,7 @@ const renderedNotes = await Promise.all(
   currentNotes.map(async (note: any) => {
     const { Content } = await render(note);
     return { ...note, Content };
-  })
+  }),
 );
 
 const totalNotesCount = page.total;
@@ -55,166 +55,251 @@ function formatMomentsDate(date: Date) {
 
 <Layout title={NOTES.TITLE} description={NOTES.DESCRIPTION}>
   <!-- 动态氛围背景 -->
-  <div class="fixed inset-0 pointer-events-none overflow-hidden z-[-1]">
-    <div class="absolute inset-0 bg-[linear-gradient(to_right,#e9d5ff_1px,transparent_1px),linear-gradient(to_bottom,#e9d5ff_1px,transparent_1px)] bg-[size:2.5rem_2.5rem] opacity-[0.2] dark:opacity-[0.1] [mask-image:radial-gradient(ellipse_at_center,white,transparent_90%)]"></div>
-    <div class="absolute top-[-5%] left-[-5%] w-[600px] h-[600px] bg-purple-400/10 dark:bg-indigo-600/10 blur-[130px] rounded-full animate-pulse"></div>
-    <div class="absolute bottom-[10%] right-[-5%] w-[550px] h-[650px] bg-fuchsia-300/10 dark:bg-blue-700/5 blur-[140px] rounded-full"></div>
+  <div class="pointer-events-none fixed inset-0 z-[-1] overflow-hidden">
+    <div
+      class="absolute inset-0 bg-[linear-gradient(to_right,#e9d5ff_1px,transparent_1px),linear-gradient(to_bottom,#e9d5ff_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_at_center,white,transparent_90%)] bg-[size:2.5rem_2.5rem] opacity-[0.2] dark:opacity-[0.1]"
+    >
+    </div>
+    <div
+      class="absolute top-[-5%] left-[-5%] h-[600px] w-[600px] animate-pulse rounded-full bg-purple-400/10 blur-[130px] dark:bg-indigo-600/10"
+    >
+    </div>
+    <div
+      class="absolute right-[-5%] bottom-[10%] h-[650px] w-[550px] rounded-full bg-fuchsia-300/10 blur-[140px] dark:bg-blue-700/5"
+    >
+    </div>
   </div>
 
   <Container>
     <aside data-pagefind-ignore>
       <div class="pb-24">
-        <PageHeader title="Notes." subtitle={`Atomic thoughts & technical fragments (Page ${page.currentPage})`} />
+        <PageHeader
+          title="Notes."
+          subtitle={`Atomic thoughts & technical fragments (Page ${page.currentPage})`}
+        />
 
-        <div class="mt-16 flex flex-col lg:flex-row gap-12 items-start">
-
+        <div class="mt-16 flex flex-col items-start gap-12 lg:flex-row">
           <!-- 左边栏：仪表盘 -->
-          <div class="w-full lg:w-[32%] lg:sticky lg:top-28 flex flex-col gap-6 p-7 rounded-[2.5rem] border border-purple-200/50 bg-white/70 backdrop-blur-xl dark:border-indigo-500/20 dark:bg-zinc-900/40 shadow-sm shrink-0">
-            <div class="flex items-center gap-3 text-[10px] font-bold tracking-[0.25em] text-purple-600/70 dark:text-indigo-400 uppercase">
-              <div class="size-1.5 rounded-full bg-purple-500 animate-pulse"></div>
+          <div
+            class="flex w-full shrink-0 flex-col gap-6 rounded-[2.5rem] border border-purple-200/50 bg-white/70 p-7 shadow-sm backdrop-blur-xl lg:sticky lg:top-28 lg:w-[32%] dark:border-indigo-500/20 dark:bg-zinc-900/40"
+          >
+            <div
+              class="flex items-center gap-3 text-[10px] font-bold tracking-[0.25em] text-purple-600/70 uppercase dark:text-indigo-400"
+            >
+              <div class="size-1.5 animate-pulse rounded-full bg-purple-500">
+              </div>
               <span>Status: Synchronized</span>
             </div>
 
-            <div class="flex items-baseline gap-3 mt-2">
-              <span class="text-5xl font-light tracking-tighter text-purple-950 dark:text-indigo-50 font-mono">{totalNotesCount}</span>
-              <span class="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Logs Compiled</span>
+            <div class="mt-2 flex items-baseline gap-3">
+              <span
+                class="font-mono text-5xl font-light tracking-tighter text-purple-950 dark:text-indigo-50"
+                >{totalNotesCount}</span
+              >
+              <span
+                class="text-[10px] font-black tracking-widest text-zinc-400 uppercase"
+                >Logs Compiled</span
+              >
             </div>
 
-            <div class="h-px bg-gradient-to-r from-purple-100 to-transparent dark:from-indigo-900/50"></div>
+            <div
+              class="h-px bg-gradient-to-r from-purple-100 to-transparent dark:from-indigo-900/50"
+            >
+            </div>
 
             <!-- 当前页面索引 -->
-            <div class="hidden lg:flex flex-col gap-4">
-              <span class="text-[9px] font-black text-purple-400 dark:text-indigo-500 uppercase tracking-widest">Current View Index</span>
-              <nav class="relative pl-4 flex flex-col gap-4">
+            <div class="hidden flex-col gap-4 lg:flex">
+              <span
+                class="text-[9px] font-black tracking-widest text-purple-400 uppercase dark:text-indigo-500"
+                >Current View Index</span
+              >
+              <nav class="relative flex flex-col gap-4 pl-4">
                 <!-- 动态进度条 -->
-                <div class="absolute left-0 top-1 bottom-1 w-[1.5px] bg-zinc-100 dark:bg-zinc-800">
-                  <div id="js-live-tree" class="w-full bg-gradient-to-b from-purple-500 to-indigo-500 shadow-[0_0_8px_#a855f7] h-0 transition-all duration-300 ease-out"></div>
+                <div
+                  class="absolute top-1 bottom-1 left-0 w-[1.5px] bg-zinc-100 dark:bg-zinc-800"
+                >
+                  <div
+                    id="js-live-tree"
+                    class="h-0 w-full bg-gradient-to-b from-purple-500 to-indigo-500 shadow-[0_0_8px_#a855f7] transition-all duration-300 ease-out"
+                  >
+                  </div>
                 </div>
 
-                {renderedNotes.map((note: any, index: number) => {
-                  const absoluteId = startingIndex - index;
-                  return (
-                    <a
-                      href={`#note-${absoluteId}`}
-                      data-index-link={absoluteId}
-                      class="group/nav flex items-center justify-between text-xs font-medium text-zinc-400 hover:text-purple-600 dark:hover:text-indigo-400 transition-all duration-300"
-                    >
-                      <span class="truncate pr-4 max-w-[160px] group-hover/nav:translate-x-1 transition-transform">
-                        {note.data.title || "Observation unit"}
-                      </span>
-                      <span class="font-mono text-[9px] opacity-40">#{String(absoluteId).padStart(2, '0')}</span>
-                    </a>
-                  );
-                })}
+                {
+                  renderedNotes.map((note: any, index: number) => {
+                    const absoluteId = startingIndex - index;
+                    return (
+                      <a
+                        href={`#note-${absoluteId}`}
+                        data-index-link={absoluteId}
+                        class="group/nav flex items-center justify-between text-xs font-medium text-zinc-400 transition-all duration-300 hover:text-purple-600 dark:hover:text-indigo-400"
+                      >
+                        <span class="max-w-[160px] truncate pr-4 transition-transform group-hover/nav:translate-x-1">
+                          {note.data.title || "Observation unit"}
+                        </span>
+                        <span class="font-mono text-[9px] opacity-40">
+                          #{String(absoluteId).padStart(2, "0")}
+                        </span>
+                      </a>
+                    );
+                  })
+                }
               </nav>
             </div>
 
-            <div class="h-px bg-gradient-to-r from-purple-100 to-transparent dark:from-indigo-900/50"></div>
+            <div
+              class="h-px bg-gradient-to-r from-purple-100 to-transparent dark:from-indigo-900/50"
+            >
+            </div>
 
             <!-- 侧边栏分页器 -->
             <nav class="flex flex-col gap-3 font-mono text-xs select-none">
               <div class="grid grid-cols-2 gap-2">
-                {page.url.prev ? (
-                  <a href={page.url.prev} class="flex items-center justify-center gap-1.5 py-3 rounded-2xl border border-purple-100 bg-white hover:bg-purple-600 hover:text-white shadow-sm transition-all duration-300 dark:bg-zinc-900 dark:border-zinc-800">
-                    <span class="tracking-widest font-bold">PREV</span>
-                  </a>
-                ) : (
-                  <div class="flex items-center justify-center py-3 rounded-2xl border border-dashed border-zinc-100 text-zinc-200 dark:border-zinc-800 dark:text-zinc-700 pointer-events-none text-[10px] uppercase font-bold tracking-tighter">Genesis</div>
-                )}
+                {
+                  page.url.prev ? (
+                    <a
+                      href={page.url.prev}
+                      class="flex items-center justify-center gap-1.5 rounded-2xl border border-purple-100 bg-white py-3 shadow-sm transition-all duration-300 hover:bg-purple-600 hover:text-white dark:border-zinc-800 dark:bg-zinc-900"
+                    >
+                      <span class="font-bold tracking-widest">PREV</span>
+                    </a>
+                  ) : (
+                    <div class="pointer-events-none flex items-center justify-center rounded-2xl border border-dashed border-zinc-100 py-3 text-[10px] font-bold tracking-tighter text-zinc-200 uppercase dark:border-zinc-800 dark:text-zinc-700">
+                      Genesis
+                    </div>
+                  )
+                }
 
-                {page.url.next ? (
-                  <a href={page.url.next} class="flex items-center justify-center gap-1.5 py-3 rounded-2xl border border-purple-100 bg-white hover:bg-purple-600 hover:text-white shadow-sm transition-all duration-300 dark:bg-zinc-900 dark:border-zinc-800">
-                    <span class="tracking-widest font-bold">NEXT</span>
-                  </a>
-                ) : (
-                  <div class="flex items-center justify-center py-3 rounded-2xl border border-dashed border-zinc-100 text-zinc-200 dark:border-zinc-800 dark:text-zinc-700 pointer-events-none text-[10px] uppercase font-bold tracking-tighter">Latest</div>
-                )}
+                {
+                  page.url.next ? (
+                    <a
+                      href={page.url.next}
+                      class="flex items-center justify-center gap-1.5 rounded-2xl border border-purple-100 bg-white py-3 shadow-sm transition-all duration-300 hover:bg-purple-600 hover:text-white dark:border-zinc-800 dark:bg-zinc-900"
+                    >
+                      <span class="font-bold tracking-widest">NEXT</span>
+                    </a>
+                  ) : (
+                    <div class="pointer-events-none flex items-center justify-center rounded-2xl border border-dashed border-zinc-100 py-3 text-[10px] font-bold tracking-tighter text-zinc-200 uppercase dark:border-zinc-800 dark:text-zinc-700">
+                      Latest
+                    </div>
+                  )
+                }
               </div>
             </nav>
           </div>
 
           <!-- 右边栏：Note 卡片 -->
-          <div class="w-full lg:w-[68%] flex flex-col gap-12">
-            {renderedNotes.map((note: any, i: number) => {
-              const absoluteId = startingIndex - i;
-              return (
-                <article
-                  id={`note-${absoluteId}`}
-                  class="note-card-container group relative"
-                  style={`--order: ${i}; scroll-margin-top: 120px;`}
-                  data-note-id={absoluteId}
-                >
-                  <!-- 活页孔 -->
-                  <div class="absolute left-4 top-0 bottom-0 w-4 flex flex-col justify-center gap-6 z-20 pointer-events-none">
-                    {[...Array(8)].map((_, hi) => (
-                      <div
-                        class="notebook-hole size-2.5 sm:size-3 rounded-full bg-zinc-100 border border-zinc-200 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.1)] dark:bg-black dark:border-zinc-800 dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] transition-all duration-500"
-                        style={`transition-delay: ${hi * 40}ms;`}
-                      ></div>
-                    ))}
-                  </div>
+          <div class="flex w-full flex-col gap-12 lg:w-[68%]">
+            {
+              renderedNotes.map((note: any, i: number) => {
+                const absoluteId = startingIndex - i;
+                return (
+                  <article
+                    id={`note-${absoluteId}`}
+                    class="note-card-container group relative"
+                    style={`--order: ${i}; scroll-margin-top: 120px;`}
+                    data-note-id={absoluteId}
+                  >
+                    {/* 活页孔 */}
+                    <div class="pointer-events-none absolute top-0 bottom-0 left-4 z-20 flex w-4 flex-col justify-center gap-6">
+                      {[...Array(8)].map((_, hi) => (
+                        <div
+                          class="notebook-hole size-2.5 rounded-full border border-zinc-200 bg-zinc-100 shadow-[inset_0_1.5px_3px_rgba(0,0,0,0.1)] transition-all duration-500 sm:size-3 dark:border-zinc-800 dark:bg-black dark:shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)]"
+                          style={`transition-delay: ${hi * 40}ms;`}
+                        />
+                      ))}
+                    </div>
 
-                  <!-- 核心卡片 -->
-                  <div class="relative ml-10 rounded-[2.5rem] bg-white border border-zinc-200/60 dark:bg-zinc-900/40 dark:border-indigo-500/10 shadow-sm transition-all duration-500 group-hover:border-purple-200 dark:group-hover:border-indigo-500/30 group-hover:shadow-xl group-hover:shadow-purple-500/5">
-                    <!-- 笔记本装饰红线 -->
-                    <div class="absolute left-10 top-0 bottom-0 w-px bg-red-100/60 dark:bg-red-900/20"></div>
+                    {/* 核心卡片 */}
+                    <div class="relative ml-10 rounded-[2.5rem] border border-zinc-200/60 bg-white shadow-sm transition-all duration-500 group-hover:border-purple-200 group-hover:shadow-xl group-hover:shadow-purple-500/5 dark:border-indigo-500/10 dark:bg-zinc-900/40 dark:group-hover:border-indigo-500/30">
+                      <div class="absolute top-0 bottom-0 left-10 w-px bg-red-100/60 dark:bg-red-900/20" />
 
-                    <div class="p-8 sm:p-12 pl-12 sm:pl-16">
-                      <div class="flex items-center justify-between gap-4 mb-8 pb-6 border-b border-zinc-50 dark:border-indigo-950/30">
-                        <div class="flex items-center gap-4 min-w-0">
-                          <div class="flex items-center justify-center shrink-0 size-7 rounded-xl bg-purple-50 text-purple-500 group-hover:bg-purple-600 group-hover:text-white transition-all duration-500">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8.5"/><path d="M15 18H9"/><path d="M15 14H9"/><path d="M15 10H9"/><path d="M19 2.5 21.5 4.5 19 6.5"/></svg>
+                      <div class="p-8 pl-12 sm:p-12 sm:pl-16">
+                        <div class="mb-8 flex items-center justify-between gap-4 border-b border-zinc-50 pb-6 dark:border-indigo-950/30">
+                          <div class="flex min-w-0 items-center gap-4">
+                            <div class="flex size-7 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-500 transition-all duration-500 group-hover:bg-purple-600 group-hover:text-white">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              >
+                                <>
+                                  <path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8.5" />
+                                  <path d="M15 18H9" />
+                                  <path d="M15 14H9" />
+                                  <path d="M15 10H9" />
+                                  <path d="M19 2.5 21.5 4.5 19 6.5" />
+                                </>
+                              </svg>
+                            </div>
+                            <div class="flex min-w-0 flex-col">
+                              <h2 class="text-lg font-bold tracking-tight text-zinc-900 transition-colors group-hover:text-purple-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                                {note.data.title || "Untitled Fragment"}
+                              </h2>
+                              <span class="mt-0.5 font-mono text-[10px] tracking-[0.1em] text-purple-400 dark:text-indigo-500">
+                                {formatMomentsDate(note.data.date)}
+                              </span>
+                            </div>
                           </div>
-                          <div class="flex flex-col min-w-0">
-                            <h2 class="font-bold text-zinc-900 dark:text-zinc-100 text-lg tracking-tight group-hover:text-purple-600 dark:group-hover:text-indigo-400 transition-colors">
-                              {note.data.title || "Untitled Fragment"}
-                            </h2>
-                            <span class="font-mono text-[10px] text-purple-400 dark:text-indigo-500 tracking-[0.1em] mt-0.5">
-                              {formatMomentsDate(note.data.date)}
-                            </span>
+
+                          {/* LOG ID 和 带 Tooltip 的分享按钮 */}
+                          <div class="flex items-center gap-3">
+                            <div class="font-mono text-[11px] font-bold tracking-tighter text-zinc-300 dark:text-zinc-700">
+                              LOG.#{absoluteId}
+                            </div>
+                            <button
+                              class="share-note-btn tooltip-trigger relative flex size-7 items-center justify-center rounded-lg text-zinc-400 transition-all duration-300 hover:bg-purple-50 hover:text-purple-600 dark:text-zinc-600 dark:hover:bg-indigo-900/40 dark:hover:text-indigo-400"
+                              data-note-id={`note-${absoluteId}`}
+                              data-tooltip="Copy link"
+                              aria-label="Share note"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              >
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                              </svg>
+                            </button>
                           </div>
                         </div>
 
-                        <!-- LOG ID 和 带 Tooltip 的分享按钮 -->
-                        <div class="flex items-center gap-3">
-                          <div class="font-mono text-[11px] font-bold text-zinc-300 dark:text-zinc-700 tracking-tighter">
-                            LOG.#{absoluteId}
+                        <div class="pl-1 sm:pl-8">
+                          <div class="prose prose-zinc prose-base dark:prose-invert prose-p:leading-relaxed prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-a:text-purple-600 dark:prose-a:text-indigo-400 prose-strong:text-purple-900 dark:prose-strong:text-indigo-100 max-w-none">
+                            <note.Content components={{ img: MarkdownImage }} />
                           </div>
-                          <button
-                            class="share-note-btn tooltip-trigger flex items-center justify-center size-7 rounded-lg text-zinc-400 hover:text-purple-600 hover:bg-purple-50 dark:text-zinc-600 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/40 transition-all duration-300 relative"
-                            data-note-id={`note-${absoluteId}`}
-                            data-tooltip="Copy link"
-                            aria-label="Share note"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                            </svg>
-                          </button>
-                        </div>
-                        <!-- 修改部分结束 -->
 
-                      </div>
-
-                      <div class="pl-1 sm:pl-8">
-                        <div class="prose prose-zinc prose-base max-w-none dark:prose-invert prose-p:leading-relaxed prose-p:text-zinc-600 dark:prose-p:text-zinc-400 prose-a:text-purple-600 dark:prose-a:text-indigo-400 prose-strong:text-purple-900 dark:prose-strong:text-indigo-100">
-                          <note.Content components={{ img: MarkdownImage }} />
-                        </div>
-
-                        <div class="mt-12 flex items-center justify-between opacity-30 group-hover:opacity-100 transition-opacity duration-500">
-                          <div class="flex gap-2">
-                             {[1, 2, 3].map(() => <div class="size-1 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>)}
+                          <div class="mt-12 flex items-center justify-between opacity-30 transition-opacity duration-500 group-hover:opacity-100">
+                            <div class="flex gap-2">
+                              {[1, 2, 3].map(() => (
+                                <div class="size-1 rounded-full bg-zinc-200 dark:bg-zinc-800" />
+                              ))}
+                            </div>
+                            <div class="text-[9px] font-black tracking-[0.3em] text-zinc-400 uppercase">
+                              End Translation
+                            </div>
                           </div>
-                          <div class="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400">End Translation</div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </article>
-              );
-            })}
+                  </article>
+                );
+              })
+            }
           </div>
-
         </div>
       </div>
     </aside>
@@ -231,7 +316,10 @@ function formatMomentsDate(date: Date) {
   }
 
   @keyframes noteUp {
-    to { opacity: 1; transform: translateY(0); }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* 活页孔 Hover 律动 */
@@ -303,38 +391,38 @@ function formatMomentsDate(date: Date) {
       const targetElement = document.querySelector(window.location.hash);
       if (targetElement) {
         setTimeout(() => {
-          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
         }, 200);
       }
     }
 
-    const liveTree = document.getElementById('js-live-tree');
-    const noteCards = document.querySelectorAll('[data-note-id]');
-    const navLinks = document.querySelectorAll('[data-index-link]');
+    const liveTree = document.getElementById("js-live-tree");
+    const noteCards = document.querySelectorAll("[data-note-id]");
+    const navLinks = document.querySelectorAll("[data-index-link]");
 
     // 2. 绑定复制链接功能
-    const shareButtons = document.querySelectorAll('.share-note-btn');
-    shareButtons.forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const noteId = btn.getAttribute('data-note-id');
+    const shareButtons = document.querySelectorAll(".share-note-btn");
+    shareButtons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const noteId = btn.getAttribute("data-note-id");
         const url = new URL(window.location.href);
-        url.hash = noteId || '';
+        url.hash = noteId || "";
         const shareUrl = url.toString();
 
         try {
           await navigator.clipboard.writeText(shareUrl);
 
           // 反馈：变更 Tooltip 文字和图标
-          btn.setAttribute('data-tooltip', 'Copied!');
+          btn.setAttribute("data-tooltip", "Copied!");
           const originalInner = btn.innerHTML;
           btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 dark:text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 
           setTimeout(() => {
             btn.innerHTML = originalInner;
-            btn.setAttribute('data-tooltip', 'Copy link');
+            btn.setAttribute("data-tooltip", "Copy link");
           }, 2000);
         } catch (err) {
-          console.error('Failed to copy text: ', err);
+          console.error("Failed to copy text: ", err);
         }
       });
     });
@@ -350,34 +438,45 @@ function formatMomentsDate(date: Date) {
       ticking = false;
     };
 
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateProgressBar);
-        ticking = true;
-      }
-    }, { passive: true });
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const activeId = entry.target.getAttribute('data-note-id');
-          navLinks.forEach(link => {
-            const isMatch = link.getAttribute('data-index-link') === activeId;
-            link.classList.toggle('text-purple-600', isMatch);
-            link.classList.toggle('dark:text-indigo-400', isMatch);
-            link.classList.toggle('pl-2', isMatch);
-            link.classList.toggle('text-zinc-400', !isMatch);
-          });
+    window.addEventListener(
+      "scroll",
+      () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateProgressBar);
+          ticking = true;
         }
-      });
-    }, { rootMargin: "-20% 0px -60% 0px", threshold: 0.1 });
+      },
+      { passive: true },
+    );
 
-    noteCards.forEach(card => observer.observe(card));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const activeId = entry.target.getAttribute("data-note-id");
+            navLinks.forEach((link) => {
+              const isMatch = link.getAttribute("data-index-link") === activeId;
+              link.classList.toggle("text-purple-600", isMatch);
+              link.classList.toggle("dark:text-indigo-400", isMatch);
+              link.classList.toggle("pl-2", isMatch);
+              link.classList.toggle("text-zinc-400", !isMatch);
+            });
+          }
+        });
+      },
+      { rootMargin: "-20% 0px -60% 0px", threshold: 0.1 },
+    );
 
-    document.addEventListener('astro:before-swap', () => {
-      observer.disconnect();
-    }, { once: true });
+    noteCards.forEach((card) => observer.observe(card));
+
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        observer.disconnect();
+      },
+      { once: true },
+    );
   }
 
-  document.addEventListener('astro:page-load', initNoteSystem);
+  document.addEventListener("astro:page-load", initNoteSystem);
 </script>

@@ -255,7 +255,7 @@ const { title, description, image = "/astro-micro.jpg" } = Astro.props;
     if (iframe) {
       iframe.contentWindow.postMessage(
         { giscus: { setConfig: { theme } } },
-        "https://giscus.app"
+        "https://giscus.app",
       );
     }
   };

@@ -19,7 +19,12 @@ const allSeries = (await getCollection("series")).filter(
 // Load index entries for series metadata
 const indexEntries = new Map(
   allSeries
-    .filter((p) => !p.id.includes("/") || p.id.endsWith("/index.md") || p.id.endsWith("/index.mdx"))
+    .filter(
+      (p) =>
+        !p.id.includes("/") ||
+        p.id.endsWith("/index.md") ||
+        p.id.endsWith("/index.mdx"),
+    )
     .map((p) => {
       const name = p.id.split("/")[0].replace(/\.(md|mdx)$/, "");
       return [name, p];
@@ -28,7 +33,10 @@ const indexEntries = new Map(
 
 // Articles only (exclude index files)
 const seriesPosts = allSeries.filter(
-  (p) => p.id.includes("/") && !p.id.endsWith("/index.md") && !p.id.endsWith("/index.mdx"),
+  (p) =>
+    p.id.includes("/") &&
+    !p.id.endsWith("/index.md") &&
+    !p.id.endsWith("/index.mdx"),
 );
 
 // Group by series folder name

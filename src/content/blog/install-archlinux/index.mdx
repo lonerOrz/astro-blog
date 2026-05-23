@@ -99,9 +99,7 @@ timedatectl set-timezone Asia/Shanghai
 
 ## 磁盘分区
 
-<Callout>
-  注意不要误格式化 Windows 分区。
-</Callout>
+<Callout>注意不要误格式化 Windows 分区。</Callout>
 
 打开分区工具：
 
@@ -111,10 +109,10 @@ cfdisk /dev/nvme0n1
 
 推荐分区结构：
 
-| 分区 | 用途 |
-|---|---|
-| EFI | 512MB |
-| Swap | 8GB |
+| 分区 | 用途              |
+| ---- | ----------------- |
+| EFI  | 512MB             |
+| Swap | 8GB               |
 | Root | 剩余空间（Btrfs） |
 
 ---

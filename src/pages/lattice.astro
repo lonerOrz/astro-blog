@@ -8,85 +8,170 @@ import Container from "../components/Container.astro";
   description="High-fidelity mathematical topology visualization."
 >
   <Container>
-    <div class="mx-auto max-w-6xl py-12 space-y-8" id="knot-container">
-      <header class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between border-b border-zinc-200 pb-8 dark:border-zinc-800 animate-slide-up">
+    <div class="mx-auto max-w-6xl space-y-8 py-12" id="knot-container">
+      <header
+        class="animate-slide-up flex flex-col gap-6 border-b border-zinc-200 pb-8 md:flex-row md:items-end md:justify-between dark:border-zinc-800"
+      >
         <div class="space-y-4">
-          <div class="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 dark:border-zinc-800 dark:bg-zinc-900">
+          <div
+            class="inline-flex items-center gap-2 rounded-full border border-zinc-300 bg-zinc-100 px-3 py-1 dark:border-zinc-800 dark:bg-zinc-900"
+          >
             <span class="relative flex h-2 w-2">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              <span
+                class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75"
+              ></span>
+              <span
+                class="relative inline-flex h-2 w-2 rounded-full bg-blue-500"
+              ></span>
             </span>
-            <span class="font-mono text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase">Math Engine v2.0</span>
+            <span
+              class="font-mono text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase"
+              >Math Engine v2.0</span
+            >
           </div>
-          <h1 class="text-4xl font-black tracking-tighter text-zinc-900 uppercase dark:text-white leading-none">
+          <h1
+            class="text-4xl leading-none font-black tracking-tighter text-zinc-900 uppercase dark:text-white"
+          >
             Torus <span class="text-zinc-400 dark:text-zinc-600">//</span> Knot
           </h1>
-          <p class="max-w-md text-[11px] font-bold leading-relaxed tracking-[0.2em] text-zinc-500 uppercase">
-            Parametric curves generated via <span class="text-zinc-900 dark:text-zinc-300">Toroidal Harmonic Motion</span>. Projected in isometric 3D space.
+          <p
+            class="max-w-md text-[11px] leading-relaxed font-bold tracking-[0.2em] text-zinc-500 uppercase"
+          >
+            Parametric curves generated via <span
+              class="text-zinc-900 dark:text-zinc-300"
+              >Toroidal Harmonic Motion</span
+            >. Projected in isometric 3D space.
           </p>
         </div>
 
         <div class="grid grid-cols-2 gap-10 font-mono">
           <div class="space-y-1">
-            <div class="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">Calculation</div>
-            <div class="text-xs text-zinc-800 dark:text-zinc-200 uppercase">Matrix Projection</div>
+            <div
+              class="text-[9px] font-bold tracking-widest text-zinc-400 uppercase"
+            >
+              Calculation
+            </div>
+            <div class="text-xs text-zinc-800 uppercase dark:text-zinc-200">
+              Matrix Projection
+            </div>
           </div>
           <div class="space-y-1">
-            <div class="text-[9px] font-bold tracking-widest text-zinc-400 uppercase">Complexity</div>
-            <div class="text-xs text-zinc-800 dark:text-zinc-200 uppercase">Non-Euclidean</div>
+            <div
+              class="text-[9px] font-bold tracking-widest text-zinc-400 uppercase"
+            >
+              Complexity
+            </div>
+            <div class="text-xs text-zinc-800 uppercase dark:text-zinc-200">
+              Non-Euclidean
+            </div>
           </div>
         </div>
       </header>
 
       <!-- Main Display -->
-      <main class="relative aspect-video w-full overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-black animate-slide-up" style="--delay: 0.1s">
-        <div class="absolute top-8 left-8 z-20 space-y-4 pointer-events-none">
-          <div class="rounded-2xl border border-zinc-200/50 bg-white/40 p-5 backdrop-blur-xl dark:border-zinc-800/50 dark:bg-black/40 shadow-sm">
-            <div class="text-[8px] font-black tracking-[0.3em] text-zinc-400 uppercase mb-2">Mathematical Formula</div>
-            <div id="formula-readout" class="font-mono text-[10px] font-bold text-zinc-800 dark:text-zinc-200">
+      <main
+        class="animate-slide-up relative aspect-video w-full overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-black"
+        style="--delay: 0.1s"
+      >
+        <div class="pointer-events-none absolute top-8 left-8 z-20 space-y-4">
+          <div
+            class="rounded-2xl border border-zinc-200/50 bg-white/40 p-5 shadow-sm backdrop-blur-xl dark:border-zinc-800/50 dark:bg-black/40"
+          >
+            <div
+              class="mb-2 text-[8px] font-black tracking-[0.3em] text-zinc-400 uppercase"
+            >
+              Mathematical Formula
+            </div>
+            <div
+              id="formula-readout"
+              class="font-mono text-[10px] font-bold text-zinc-800 dark:text-zinc-200"
+            >
               x = (R + r cos qθ)cos pθ
             </div>
           </div>
         </div>
 
         <!-- 装饰背景层 -->
-        <div class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_70%)]"></div>
-        <div class="absolute inset-0 z-0 opacity-20 dark:opacity-40" style="background-image: radial-gradient(circle, #80808022 1px, transparent 1px); background-size: 40px 40px;"></div>
+        <div
+          class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.04),transparent_70%)]"
+        >
+        </div>
+        <div
+          class="absolute inset-0 z-0 opacity-20 dark:opacity-40"
+          style="background-image: radial-gradient(circle, #80808022 1px, transparent 1px); background-size: 40px 40px;"
+        >
+        </div>
 
         <!-- 渲染画布 -->
-        <canvas id="math-canvas" class="relative z-10 h-full w-full cursor-move"></canvas>
+        <canvas id="math-canvas" class="relative z-10 h-full w-full cursor-move"
+        ></canvas>
 
         <!-- 遮罩渐变 -->
-        <div class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/20 to-transparent dark:from-black dark:via-black/20"></div>
+        <div
+          class="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white/20 to-transparent dark:from-black dark:via-black/20"
+        >
+        </div>
       </main>
 
       <!-- Control Interface -->
-      <footer class="grid gap-8 rounded-[2rem] border border-zinc-200 bg-zinc-50/50 p-10 dark:border-zinc-800 dark:bg-zinc-950/50 md:grid-cols-3 animate-slide-up" style="--delay: 0.2s">
-        {[
-          { id: 'p', label: 'Rotational (p)', min: 1, max: 15, step: 1, val: 3 },
-          { id: 'q', label: 'Harmonic (q)', min: 1, max: 20, step: 1, val: 7 },
-          { id: 'r', label: 'Radius Amplitude', min: 0.1, max: 1.5, step: 0.01, val: 0.45 }
-        ].map(item => (
-          <div class="space-y-5">
-            <div class="flex items-center justify-between px-1">
-              <label for={`input-${item.id}`} class="text-[10px] font-black tracking-[0.25em] text-zinc-400 uppercase">
-                {item.label}
-              </label>
-              <span id={`${item.id}-readout`} class="font-mono text-xs font-bold text-blue-600 dark:text-blue-400">
-                {item.val}
-              </span>
+      <footer
+        class="animate-slide-up grid gap-8 rounded-[2rem] border border-zinc-200 bg-zinc-50/50 p-10 md:grid-cols-3 dark:border-zinc-800 dark:bg-zinc-950/50"
+        style="--delay: 0.2s"
+      >
+        {
+          [
+            {
+              id: "p",
+              label: "Rotational (p)",
+              min: 1,
+              max: 15,
+              step: 1,
+              val: 3,
+            },
+            {
+              id: "q",
+              label: "Harmonic (q)",
+              min: 1,
+              max: 20,
+              step: 1,
+              val: 7,
+            },
+            {
+              id: "r",
+              label: "Radius Amplitude",
+              min: 0.1,
+              max: 1.5,
+              step: 0.01,
+              val: 0.45,
+            },
+          ].map((item) => (
+            <div class="space-y-5">
+              <div class="flex items-center justify-between px-1">
+                <label
+                  for={`input-${item.id}`}
+                  class="text-[10px] font-black tracking-[0.25em] text-zinc-400 uppercase"
+                >
+                  {item.label}
+                </label>
+                <span
+                  id={`${item.id}-readout`}
+                  class="font-mono text-xs font-bold text-blue-600 dark:text-blue-400"
+                >
+                  {item.val}
+                </span>
+              </div>
+              <input
+                id={`input-${item.id}`}
+                type="range"
+                min={item.min}
+                max={item.max}
+                step={item.step}
+                value={item.val}
+                class="custom-slider"
+              />
             </div>
-            <input
-              id={`input-${item.id}`}
-              type="range"
-              min={item.min}
-              max={item.max}
-              step={item.step}
-              value={item.val}
-              class="custom-slider"
-            />
-          </div>
-        ))}
+          ))
+        }
       </footer>
     </div>
   </Container>
@@ -101,7 +186,9 @@ import Container from "../components/Container.astro";
     outline: none;
     border-radius: 2px;
   }
-  .dark .custom-slider { background: #27272a; }
+  .dark .custom-slider {
+    background: #27272a;
+  }
 
   .custom-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -110,7 +197,9 @@ import Container from "../components/Container.astro";
     border-radius: 50%;
     background: #000;
     border: 3px solid #fff;
-    box-shadow: 0 0 0 1px #e2e8f0, 0 4px 6px -1px rgba(0,0,0,0.1);
+    box-shadow:
+      0 0 0 1px #e2e8f0,
+      0 4px 6px -1px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
@@ -119,7 +208,10 @@ import Container from "../components/Container.astro";
     border-color: #000;
     box-shadow: 0 0 0 1px #27272a;
   }
-  .custom-slider::-webkit-slider-thumb:hover { transform: scale(1.25); background: #2563eb; }
+  .custom-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+    background: #2563eb;
+  }
 
   /* 入场动画 */
   .animate-slide-up {
@@ -130,7 +222,10 @@ import Container from "../components/Container.astro";
   }
 
   @keyframes fadeInUp {
-    to { opacity: 1; transform: translateY(0); }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 
@@ -144,14 +239,14 @@ import Container from "../components/Container.astro";
       this.inputs = {
         p: document.getElementById("input-p"),
         q: document.getElementById("input-q"),
-        r: document.getElementById("input-r")
+        r: document.getElementById("input-r"),
       };
 
       this.readouts = {
         p: document.getElementById("p-readout"),
         q: document.getElementById("q-readout"),
         r: document.getElementById("r-readout"),
-        formula: document.getElementById("formula-readout")
+        formula: document.getElementById("formula-readout"),
       };
 
       this.t = 0;
@@ -189,7 +284,7 @@ import Container from "../components/Container.astro";
       return {
         x: this.width / 2 + x2 * this.scale * perspective,
         y: this.height / 2 + y1 * this.scale * perspective,
-        z: z2 // 用于深度深度着色
+        z: z2, // 用于深度深度着色
       };
     }
 
@@ -235,7 +330,8 @@ import Container from "../components/Container.astro";
           const y = (2.2 + r * Math.cos(v)) * Math.sin(u);
           const z = r * Math.sin(v);
           const pt = this.project(x, y, z, rotX, rotY);
-          if (v === 0) ctx.moveTo(pt.x, pt.y); else ctx.lineTo(pt.x, pt.y);
+          if (v === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
         }
         ctx.stroke();
       }
@@ -261,7 +357,7 @@ import Container from "../components/Container.astro";
 
           // 基于深度的样式优化
           const depthAlpha = Math.max(0.05, (pt.z + 2.5) / 5);
-          const hue = (theta / (Math.PI * 2) * 60 + 210) % 360; // 极光蓝调
+          const hue = ((theta / (Math.PI * 2)) * 60 + 210) % 360; // 极光蓝调
 
           if (theta === 0) {
             ctx.moveTo(pt.x, pt.y);
@@ -300,10 +396,16 @@ import Container from "../components/Container.astro";
   let visualizer = new TorusVisualizer();
 
   // 清理 SPA 路由切换残留
-  document.addEventListener("astro:before-swap", () => {
-    if (visualizer) visualizer.destroy();
-  }, { once: true });
+  document.addEventListener(
+    "astro:before-swap",
+    () => {
+      if (visualizer) visualizer.destroy();
+    },
+    { once: true },
+  );
 
   // 内部辅助函数
-  function sin(v) { return Math.sin(v); }
+  function sin(v) {
+    return Math.sin(v);
+  }
 </script>

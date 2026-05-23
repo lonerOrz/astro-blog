@@ -106,7 +106,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       syncFrame = requestAnimationFrame(() => {
         const pic = mount.querySelector(".aplayer-pic");
         if (!pic) return;
-        const cover = pic.style.backgroundImage || window.getComputedStyle(pic).backgroundImage;
+        const cover =
+          pic.style.backgroundImage ||
+          window.getComputedStyle(pic).backgroundImage;
         if (cover && cover !== "none" && bg.dataset.currentCover !== cover) {
           bg.dataset.currentCover = cover;
           bg.style.setProperty("--music-cover", cover);
@@ -119,16 +121,20 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       if (!playlistId || playlistId === currentPlaylist) return;
       currentPlaylist = playlistId;
 
-      try { localStorage.setItem("an_music_last_playlist", playlistId); } catch (e) {}
+      try {
+        localStorage.setItem("an_music_last_playlist", playlistId);
+      } catch (e) {}
 
       // 更新 Selector UI
-      document.querySelectorAll("#playlist-selector [data-playlist]").forEach((b) => {
-        const active = b.dataset.playlist === playlistId;
-        b.classList.toggle("playlist-active", active);
-        b.classList.toggle("playlist-inactive", !active);
-        b.setAttribute("aria-selected", String(active));
-        b.tabIndex = active ? 0 : -1;
-      });
+      document
+        .querySelectorAll("#playlist-selector [data-playlist]")
+        .forEach((b) => {
+          const active = b.dataset.playlist === playlistId;
+          b.classList.toggle("playlist-active", active);
+          b.classList.toggle("playlist-inactive", !active);
+          b.setAttribute("aria-selected", String(active));
+          b.tabIndex = active ? 0 : -1;
+        });
 
       // 显示 Loading
       let shell = mount.querySelector("#an_music_loading");
@@ -136,13 +142,16 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         shell = document.createElement("div");
         shell.id = "an_music_loading";
         shell.className = "music-loading-shell";
-        shell.innerHTML = '<div class="music-loading-cover"></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
+        shell.innerHTML =
+          '<div class="music-loading-cover"></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
         mount.appendChild(shell);
       }
       shell.classList.remove("is-hidden");
 
       // 清理旧播放器
-      document.querySelectorAll("meting-js, .aplayer").forEach(n => n.remove());
+      document
+        .querySelectorAll("meting-js, .aplayer")
+        .forEach((n) => n.remove());
 
       loadAPlayerScripts().then(() => {
         mount.appendChild(createMetingElement(playlistId));
@@ -160,7 +169,10 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
             if (pic) {
               picObserver?.disconnect();
               picObserver = new MutationObserver(syncCover);
-              picObserver.observe(pic, { attributes: true, attributeFilter: ["style"] });
+              picObserver.observe(pic, {
+                attributes: true,
+                attributeFilter: ["style"],
+              });
               syncCover();
             }
           }
@@ -175,8 +187,13 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       let initial = null;
       try {
         const saved = localStorage.getItem("an_music_last_playlist");
-        const available = selector?.dataset.playlists ? JSON.parse(selector.dataset.playlists) : [];
-        initial = (saved && available.some(p => p.id === saved)) ? saved : selector?.dataset.default;
+        const available = selector?.dataset.playlists
+          ? JSON.parse(selector.dataset.playlists)
+          : [];
+        initial =
+          saved && available.some((p) => p.id === saved)
+            ? saved
+            : selector?.dataset.default;
       } catch (e) {}
       if (initial) setPlaylist(initial);
     });
@@ -187,16 +204,20 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       const btn = e.target.closest("[data-playlist]");
       if (btn) setPlaylist(btn.dataset.playlist);
     });
-    selector?.addEventListener('change', (e) => {
-      if (e.target.matches('select')) setPlaylist(e.target.value);
+    selector?.addEventListener("change", (e) => {
+      if (e.target.matches("select")) setPlaylist(e.target.value);
     });
 
     // SPA 清理
-    document.addEventListener("astro:before-swap", () => {
-      picObserver?.disconnect();
-      if (syncFrame) cancelAnimationFrame(syncFrame);
-      root.classList.remove("music-page-active");
-    }, { once: true });
+    document.addEventListener(
+      "astro:before-swap",
+      () => {
+        picObserver?.disconnect();
+        if (syncFrame) cancelAnimationFrame(syncFrame);
+        root.classList.remove("music-page-active");
+      },
+      { once: true },
+    );
   })();
 </script>
 

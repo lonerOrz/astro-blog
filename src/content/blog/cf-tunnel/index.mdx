@@ -64,7 +64,7 @@ Cloudflare Tunnel
 cloudflared
     ↓
 本地服务
-````
+```
 
 本地只需要运行一个：
 
@@ -76,9 +76,9 @@ cloudflared
 
 因此：
 
-* 不需要开放防火墙端口
-* 不暴露源站 IP
-* NAT / CGNAT 环境也能使用
+- 不需要开放防火墙端口
+- 不暴露源站 IP
+- NAT / CGNAT 环境也能使用
 
 ---
 
@@ -86,14 +86,12 @@ cloudflared
 
 你需要：
 
-* 一个 Cloudflare 账号
-* 域名托管到 Cloudflare
-* 开启 Zero Trust
-* 一台内网设备
+- 一个 Cloudflare 账号
+- 域名托管到 Cloudflare
+- 开启 Zero Trust
+- 一台内网设备
 
-<Callout>
-  免费计划即可使用，大多数个人场景完全够用。
-</Callout>
+<Callout>免费计划即可使用，大多数个人场景完全够用。</Callout>
 
 ---
 
@@ -163,9 +161,7 @@ Created tunnel homelab with id:
 ~/.cloudflared/12345678-abcd.json
 ```
 
-<Callout type="warning">
-  不要泄露 json 凭据文件。
-</Callout>
+<Callout type="warning">不要泄露 json 凭据文件。</Callout>
 
 ---
 
@@ -353,8 +349,8 @@ Zero Trust
 
 之后：
 
-* 安装 WARP 客户端
-* 登录 Zero Trust
+- 安装 WARP 客户端
+- 登录 Zero Trust
 
 即可直接访问：
 
@@ -364,8 +360,8 @@ Zero Trust
 
 效果类似：
 
-* Tailscale
-* Zerotier
+- Tailscale
+- Zerotier
 
 但与 Cloudflare 深度集成。
 
@@ -375,10 +371,10 @@ Zero Trust
 
 建议：
 
-* NAS
-* 面板
-* SSH
-* 管理后台
+- NAS
+- 面板
+- SSH
+- 管理后台
 
 全部开启 Access。
 
@@ -398,10 +394,10 @@ Self-hosted
 
 然后限制：
 
-* 指定邮箱
-* GitHub 登录
-* Google 登录
-* OTP 验证
+- 指定邮箱
+- GitHub 登录
+- Google 登录
+- OTP 验证
 
 这样即使知道域名：
 
@@ -479,21 +475,21 @@ Docker Services
 
 适合：
 
-* HomeLab
-* NAS
-* Kubernetes
-* Docker Compose
+- HomeLab
+- NAS
+- Kubernetes
+- Docker Compose
 
 ---
 
 ## 与传统方案对比
 
-| 方案                | 公网 IP | 开放端口 | HTTPS | 安全性 |
-| ----------------- | ----- | ---- | ----- | --- |
-| Cloudflare Tunnel | ❌     | ❌    | ✅     | 高   |
-| DDNS              | ✅     | ✅    | 手动    | 低   |
-| FRP               | 需要服务器 | 需要   | 手动    | 中   |
-| 端口映射              | ✅     | ✅    | 手动    | 低   |
+| 方案              | 公网 IP    | 开放端口 | HTTPS | 安全性 |
+| ----------------- | ---------- | -------- | ----- | ------ |
+| Cloudflare Tunnel | ❌         | ❌       | ✅    | 高     |
+| DDNS              | ✅         | ✅       | 手动  | 低     |
+| FRP               | 需要服务器 | 需要     | 手动  | 中     |
+| 端口映射          | ✅         | ✅       | 手动  | 低     |
 
 ---
 
@@ -501,11 +497,11 @@ Docker Services
 
 建议：
 
-* 小型服务直接 Tunnel
-* 敏感服务加 Access
-* Docker 部署 cloudflared
-* 配置文件纳入 Git 管理
-* 使用多个 Tunnel 分离不同用途
+- 小型服务直接 Tunnel
+- 敏感服务加 Access
+- Docker 部署 cloudflared
+- 配置文件纳入 Git 管理
+- 使用多个 Tunnel 分离不同用途
 
 例如：
 
@@ -526,15 +522,15 @@ Cloudflare Tunnel 基本已经成为：
 
 尤其适合：
 
-* NAS
-* HomeLab
-* 自建服务
-* Docker 环境
-* 远程开发
+- NAS
+- HomeLab
+- 自建服务
+- Docker 环境
+- 远程开发
 
 相比传统方案：
 
-* 更安全
-* 更简单
-* 更稳定
-* 基本零维护
+- 更安全
+- 更简单
+- 更稳定
+- 基本零维护

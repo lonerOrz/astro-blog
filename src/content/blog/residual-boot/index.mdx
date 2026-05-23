@@ -41,18 +41,16 @@ import Callout from "@/components/Callout.astro";
 
 ```bash
 sudo grub-mkconfig -o /boot/grub/grub.cfg
-````
+```
 
 GRUB 会重新扫描当前系统。
 
 如果被删除的系统已经不存在：
 
-* 对应菜单项会自动消失
-* 无需手动编辑 `grub.cfg`
+- 对应菜单项会自动消失
+- 无需手动编辑 `grub.cfg`
 
-<Callout>
-  不建议直接手动修改 `/boot/grub/grub.cfg`。
-</Callout>
+<Callout>不建议直接手动修改 `/boot/grub/grub.cfg`。</Callout>
 
 ---
 
@@ -98,8 +96,8 @@ lsblk
 
 通常 EFI 分区会挂载到：
 
-* `/boot`
-* `/boot/efi`
+- `/boot`
+- `/boot/efi`
 
 ---
 
@@ -146,9 +144,7 @@ sudo rm -rf /boot/efi/EFI/nixos
 sudo rm -rf /boot/efi/EFI/Arch
 ```
 
-<Callout>
-  不要删除 `Microsoft` 目录，否则 Windows 将无法启动。
-</Callout>
+<Callout>不要删除 `Microsoft` 目录，否则 Windows 将无法启动。</Callout>
 
 ---
 
@@ -156,8 +152,8 @@ sudo rm -rf /boot/efi/EFI/Arch
 
 有时候：
 
-* EFI 文件已经删除
-* 但 BIOS 启动菜单仍然存在旧项目
+- EFI 文件已经删除
+- 但 BIOS 启动菜单仍然存在旧项目
 
 这是因为 UEFI Boot Entry 仍保留。
 
@@ -197,8 +193,8 @@ sudo efibootmgr -b 0002 -B
 
 参数说明：
 
-* `-b`：指定 Boot 编号
-* `-B`：删除 Boot Entry
+- `-b`：指定 Boot 编号
+- `-B`：删除 Boot Entry
 
 ---
 
@@ -206,8 +202,8 @@ sudo efibootmgr -b 0002 -B
 
 如果你使用的是：
 
-* systemd-boot
-* bootctl
+- systemd-boot
+- bootctl
 
 需要删除 loader 配置。
 
@@ -267,6 +263,6 @@ reboot
 
 确认：
 
-* GRUB 菜单不再显示旧系统
-* BIOS 启动项已清理
-* EFI 分区无残留目录
+- GRUB 菜单不再显示旧系统
+- BIOS 启动项已清理
+- EFI 分区无残留目录

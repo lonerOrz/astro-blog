@@ -44,7 +44,7 @@ Hyprland 默认使用 Wayland。
 
 ```bash
 sudo pacman -S gamescope
-````
+```
 
 ### Steam 启动参数
 
@@ -54,17 +54,15 @@ gamescope -W 1920 -H 1080 -r 144 -f -- %command%
 
 参数说明：
 
-| 参数          | 作用           |
-| ----------- | ------------ |
-| `-W`        | 游戏宽度         |
-| `-H`        | 游戏高度         |
-| `-r`        | 刷新率          |
-| `-f`        | 强制全屏         |
+| 参数        | 作用               |
+| ----------- | ------------------ |
+| `-W`        | 游戏宽度           |
+| `-H`        | 游戏高度           |
+| `-r`        | 刷新率             |
+| `-f`        | 强制全屏           |
 | `%command%` | Steam 游戏启动命令 |
 
-<Callout>
-  刷新率建议改成你显示器的实际刷新率，例如 144Hz / 165Hz。
-</Callout>
+<Callout>刷新率建议改成你显示器的实际刷新率，例如 144Hz / 165Hz。</Callout>
 
 ---
 
@@ -74,9 +72,9 @@ gamescope -W 1920 -H 1080 -r 144 -f -- %command%
 
 作用：
 
-* 自动提升 CPU 频率
-* 调整调度策略
-* 降低后台进程影响
+- 自动提升 CPU 频率
+- 调整调度策略
+- 降低后台进程影响
 
 ### 安装 gamemode
 
@@ -134,9 +132,7 @@ sudo pacman -S mesa mesa-utils vulkan-radeon \
 lib32-mesa lib32-vulkan-radeon
 ```
 
-<Callout>
-  AMD 显卡在 Wayland 下通常兼容性更好。
-</Callout>
+<Callout>AMD 显卡在 Wayland 下通常兼容性更好。</Callout>
 
 ---
 
@@ -164,9 +160,9 @@ hyprctl reload
 
 作用：
 
-* 减少屏幕重绘
-* 降低 GPU 压力
-* 提高帧率稳定性
+- 减少屏幕重绘
+- 降低 GPU 压力
+- 提高帧率稳定性
 
 ---
 
@@ -192,16 +188,14 @@ hyprctl reload
 
 作用：
 
-* 降低输入延迟
-* 提高响应速度
+- 降低输入延迟
+- 提高响应速度
 
 缺点：
 
-* 可能出现画面撕裂
+- 可能出现画面撕裂
 
-<Callout>
-  FPS 类游戏通常建议关闭 VSync。
-</Callout>
+<Callout>FPS 类游戏通常建议关闭 VSync。</Callout>
 
 ---
 
@@ -209,10 +203,10 @@ hyprctl reload
 
 `MangoHud` 可以实时显示：
 
-* FPS
-* GPU 占用
-* CPU 温度
-* 显存使用率
+- FPS
+- GPU 占用
+- CPU 温度
+- 显存使用率
 
 ### 安装 MangoHud
 
@@ -244,15 +238,15 @@ WINEFSYNC=1 %command%
 
 作用：
 
-* 降低卡顿
-* 提高 Wine 多线程性能
-* 提升大型游戏流畅度
+- 降低卡顿
+- 提高 Wine 多线程性能
+- 提升大型游戏流畅度
 
 适用于：
 
-* Wine
-* Proton
-* DXVK
+- Wine
+- Proton
+- DXVK
 
 ---
 
@@ -266,17 +260,15 @@ yay -S mesa-git
 
 优势：
 
-* 最新 Vulkan 驱动
-* 更新的 Mesa 优化
-* 更好的 Wayland 支持
+- 最新 Vulkan 驱动
+- 更新的 Mesa 优化
+- 更好的 Wayland 支持
 
 缺点：
 
-* 可能不稳定
+- 可能不稳定
 
-<Callout>
-  mesa-git 更适合追求最新特性的用户。
-</Callout>
+<Callout>mesa-git 更适合追求最新特性的用户。</Callout>
 
 ---
 
@@ -291,15 +283,15 @@ systemctl disable bluetooth
 
 还可以关闭：
 
-* 打印服务
-* Docker
-* 虚拟机
-* 自动同步程序
+- 打印服务
+- Docker
+- 虚拟机
+- 自动同步程序
 
 作用：
 
-* 降低 CPU 占用
-* 提高帧率稳定性
+- 降低 CPU 占用
+- 提高帧率稳定性
 
 ---
 
@@ -327,16 +319,16 @@ WINEFSYNC=1 gamemoderun mangohud %command%
 
 ## 总结
 
-| 优化项             | 作用           | 推荐       |
-| --------------- | ------------ | -------- |
+| 优化项          | 作用             | 推荐         |
+| --------------- | ---------------- | ------------ |
 | gamescope       | Wayland 全屏优化 | 强烈推荐     |
-| gamemode        | CPU 调度优化     | 推荐       |
-| MangoHud        | 实时性能监控       | 推荐       |
-| fsync           | Proton 游戏优化  | 推荐       |
-| damage tracking | 降低重绘开销       | 推荐       |
-| 关闭 VSync        | 降低输入延迟       | FPS 游戏推荐 |
-| mesa-git        | AMD 新驱动      | 进阶用户     |
-| 精简后台服务          | 降低资源占用       | 推荐       |
+| gamemode        | CPU 调度优化     | 推荐         |
+| MangoHud        | 实时性能监控     | 推荐         |
+| fsync           | Proton 游戏优化  | 推荐         |
+| damage tracking | 降低重绘开销     | 推荐         |
+| 关闭 VSync      | 降低输入延迟     | FPS 游戏推荐 |
+| mesa-git        | AMD 新驱动       | 进阶用户     |
+| 精简后台服务    | 降低资源占用     | 推荐         |
 
 ## 结语
 
@@ -344,10 +336,10 @@ Hyprland 在 Wayland 下已经具备非常优秀的游戏体验。
 
 配合：
 
-* gamescope
-* gamemode
-* MangoHud
-* Proton
-* Vulkan
+- gamescope
+- gamemode
+- MangoHud
+- Proton
+- Vulkan
 
 基本已经能够达到接近 Windows 的游戏性能表现。

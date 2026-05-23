@@ -49,9 +49,7 @@ import Callout from "@/components/Callout.astro";
 }
 ```
 
-<Callout>
-  请将 `yourhostname` 替换为你的主机名。
-</Callout>
+<Callout>请将 `yourhostname` 替换为你的主机名。</Callout>
 
 ---
 
@@ -86,9 +84,7 @@ nix-shell -p ssh-to-age --run \
 "ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt"
 ```
 
-<Callout>
-  SSH 私钥不能设置 passphrase，否则转换可能失败。
-</Callout>
+<Callout>SSH 私钥不能设置 passphrase，否则转换可能失败。</Callout>
 
 ---
 
@@ -152,9 +148,7 @@ creation_rules:
     └── secrets.yaml
 ```
 
-<Callout>
-  `.sops.yaml` 用于定义哪些文件会被自动加密。
-</Callout>
+<Callout>`.sops.yaml` 用于定义哪些文件会被自动加密。</Callout>
 
 ---
 
