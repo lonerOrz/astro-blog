@@ -76,8 +76,8 @@ const facts = [
 
         <!-- 3D 翻转卡片 -->
         <aside class="stagger-item" style="--delay: 300ms">
-          <div class="flip-card-perspective">
-            <div class="flip-card-inner group cursor-help">
+          <div class="flip-card-perspective group">
+            <div class="flip-card-inner cursor-help">
               <!-- 正面: Image Card -->
               <figure
                 class="flip-card-front relative overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white p-2.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
@@ -208,43 +208,53 @@ const facts = [
 
 <style>
   .flip-card-perspective {
-    perspective: 1200px;
-    -webkit-perspective: 1200px;
+    perspective: 2000px;
+    -webkit-perspective: 2000px;
     width: 100%;
+    position: relative;
   }
 
   .flip-card-inner {
     position: relative;
     width: 100%;
     transform-style: preserve-3d;
-    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateZ(0);
+    transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     will-change: transform;
+    transform: translateZ(0);
   }
 
-  .flip-card-inner:hover {
-    transform: rotateY(180deg) translateY(-4px) translateZ(0);
+  /* 通过父级的 group-hover 触发，确保 Hitbox 稳定 */
+  .group:hover .flip-card-inner {
+    transform: rotateY(180deg);
   }
 
   .flip-card-front,
   .flip-card-back {
     width: 100%;
-    -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     -webkit-transform-style: preserve-3d;
     transform-style: preserve-3d;
   }
 
   .flip-card-back {
     transform: rotateY(180deg) translateZ(1px);
+    z-index: 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
     .flip-card-inner {
       transition: none;
     }
-    .flip-card-inner:hover {
+    .group:hover .flip-card-inner {
       transform: none;
+    }
+  }
+
+  /* 针对无法 hover 的设备（触摸屏）的兜底 */
+  @media (hover: none) {
+    .flip-card-inner {
+      transition: transform 0.3s ease;
     }
   }
 </style>
