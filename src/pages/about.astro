@@ -6,32 +6,21 @@ import Link from "@components/Link.astro";
 import { ABOUT, SITE, SOCIALS } from "@consts";
 
 const facts = [
-  {
-    label: "Focus",
-    value: "Web, tooling, and small useful systems.",
-  },
-  {
-    label: "Taste",
-    value: "Quiet interfaces, fast pages, clear writing.",
-  },
-  {
-    label: "Stack",
-    value: "Astro, TypeScript, Tailwind CSS, and Nix.",
-  },
+  { label: "Focus", value: "Web, tooling, and small useful systems." },
+  { label: "Taste", value: "Quiet interfaces, fast pages, clear writing." },
+  { label: "Stack", value: "Astro, TypeScript, Tailwind CSS, and Nix." },
 ];
 ---
 
 <Layout title={ABOUT.TITLE} description={ABOUT.DESCRIPTION || "About lonerOrz"}>
   <Container>
     <div class="mx-auto max-w-5xl space-y-14">
-      <!-- 页面头部 -->
       <div class="animate">
         <PageHeader title="About." subtitle="lonerOrz" />
       </div>
 
       <section class="grid gap-12 lg:grid-cols-[1fr_340px] lg:items-start">
         <div class="min-w-0 space-y-10">
-          <!-- 文字介绍 -->
           <div class="animate space-y-6">
             <p
               class="max-w-2xl text-3xl leading-tight font-semibold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50"
@@ -44,28 +33,19 @@ const facts = [
             >
               <p>
                 Hello, I'm lonerOrz. I'm a developer who cares about simplicity,
-                speed, and the details that make software feel pleasant to use.
-              </p>
-              <p>
-                This site is my digital garden: a place to document what I'm
-                learning, collect technical notes, and keep track of series that
-                would otherwise disappear into folders and browser tabs.
+                speed, and the details.
               </p>
             </div>
           </div>
 
-          <!-- Fact 块 -->
           <div class="grid gap-4 sm:grid-cols-3">
             {
               facts.map((fact, i) => (
-                <div
-                  class="stagger-item rounded-2xl border border-zinc-200 bg-white/50 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 dark:border-zinc-800 dark:bg-zinc-900/40"
-                  style={`--delay: ${150 + i * 80}ms`}
-                >
-                  <p class="font-mono text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase dark:text-zinc-500">
+                <div class="stagger-item rounded-2xl border border-zinc-200 bg-white/50 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 dark:border-zinc-800 dark:bg-zinc-900/40">
+                  <p class="font-mono text-[10px] font-bold tracking-[0.2em] text-zinc-400 uppercase">
                     {fact.label}
                   </p>
-                  <p class="mt-2 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+                  <p class="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
                     {fact.value}
                   </p>
                 </div>
@@ -77,8 +57,8 @@ const facts = [
         <!-- 3D 翻转卡片 -->
         <aside class="stagger-item" style="--delay: 300ms">
           <div class="flip-card-perspective group">
-            <div class="flip-card-inner cursor-help">
-              <!-- 正面: Image Card -->
+            <div id="about-card" class="flip-card-inner cursor-help">
+              <!-- 正面 -->
               <figure
                 class="flip-card-front relative overflow-hidden rounded-[2.5rem] border border-zinc-200 bg-white p-2.5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
               >
@@ -97,7 +77,7 @@ const facts = [
                 </figcaption>
               </figure>
 
-              <!-- 反面: Data Readout -->
+              <!-- 反面 -->
               <div
                 class="flip-card-back absolute inset-0 flex flex-col justify-between rounded-[2.5rem] border border-zinc-200 bg-white p-8 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
               >
@@ -119,92 +99,40 @@ const facts = [
                       >
                     </div>
                   </div>
-
                   <div class="space-y-6">
                     <div>
                       <p
-                        class="mb-1 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
+                        class="mb-1 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase"
                       >
-                        Current Status
+                        Status
                       </p>
                       <p
-                        class="text-sm leading-relaxed text-zinc-600 italic dark:text-zinc-400"
+                        class="text-sm text-zinc-600 italic dark:text-zinc-400"
                       >
-                        "Building things that last, writing things that matter."
-                      </p>
-                    </div>
-                    <div>
-                      <p
-                        class="mb-1 font-mono text-[10px] font-bold tracking-widest text-zinc-400 uppercase dark:text-zinc-500"
-                      >
-                        Now Reading
-                      </p>
-                      <p
-                        class="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400"
-                      >
-                        Technical fragments & philosophy.
+                        "Building things that last."
                       </p>
                     </div>
                   </div>
                 </div>
-
                 <div class="pt-4 text-center">
                   <span
-                    class="animate-pulse font-mono text-[10px] tracking-[0.3em] text-zinc-300 uppercase dark:text-zinc-600"
+                    class="animate-pulse font-mono text-[10px] tracking-[0.3em] text-zinc-300 uppercase"
+                    >Hover to return</span
                   >
-                    Hover to return
-                  </span>
                 </div>
               </div>
             </div>
           </div>
         </aside>
       </section>
-
-      <!-- 底部连接 -->
-      <section
-        class="animate border-t border-zinc-100 pt-12 dark:border-zinc-800"
-      >
-        <div class="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
-          <div class="space-y-3">
-            <h2
-              class="text-sm font-bold tracking-widest text-zinc-400 uppercase"
-            >
-              Connect
-            </h2>
-            <p
-              class="max-w-xl text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400"
-            >
-              If you want to talk about code, writing, music, or anything else,
-              you can find me through the links below.
-            </p>
-          </div>
-          <div class="flex flex-wrap gap-4">
-            {
-              SOCIALS.map((social) => (
-                <Link
-                  href={social.HREF}
-                  external
-                  underline={false}
-                  class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 shadow-sm transition-all hover:bg-zinc-900 hover:text-white dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-100 dark:hover:text-zinc-900"
-                >
-                  {social.NAME}
-                </Link>
-              ))
-            }
-            <Link
-              href={`mailto:${SITE.EMAIL}`}
-              underline={false}
-              class="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 shadow-sm transition-all hover:bg-zinc-900 hover:text-white dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-100 dark:hover:text-zinc-900"
-            >
-              Email
-            </Link>
-          </div>
-        </div>
-      </section>
     </div>
   </Container>
 </Layout>
+
+<script>
+  const card = document.getElementById("about-card");
+  card?.addEventListener("click", () => card.classList.toggle("is-flipped"));
+</script>
 
 <style>
   .flip-card-perspective {
@@ -218,13 +146,14 @@ const facts = [
     position: relative;
     width: 100%;
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
     transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     will-change: transform;
     transform: translateZ(0);
   }
 
-  /* 通过父级的 group-hover 触发，确保 Hitbox 稳定 */
-  .group:hover .flip-card-inner {
+  .group:hover .flip-card-inner,
+  .flip-card-inner.is-flipped {
     transform: rotateY(180deg);
   }
 
@@ -233,28 +162,14 @@ const facts = [
     width: 100%;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    -webkit-transform-style: preserve-3d;
-    transform-style: preserve-3d;
+  }
+
+  .flip-card-front {
+    transform: rotateY(0deg);
   }
 
   .flip-card-back {
     transform: rotateY(180deg) translateZ(1px);
     z-index: 1;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .flip-card-inner {
-      transition: none;
-    }
-    .group:hover .flip-card-inner {
-      transform: none;
-    }
-  }
-
-  /* 针对无法 hover 的设备（触摸屏）的兜底 */
-  @media (hover: none) {
-    .flip-card-inner {
-      transition: transform 0.3s ease;
-    }
   }
 </style>
