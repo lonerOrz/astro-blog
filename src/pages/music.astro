@@ -34,7 +34,16 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
       <div id="an_music_player_mount">
         <div id="an_music_loading" class="music-loading-shell">
-          <div class="music-loading-cover"></div>
+          <div class="music-loading-cover">
+            <svg class="music-loading-svg" viewBox="0 0 100 100" aria-hidden="true">
+              <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.2" />
+              <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="2.5 5" />
+              <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" />
+              <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.6" stroke-dasharray="2 4" />
+              <circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)" />
+              <circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)" />
+            </svg>
+          </div>
           <div class="music-loading-copy">
             <p>Loading playlist</p>
             <span>Music will start as soon as the playlist is ready.</span>
@@ -156,9 +165,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       if (!shell) {
         shell = document.createElement("div");
         shell.id = "an_music_loading";
-        shell.className = "music-loading-shell";
-        shell.innerHTML =
-          '<div class="music-loading-cover"></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
+          shell.className = "music-loading-shell";
+          shell.innerHTML =
+            '<div class="music-loading-cover"><svg class="music-loading-svg" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.2" /><circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="2.5 5" /><circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" /><circle cx="50" cy="50" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.6" stroke-dasharray="2 4" /><circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)" /><circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)" /></svg></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
         mount.appendChild(shell);
       }
       shell.classList.remove("is-hidden");
@@ -415,7 +424,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     display: grid;
     min-height: 52vh;
     place-items: center;
-    gap: 20px;
+    gap: 24px;
     text-align: center;
     opacity: 1;
     transition:
@@ -427,20 +436,27 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     scale: 0.985;
   }
   .music-loading-cover {
-    width: 180px;
-    height: 180px;
-    border-radius: 28px;
-    background:
-      linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.18),
-        rgba(255, 255, 255, 0.04)
-      ),
-      rgba(255, 255, 255, 0.08);
+    position: relative;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.16),
       0 24px 80px rgba(0, 0, 0, 0.35);
-    animation: music-shell-pulse 1.8s ease-in-out infinite;
+  }
+  .music-loading-svg {
+    width: 100%;
+    height: 100%;
+    animation: music-loading-spin 2.5s linear infinite;
+  }
+  @keyframes music-loading-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
   .music-loading-copy p {
     margin: 0;
@@ -454,19 +470,8 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     color: rgba(255, 255, 255, 0.58);
     font-size: 0.875rem;
   }
-  @keyframes music-shell-pulse {
-    0%,
-    100% {
-      opacity: 0.72;
-      scale: 1;
-    }
-    50% {
-      opacity: 1;
-      scale: 1.015;
-    }
-  }
   @media (prefers-reduced-motion: reduce) {
-    .music-loading-cover {
+    .music-loading-svg {
       animation: none;
     }
   }
@@ -776,15 +781,15 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     border-radius: 4px !important;
   }
 
-  #an_music_player_mount {
-    opacity: 0 !important;
-    transform: translateY(40px) !important;
+  #an_music_player_mount .aplayer {
+    opacity: 0;
+    transform: translateY(40px);
     transition:
       opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  #an_music_player_mount.is-ready {
+  #an_music_player_mount.is-ready .aplayer {
     opacity: 1 !important;
     transform: translateY(0) !important;
   }
