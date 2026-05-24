@@ -14,7 +14,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 ---
 
 <Layout title={MUSIC.TITLE} description={MUSIC.DESCRIPTION} hideFooter>
-  <!-- 并行预加载资源 -->
   <link rel="preload" href="/js/aplayer/APlayer.min.js" as="script" />
   <link rel="preload" href="/js/aplayer/Meting2.min.js" as="script" />
   <link rel="stylesheet" href="/css/aplayer/APlayer.min.css" />
@@ -35,45 +34,115 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       <div id="an_music_player_mount">
         <div id="an_music_loading" class="music-loading-shell">
           <div class="music-loading-cover">
+            <div class="loading-wave"></div>
+            <div class="loading-wave"></div>
             <svg
               class="music-loading-svg"
               viewBox="0 0 100 100"
               aria-hidden="true"
             >
-              <circle
-                cx="50"
-                cy="50"
-                r="44"
-                fill="none"
-                stroke="rgba(255,255,255,0.15)"
-                stroke-width="1.2"></circle>
-              <circle
-                cx="50"
-                cy="50"
-                r="36"
-                fill="none"
-                stroke="rgba(255,255,255,0.07)"
-                stroke-width="0.6"
-                stroke-dasharray="2.5 5"></circle>
-              <circle
-                cx="50"
-                cy="50"
-                r="28"
-                fill="none"
-                stroke="rgba(255,255,255,0.07)"
-                stroke-width="0.6"></circle>
-              <circle
-                cx="50"
-                cy="50"
-                r="20"
-                fill="none"
-                stroke="rgba(255,255,255,0.06)"
-                stroke-width="0.6"
-                stroke-dasharray="2 4"></circle>
-              <circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)"
-              ></circle>
-              <circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)"
-              ></circle>
+              <g class="record-base">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="46"
+                  fill="url(#vinyl-plate)"
+                  stroke="#1c1c1f"
+                  stroke-width="0.3"></circle>
+
+                <g id="record-grooves" opacity="0.35">
+                  {
+                    Array.from({ length: 9 }, (_, i) => 38 - i * 4).map((r) => (
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={r}
+                        fill="none"
+                        stroke="#ffffff"
+                        stroke-width="0.08"
+                      />
+                    ))
+                  }
+                </g>
+
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="14"
+                  fill="#141416"
+                  stroke="#2c2c30"
+                  stroke-width="0.4"></circle>
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="12"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.05)"
+                  stroke-width="0.15"></circle>
+
+                <circle cx="50" cy="50" r="3.2" fill="url(#center-gold)"
+                ></circle>
+                <circle cx="50" cy="50" r="1.3" fill="#030303"></circle>
+              </g>
+
+              <g class="light-effect">
+                <path
+                  id="light-path"
+                  d="M 80,50 A 30,30 0 0,1 20,50 A 30,30 0 0,1 80,50"
+                  fill="none"></path>
+                <path
+                  d="M 80,50 A 30,30 0 0,1 20,50 A 30,30 0 0,1 80,50"
+                  fill="none"
+                  stroke="rgba(255,213,79,0.06)"
+                  stroke-width="0.4"></path>
+                <circle
+                  class="light-point"
+                  cx="0"
+                  cy="0"
+                  r="4.5"
+                  fill="url(#light-gradient)"
+                  filter="url(#glow)"
+                >
+                  <animateMotion dur="3s" repeatCount="indefinite">
+                    <mpath href="#light-path"></mpath>
+                  </animateMotion>
+                </circle>
+              </g>
+
+              <defs>
+                <radialGradient id="vinyl-plate" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#0c0c0e"></stop>
+                  <stop offset="70%" stop-color="#141417"></stop>
+                  <stop offset="92%" stop-color="#1e1e22"></stop>
+                  <stop offset="100%" stop-color="#08080a"></stop>
+                </radialGradient>
+
+                <radialGradient id="center-gold" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffe082"></stop>
+                  <stop offset="60%" stop-color="#ffb300"></stop>
+                  <stop offset="100%" stop-color="#b78103"></stop>
+                </radialGradient>
+
+                <radialGradient id="light-gradient" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#ffffff" stop-opacity="1"
+                  ></stop>
+                  <stop offset="25%" stop-color="#ffca28" stop-opacity="0.9"
+                  ></stop>
+                  <stop offset="60%" stop-color="#ff8f00" stop-opacity="0.35"
+                  ></stop>
+                  <stop offset="100%" stop-color="#ff6f00" stop-opacity="0"
+                  ></stop>
+                </radialGradient>
+
+                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="1.5" result="blur"
+                  ></feGaussianBlur>
+                  <feMerge>
+                    <feMergeNode in="blur"></feMergeNode>
+                    <feMergeNode in="SourceGraphic"></feMergeNode>
+                  </feMerge>
+                </filter>
+              </defs>
             </svg>
           </div>
           <div class="music-loading-copy">
@@ -97,30 +166,31 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
     root.classList.add("music-page-active");
 
+    const fallbackLoadingTemplate =
+      document.getElementById("an_music_loading")?.innerHTML || "";
+
     let currentPlaylist = null;
     let picObserver = null;
     let syncFrame = null;
     let loadScriptPromise = null;
 
-    function loadAPlayerScripts() {
-      if (window.APlayer && window.MetingJSElement) return Promise.resolve();
+    const loadScript = (src) =>
+      new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
 
+    async function loadAPlayerScripts() {
+      if (window.APlayer && window.MetingJSElement) return;
       if (!loadScriptPromise) {
-        loadScriptPromise = new Promise((resolve, reject) => {
-          const js = document.createElement("script");
-          js.src = "/js/aplayer/APlayer.min.js";
-          js.async = true;
-          js.onload = () => {
-            const meting = document.createElement("script");
-            meting.src = "/js/aplayer/Meting2.min.js";
-            meting.async = true;
-            meting.onload = resolve;
-            meting.onerror = reject;
-            document.head.appendChild(meting);
-          };
-          js.onerror = reject;
-          document.head.appendChild(js);
-        });
+        loadScriptPromise = (async () => {
+          await loadScript("/js/aplayer/APlayer.min.js");
+          await loadScript("/js/aplayer/Meting2.min.js");
+        })();
       }
       return loadScriptPromise;
     }
@@ -145,12 +215,11 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
     function destroyCurrentPlayer() {
       mount.classList.remove("is-ready");
-
-      document.querySelectorAll("meting-js").forEach((metingNode) => {
-        if (metingNode.aplayer) metingNode.aplayer.destroy();
-        metingNode.remove();
+      document.querySelectorAll("meting-js").forEach((el) => {
+        if (el.aplayer) el.aplayer.destroy();
+        el.remove();
       });
-      document.querySelectorAll(".aplayer").forEach((n) => n.remove());
+      document.querySelectorAll(".aplayer").forEach((el) => el.remove());
     }
 
     function syncCover() {
@@ -173,6 +242,17 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
           bg.classList.add("is-cover-ready");
         }
       });
+    }
+
+    function getInitialPlaylist(selector) {
+      try {
+        const saved = localStorage.getItem("an_music_last_playlist");
+        const available = selector?.dataset.playlists
+          ? JSON.parse(selector.dataset.playlists)
+          : [];
+        if (saved && available.some((p) => p.id === saved)) return saved;
+      } catch (e) {}
+      return selector?.dataset.default;
     }
 
     function setPlaylist(playlistId) {
@@ -198,8 +278,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         shell = document.createElement("div");
         shell.id = "an_music_loading";
         shell.className = "music-loading-shell";
-        shell.innerHTML =
-          '<div class="music-loading-cover"><svg class="music-loading-svg" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.2" /><circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="2.5 5" /><circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" /><circle cx="50" cy="50" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.6" stroke-dasharray="2 4" /><circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)" /><circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)" /></svg></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
+        shell.innerHTML = fallbackLoadingTemplate;
         mount.appendChild(shell);
       }
       shell.classList.remove("is-hidden");
@@ -209,7 +288,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       loadAPlayerScripts()
         .then(() => {
           mount.appendChild(createMetingElement(playlistId));
-
           let isReadyFired = false;
 
           const fireReady = (aplayer) => {
@@ -217,7 +295,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
             isReadyFired = true;
 
             shell.classList.add("is-hidden");
-
             window.setTimeout(() => {
               shell.remove();
               mount.classList.add("is-ready");
@@ -237,13 +314,13 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
               const volumeWrap = aplayer.querySelector(".aplayer-volume-wrap");
               const metingJS = mount.querySelector("meting-js");
-              if (volumeWrap && metingJS && metingJS.aplayer) {
+              if (volumeWrap && metingJS?.aplayer) {
                 volumeWrap.addEventListener(
                   "wheel",
                   (e) => {
                     e.preventDefault();
                     const ap = metingJS.aplayer;
-                    let nextVol = ap.volume() + (e.deltaY < 0 ? 0.05 : -0.05);
+                    const nextVol = ap.volume() + (e.deltaY < 0 ? 0.05 : -0.05);
                     ap.volume(Math.max(0, Math.min(1, nextVol)), false);
                   },
                   { passive: false },
@@ -263,7 +340,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
             if (aplayer && listItems.length > 0) {
               obs.disconnect();
               clearTimeout(safeTimer);
-              setTimeout(() => fireReady(aplayer), 50); // 延时一点点让页面重绘
+              setTimeout(() => fireReady(aplayer), 50);
             }
           });
           observer.observe(mount, { childList: true, subtree: true });
@@ -275,19 +352,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
     window.requestAnimationFrame(() => {
       const selector = document.getElementById("playlist-selector");
-      let initial = null;
-      try {
-        const saved = localStorage.getItem("an_music_last_playlist");
-        const available = selector?.dataset.playlists
-          ? JSON.parse(selector.dataset.playlists)
-          : [];
-        initial =
-          saved && available.some((p) => p.id === saved)
-            ? saved
-            : selector?.dataset.default;
-      } catch (e) {
-        initial = selector?.dataset.default;
-      }
+      const initial = getInitialPlaylist(selector);
       if (initial) setPlaylist(initial);
     });
 
@@ -425,11 +490,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     animation: none !important;
     opacity: 1 !important;
   }
-  @keyframes music-cover-in {
-    from {
-      filter: blur(36px) saturate(1.35) brightness(0.96);
-    }
-  }
   #an_music_overlay {
     background:
       radial-gradient(
@@ -480,14 +540,47 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       inset 0 1px 0 rgba(255, 255, 255, 0.16),
       0 24px 80px rgba(0, 0, 0, 0.35);
   }
+  .loading-wave {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 193, 7, 0.25);
+    pointer-events: none;
+    z-index: 1;
+    animation: loading-ripple-effect 3s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+  }
+  .loading-wave:nth-child(2) {
+    animation-delay: 1.5s;
+  }
+  @keyframes loading-ripple-effect {
+    0% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scale(1.6);
+      opacity: 0;
+    }
+  }
   .music-loading-svg {
     width: 100%;
     height: 100%;
-    animation: music-loading-spin 2.5s linear infinite;
+    position: relative;
+    z-index: 2;
+    animation: music-loading-spin 8s linear infinite;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.3));
   }
   @keyframes music-loading-spin {
+    from {
+      transform: rotate(0deg);
+    }
     to {
       transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .music-loading-svg {
+      animation: none;
     }
   }
   .music-loading-copy p {
@@ -502,11 +595,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     color: rgba(255, 255, 255, 0.58);
     font-size: 0.875rem;
   }
-  @media (prefers-reduced-motion: reduce) {
-    .music-loading-svg {
-      animation: none;
-    }
-  }
   #anMusic-page .aplayer {
     position: relative !important;
     z-index: 1 !important;
@@ -519,31 +607,23 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     margin: 0 !important;
   }
   #anMusic-page .aplayer * {
-    border-top: none !important;
-    border-bottom: none !important;
-    border-left: none !important;
-    border-right: none !important;
+    border: none !important;
   }
-
   #anMusic-page .aplayer-list {
     width: 35% !important;
     display: block !important;
     height: 100% !important;
     max-height: none !important;
     padding-right: 5px !important;
-    transition:
-      width 0.4s cubic-bezier(0.23, 1, 0.32, 1),
-      opacity 0.3s ease !important;
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
     overflow: hidden !important;
     opacity: 1 !important;
   }
-
   #anMusic-page .aplayer-list.aplayer-list-hide {
     width: 0 !important;
     opacity: 0 !important;
     padding-right: 0 !important;
   }
-
   #anMusic-page .aplayer-body {
     width: 65% !important;
     height: 100% !important;
@@ -551,16 +631,16 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     display: flex !important;
     padding-left: 30px !important;
     box-sizing: border-box !important;
-    transition:
-      width 0.4s cubic-bezier(0.23, 1, 0.32, 1),
-      padding 0.4s ease !important;
+    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
   }
-
   #anMusic-page .aplayer-list.aplayer-list-hide + .aplayer-body {
     width: 100% !important;
     padding-left: 0 !important;
   }
-
+  #anMusic-page .aplayer:has(.aplayer-list-hide) .aplayer-body {
+    width: 100% !important;
+    padding-left: 0 !important;
+  }
   #anMusic-page .aplayer-list ol {
     max-height: 100% !important;
     padding-right: 15px !important;
@@ -587,7 +667,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     color: #fff !important;
     transition: background 0.3s !important;
     padding-left: 15px !important;
-    position: relative !important;
   }
   #anMusic-page .aplayer-list ol li:hover {
     background: rgba(255, 255, 255, 0.15) !important;
@@ -622,7 +701,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     display: block !important;
     width: 100% !important;
     word-wrap: break-word !important;
-    white-space: normal !important;
   }
   #anMusic-page .aplayer-info .aplayer-music .aplayer-author {
     color: rgba(255, 255, 255, 0.6) !important;
@@ -732,16 +810,12 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     fill: #fff !important;
     opacity: 0.8;
   }
-
-  /* 修复音量条 UI 定位与拖拽交互错位 */
-
   #anMusic-page .aplayer-volume-wrap {
     position: relative !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
   }
-
   #anMusic-page .aplayer-volume-bar-wrap {
     position: absolute !important;
     bottom: 100% !important;
@@ -766,7 +840,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       visibility 0.2s ease,
       margin-bottom 0.2s ease !important;
   }
-
   #anMusic-page .aplayer-volume-wrap:hover .aplayer-volume-bar-wrap,
   #anMusic-page .aplayer-volume-bar-wrap.aplayer-volume-bar-wrap-active {
     opacity: 1 !important;
@@ -774,7 +847,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     pointer-events: auto !important;
     margin-bottom: 16px !important;
   }
-
   #anMusic-page .aplayer-volume-bar-wrap::after {
     content: "" !important;
     display: block !important;
@@ -786,11 +858,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     background: transparent !important;
     border: none !important;
   }
-
   #anMusic-page .aplayer-volume-bar-wrap::before {
     display: none !important;
   }
-
   #anMusic-page .aplayer-volume-bar {
     position: absolute !important;
     top: 12px !important;
@@ -803,7 +873,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     border-radius: 4px !important;
     right: auto !important;
   }
-
   #anMusic-page .aplayer-volume {
     position: absolute !important;
     bottom: 0 !important;
@@ -812,7 +881,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     background: #fff !important;
     border-radius: 4px !important;
   }
-
   #an_music_player_mount .aplayer {
     opacity: 0;
     transform: translateY(40px);
@@ -820,7 +888,6 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
       transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   }
-
   #an_music_player_mount.is-ready .aplayer {
     opacity: 1 !important;
     transform: translateY(0) !important;
