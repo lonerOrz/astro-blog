@@ -35,13 +35,45 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       <div id="an_music_player_mount">
         <div id="an_music_loading" class="music-loading-shell">
           <div class="music-loading-cover">
-            <svg class="music-loading-svg" viewBox="0 0 100 100" aria-hidden="true">
-              <circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.2" />
-              <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="2.5 5" />
-              <circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" />
-              <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.6" stroke-dasharray="2 4" />
-              <circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)" />
-              <circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)" />
+            <svg
+              class="music-loading-svg"
+              viewBox="0 0 100 100"
+              aria-hidden="true"
+            >
+              <circle
+                cx="50"
+                cy="50"
+                r="44"
+                fill="none"
+                stroke="rgba(255,255,255,0.15)"
+                stroke-width="1.2"></circle>
+              <circle
+                cx="50"
+                cy="50"
+                r="36"
+                fill="none"
+                stroke="rgba(255,255,255,0.07)"
+                stroke-width="0.6"
+                stroke-dasharray="2.5 5"></circle>
+              <circle
+                cx="50"
+                cy="50"
+                r="28"
+                fill="none"
+                stroke="rgba(255,255,255,0.07)"
+                stroke-width="0.6"></circle>
+              <circle
+                cx="50"
+                cy="50"
+                r="20"
+                fill="none"
+                stroke="rgba(255,255,255,0.06)"
+                stroke-width="0.6"
+                stroke-dasharray="2 4"></circle>
+              <circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)"
+              ></circle>
+              <circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)"
+              ></circle>
             </svg>
           </div>
           <div class="music-loading-copy">
@@ -165,9 +197,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       if (!shell) {
         shell = document.createElement("div");
         shell.id = "an_music_loading";
-          shell.className = "music-loading-shell";
-          shell.innerHTML =
-            '<div class="music-loading-cover"><svg class="music-loading-svg" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.2" /><circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="2.5 5" /><circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" /><circle cx="50" cy="50" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.6" stroke-dasharray="2 4" /><circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)" /><circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)" /></svg></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
+        shell.className = "music-loading-shell";
+        shell.innerHTML =
+          '<div class="music-loading-cover"><svg class="music-loading-svg" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.2" /><circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" stroke-dasharray="2.5 5" /><circle cx="50" cy="50" r="28" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.6" /><circle cx="50" cy="50" r="20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.6" stroke-dasharray="2 4" /><circle cx="50" cy="50" r="12" fill="rgba(255,255,255,0.1)" /><circle cx="50" cy="50" r="3" fill="rgba(255,255,255,0.25)" /></svg></div><div class="music-loading-copy"><p>Loading playlist</p><span>Music will start as soon as the playlist is ready.</span></div>';
         mount.appendChild(shell);
       }
       shell.classList.remove("is-hidden");
