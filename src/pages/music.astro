@@ -57,29 +57,34 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     root.classList.add("music-page-active");
 
     let currentPlaylist = null;
-    let aplayerReady = false;
     let picObserver = null;
     let syncFrame = null;
 
-    /** 脚本并行加载 */
+    // 使用单例 Promise
+    let loadScriptPromise = null;
+
+    /** 脚本单例加载逻辑 */
     function loadAPlayerScripts() {
-      if (window.APlayer && aplayerReady) return Promise.resolve();
-      return new Promise((resolve, reject) => {
-        const js = document.createElement("script");
-        js.src = "/js/aplayer/APlayer.min.js";
-        js.async = true;
-        js.onload = () => {
-          aplayerReady = true;
-          const meting = document.createElement("script");
-          meting.src = "/js/aplayer/Meting2.min.js";
-          meting.async = true;
-          meting.onload = resolve;
-          meting.onerror = reject;
-          document.head.appendChild(meting);
-        };
-        js.onerror = reject;
-        document.head.appendChild(js);
-      });
+      if (window.APlayer && window.MetingJSElement) return Promise.resolve();
+
+      if (!loadScriptPromise) {
+        loadScriptPromise = new Promise((resolve, reject) => {
+          const js = document.createElement("script");
+          js.src = "/js/aplayer/APlayer.min.js";
+          js.async = true;
+          js.onload = () => {
+            const meting = document.createElement("script");
+            meting.src = "/js/aplayer/Meting2.min.js";
+            meting.async = true;
+            meting.onload = resolve;
+            meting.onerror = reject;
+            document.head.appendChild(meting);
+          };
+          js.onerror = reject;
+          document.head.appendChild(js);
+        });
+      }
+      return loadScriptPromise;
     }
 
     function createMetingElement(playlistId) {
@@ -91,13 +96,25 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         order: "list",
         fixed: "false",
         "list-folded": "false",
-        autoplay: "false",
+        autoplay: "false", // 自动播放建议保持 false
         mutex: "true",
         theme: "#fff",
         volume: "0.5",
       };
       Object.entries(attrs).forEach(([k, v]) => player.setAttribute(k, v));
       return player;
+    }
+
+    /** 销毁现有的播放器实例，防止内存泄漏和幽灵播放 */
+    function destroyCurrentPlayer() {
+      document.querySelectorAll("meting-js").forEach((metingNode) => {
+        // 调用 APlayer 自带的 destroy() 方法停止音频并解绑事件
+        if (metingNode.aplayer) {
+          metingNode.aplayer.destroy();
+        }
+        metingNode.remove();
+      });
+      document.querySelectorAll(".aplayer").forEach((n) => n.remove());
     }
 
     /** rAF 驱动封面同步 */
@@ -109,7 +126,14 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
         const cover =
           pic.style.backgroundImage ||
           window.getComputedStyle(pic).backgroundImage;
-        if (cover && cover !== "none" && bg.dataset.currentCover !== cover) {
+
+        // 规避 none 或空字符串
+        if (
+          cover &&
+          cover !== "none" &&
+          cover !== 'url("")' &&
+          bg.dataset.currentCover !== cover
+        ) {
           bg.dataset.currentCover = cover;
           bg.style.setProperty("--music-cover", cover);
           bg.classList.add("is-cover-ready");
@@ -123,7 +147,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
 
       try {
         localStorage.setItem("an_music_last_playlist", playlistId);
-      } catch (e) {}
+      } catch (e) {
+        console.warn("localStorage set access denied");
+      }
 
       // 更新 Selector UI
       document
@@ -148,37 +174,40 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       }
       shell.classList.remove("is-hidden");
 
-      // 清理旧播放器
-      document
-        .querySelectorAll("meting-js, .aplayer")
-        .forEach((n) => n.remove());
+      // 彻底销毁并清理旧播放器
+      destroyCurrentPlayer();
 
-      loadAPlayerScripts().then(() => {
-        mount.appendChild(createMetingElement(playlistId));
+      loadAPlayerScripts()
+        .then(() => {
+          mount.appendChild(createMetingElement(playlistId));
 
-        // 监控渲染完成
-        const observer = new MutationObserver((_, obs) => {
-          const aplayer = mount.querySelector(".aplayer");
-          if (aplayer) {
-            obs.disconnect();
-            shell.classList.add("is-hidden");
-            window.setTimeout(() => shell.remove(), 300);
+          // 监控渲染完成
+          const observer = new MutationObserver((_, obs) => {
+            const aplayer = mount.querySelector(".aplayer");
+            if (aplayer) {
+              obs.disconnect();
+              shell.classList.add("is-hidden");
+              window.setTimeout(() => shell.remove(), 300);
 
-            // 绑定封面监听
-            const pic = aplayer.querySelector(".aplayer-pic");
-            if (pic) {
-              picObserver?.disconnect();
-              picObserver = new MutationObserver(syncCover);
-              picObserver.observe(pic, {
-                attributes: true,
-                attributeFilter: ["style"],
-              });
-              syncCover();
+              // 绑定封面监听
+              const pic = aplayer.querySelector(".aplayer-pic");
+              if (pic) {
+                picObserver?.disconnect();
+                picObserver = new MutationObserver(syncCover);
+                picObserver.observe(pic, {
+                  attributes: true,
+                  attributeFilter: ["style"],
+                });
+                syncCover();
+              }
             }
-          }
+          });
+          observer.observe(mount, { childList: true, subtree: true });
+        })
+        .catch((err) => {
+          console.error("Failed to load player scripts:", err);
+          shell.innerHTML = "<p>Failed to load player.</p>";
         });
-        observer.observe(mount, { childList: true, subtree: true });
-      });
     }
 
     // 初始执行
@@ -194,7 +223,10 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
           saved && available.some((p) => p.id === saved)
             ? saved
             : selector?.dataset.default;
-      } catch (e) {}
+      } catch (e) {
+        // 捕获无痕模式异常
+        initial = selector?.dataset.default;
+      }
       if (initial) setPlaylist(initial);
     });
 
@@ -214,6 +246,8 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
       () => {
         picObserver?.disconnect();
         if (syncFrame) cancelAnimationFrame(syncFrame);
+        // 确保离开页面时音乐停止且内存被释放
+        destroyCurrentPlayer();
         root.classList.remove("music-page-active");
       },
       { once: true },
