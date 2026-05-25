@@ -14,43 +14,45 @@ const postSlug = (post: CollectionEntry<"blog">) =>
   post.id.replace(/\.(md|mdx)$/, "");
 ---
 
-<div class="grid grid-cols-2 gap-1.5 sm:gap-3">
-  <div>
+<div class="grid grid-cols-2 gap-1.5 sm:gap-3" data-post-nav>
+  <div data-nav-col="prev">
     {
       prevPost?.id ? (
         <a
           href={`${linkPrefix}/${postSlug(prevPost)}`}
           class="group card-interactive relative flex flex-nowrap rounded-lg border border-zinc-200 px-4 py-3 pl-10 no-underline hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
+          data-nav-link="prev"
         >
           <ArrowIcon
             direction="left"
             size={5}
             class="absolute top-1/2 left-2 -translate-y-1/2"
           />
-          <div class="flex items-center text-sm">{prevPost.data.title}</div>
+          <div class="flex items-center text-sm" data-nav-title>{prevPost.data.title}</div>
         </a>
       ) : (
-        <div class="invisible" />
+        <div class="invisible" data-nav-missing="prev" />
       )
     }
   </div>
 
-  <div>
+  <div data-nav-col="next">
     {
       nextPost?.id ? (
         <a
           href={`${linkPrefix}/${postSlug(nextPost)}`}
           class="group card-interactive relative flex grow flex-row-reverse flex-nowrap rounded-lg border border-zinc-200 px-4 py-4 pr-10 no-underline hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
+          data-nav-link="next"
         >
           <ArrowIcon
             direction="right"
             size={5}
             class="absolute top-1/2 right-2 -translate-y-1/2"
           />
-          <div class="flex items-center text-sm">{nextPost.data.title}</div>
+          <div class="flex items-center text-sm" data-nav-title>{nextPost.data.title}</div>
         </a>
       ) : (
-        <div class="invisible" />
+        <div class="invisible" data-nav-missing="next" />
       )
     }
   </div>
