@@ -193,6 +193,11 @@ const { Content, headings } = await render(post);
     const tag = params.get("tag");
     if (!tag) return;
 
+    const backLink = document.querySelector("[data-back-link]");
+    if (backLink) {
+      backLink.setAttribute("href", `/blog?tag=${encodeURIComponent(tag)}`);
+    }
+
     const slug = location.pathname.replace(/^\/blog\//, "");
     const sameTag = postsIndex.filter((p) => p.tags.includes(tag));
     const idx = sameTag.findIndex((p) => p.id === slug);
