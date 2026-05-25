@@ -40,13 +40,16 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
       <div class="space-y-10">
         <PageHeader title="Writing." subtitle={`${data.length} articles`} />
 
-        <div class="animate space-y-3">
-          <span
-            class="block pl-1 text-[0.65rem] font-black tracking-[0.15em] text-stone-400 uppercase dark:text-stone-500"
-          >
-            Filter by topic
-          </span>
-          <div class="flex flex-wrap items-center gap-2">
+        <div class="animate space-y-3" data-filter-group>
+          <button type="button" class="filter-header" data-filter-toggle>
+            <span
+              class="block pl-1 text-[0.65rem] font-black tracking-[0.15em] text-stone-400 uppercase dark:text-stone-500"
+            >
+              Filter by topic
+            </span>
+            <svg class="filter-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="flex flex-wrap items-center gap-2" data-filter-buttons>
             <button type="button" class="tag-filter-btn active" data-tag="all">
               All
             </button>
@@ -126,9 +129,22 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
       rewriteLinks(tag);
     }
 
+    const filterGroup = document.querySelector<HTMLElement>("[data-filter-group]");
+
+    function toggleFilter(expand: boolean) {
+      filterGroup?.classList.toggle("filter-expanded", expand);
+    }
+
     if (activeTag !== "all") {
       filterPosts(activeTag);
+      toggleFilter(true);
     }
+
+    const filterToggle = document.querySelector("[data-filter-toggle]");
+    filterToggle?.addEventListener("click", () => {
+      const isExpanded = filterGroup?.classList.contains("filter-expanded");
+      toggleFilter(!isExpanded);
+    });
 
     function rewriteLinks(tag: string) {
       const items = document.querySelectorAll<HTMLElement>("[data-tags]");
@@ -263,5 +279,66 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
   :global(html.dark) .tag-filter-btn.active .tag-count {
     background: rgba(255, 255, 255, 0.14);
     color: #fff;
+  }
+
+  [data-filter-group] {
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  [data-filter-group]:hover {
+    border-color: rgba(15, 23, 42, 0.08);
+  }
+
+  :global(html.dark) [data-filter-group]:hover {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .filter-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .filter-header:hover {
+    background: rgba(15, 23, 42, 0.04);
+  }
+
+  :global(html.dark) .filter-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .filter-chevron {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #a1a1aa;
+  }
+
+  .filter-expanded .filter-chevron {
+    transform: rotate(180deg);
+  }
+
+  [data-filter-buttons] {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.25s ease,
+      padding 0.3s ease;
+    padding: 0 0.5rem;
+  }
+
+  .filter-expanded [data-filter-buttons] {
+    max-height: 200px;
+    opacity: 1;
+    padding: 0.5rem;
   }
 </style>
