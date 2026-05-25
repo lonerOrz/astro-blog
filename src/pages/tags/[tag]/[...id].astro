@@ -1,0 +1,88 @@
+---
+import { type CollectionEntry, render } from "astro:content";
+import BlogPost from "@components/BlogPost.astro";
+import MarkdownImage from "@components/MarkdownImage.astro";
+import { getSortedPosts } from "@utils/nav";
+
+export async function getStaticPaths() {
+  const posts = await getSortedPosts();
+
+  const paths: {
+    params: { tag: string; id: string };
+    props: {
+      post: CollectionEntry<"blog">;
+      tag: string;
+      prevPost: CollectionEntry<"blog"> | null;
+      nextPost: CollectionEntry<"blog"> | null;
+    };
+  }[] = [];
+
+  // "all" — all posts by date
+  for (let i = 0; i < posts.length; i++) {
+    paths.push({
+      params: {
+        tag: "all",
+        id: posts[i].id.replace(/\.(md|mdx)$/, ""),
+      },
+      props: {
+        post: posts[i],
+        tag: "all",
+        prevPost: posts[i - 1] ?? null,
+        nextPost: posts[i + 1] ?? null,
+      },
+    });
+  }
+
+  // Per-tag — same-tag filtered prev/next
+  for (const post of posts) {
+    const postTags = post.data.tags || [];
+    for (const tag of postTags) {
+      const sameTagPosts = posts.filter(
+        (p) => (p.data.tags || []).includes(tag),
+      );
+      const idx = sameTagPosts.findIndex((p) => p.id === post.id);
+
+      paths.push({
+        params: {
+          tag,
+          id: post.id.replace(/\.(md|mdx)$/, ""),
+        },
+        props: {
+          post,
+          tag,
+          prevPost: sameTagPosts[idx - 1] ?? null,
+          nextPost: sameTagPosts[idx + 1] ?? null,
+        },
+      });
+    }
+  }
+
+  return paths;
+}
+
+type Props = {
+  post: CollectionEntry<"blog">;
+  tag: string;
+  prevPost: CollectionEntry<"blog"> | null;
+  nextPost: CollectionEntry<"blog"> | null;
+};
+
+const { post, tag, prevPost, nextPost } = Astro.props;
+const { Content, headings } = await render(post);
+
+const isAll = tag === "all";
+const linkPrefix = isAll ? "/tags/all" : `/tags/${encodeURIComponent(tag)}`;
+const backHref = isAll ? "/tags" : `/tags?tag=${encodeURIComponent(tag)}`;
+---
+
+<BlogPost
+  post={post}
+  backHref={backHref}
+  backLabel="Back to topics"
+  prevPost={prevPost}
+  nextPost={nextPost}
+  linkPrefix={linkPrefix}
+  headings={headings}
+>
+  <Content components={{ img: MarkdownImage }} />
+</BlogPost>

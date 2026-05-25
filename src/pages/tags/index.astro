@@ -5,7 +5,9 @@ import Container from "@components/Container.astro";
 import PageHeader from "@components/PageHeader.astro";
 import ArrowCard from "@components/ArrowCard.astro";
 
-const posts = await getCollection("blog", ({ data }) => !data.draft);
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
 
 const tagMap = new Map<string, number>();
 posts.forEach((post) => {
@@ -132,6 +134,26 @@ const description = "Browse all categories and filter articles instantly.";
       ".result-title-text",
     ) as HTMLElement;
 
+    const updatePostLinks = (tag: string) => {
+      postItems.forEach((item) => {
+        const link = item.querySelector("a");
+        if (!link) return;
+        if (!link.dataset.originalHref) {
+          link.dataset.originalHref = link.getAttribute("href") || "";
+        }
+        const original = link.dataset.originalHref;
+        const slug = original.replace(/^\/blog\//, "");
+        if (tag === "all") {
+          link.setAttribute("href", `/tags/all/${slug}`);
+        } else {
+          link.setAttribute(
+            "href",
+            `/tags/${encodeURIComponent(tag)}/${slug}`,
+          );
+        }
+      });
+    };
+
     const filterPosts = (tag: string, updateUrl = true) => {
       activeTag = tag;
 
@@ -168,6 +190,8 @@ const description = "Browse all categories and filter articles instantly.";
           item.style.display = "none";
         }
       });
+
+      updatePostLinks(tag);
 
       if (noResults) {
         noResults.classList.toggle("hidden", matchCount > 0);
