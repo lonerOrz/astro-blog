@@ -13,7 +13,7 @@ import MarkdownImage from "@components/MarkdownImage.astro";
 
 export async function getStaticPaths() {
   const posts = (await getCollection("blog"))
-    .filter((post) => !post.data.draft)
+    .filter((p) => !p.data.draft)
     .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
   return posts.map((post, index) => ({
@@ -22,6 +22,7 @@ export async function getStaticPaths() {
       post,
       prevPost: posts[index - 1] ?? null,
       nextPost: posts[index + 1] ?? null,
+      allPosts: posts,
     },
   }));
 }
@@ -30,9 +31,10 @@ type Props = {
   post: CollectionEntry<"blog">;
   prevPost: CollectionEntry<"blog"> | null;
   nextPost: CollectionEntry<"blog"> | null;
+  allPosts: CollectionEntry<"blog">[];
 };
 
-const { post, prevPost, nextPost } = Astro.props;
+const { post, prevPost, nextPost, allPosts } = Astro.props;
 const { Content, headings } = await render(post);
 ---
 
@@ -54,11 +56,21 @@ const { Content, headings } = await render(post);
   </div>
 
   <Container>
+    <div
+      hidden
+      data-posts-index={JSON.stringify(
+        allPosts.map((p) => ({
+          id: p.id.replace(/\.(md|mdx)$/, ""),
+          title: p.data.title,
+          tags: p.data.tags || [],
+        })),
+      )}
+    >
+    </div>
     <div class="animate mt-8">
       <BackToPrevious href="/blog">Back to articles</BackToPrevious>
     </div>
 
-    <!-- 文章标题区 -->
     <div class="mt-16 mb-12 space-y-6">
       <div class="animate-item flex items-center gap-3" style="--delay: 0.1s">
         <div
@@ -121,7 +133,6 @@ const { Content, headings } = await render(post);
       </div>
     </div>
 
-    <!-- 目录 -->
     {
       headings.length > 0 && (
         <div class="animate-item mb-16" style="--delay: 0.4s">
@@ -132,7 +143,6 @@ const { Content, headings } = await render(post);
       )
     }
 
-    <!-- 正文内容 -->
     <article class="animate-item" style="--delay: 0.5s">
       <div
         class="prose prose-neutral prose-lg dark:prose-invert prose-p:leading-relaxed prose-p:text-zinc-700 dark:prose-p:text-zinc-300 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:font-semibold prose-a:no-underline hover:prose-a:underline max-w-none pb-24"
@@ -140,7 +150,6 @@ const { Content, headings } = await render(post);
         <Content components={{ img: MarkdownImage }} />
       </div>
 
-      <!-- 页尾装饰 -->
       <div
         class="animate-item mt-20 flex flex-col items-center gap-6 border-t border-zinc-100 py-12 select-none dark:border-zinc-800/50"
         style="--delay: 0.2s"
@@ -165,7 +174,6 @@ const { Content, headings } = await render(post);
         </div>
       </div>
 
-      <!-- 导航与评论 -->
       <div class="space-y-24">
         <PostNavigation prevPost={prevPost} nextPost={nextPost} />
         <div class="rounded-[2.5rem] bg-zinc-50/50 p-1 dark:bg-zinc-900/30">
@@ -177,6 +185,64 @@ const { Content, headings } = await render(post);
 </Layout>
 
 <script is:inline>
+  const postsIndex = JSON.parse(
+    document
+      .querySelector("[data-posts-index]")
+      .getAttribute("data-posts-index"),
+  );
+
+  function initTagNav() {
+    const params = new URLSearchParams(location.search);
+    const tag = params.get("tag");
+    if (!tag) return;
+
+    const backLink = document.querySelector("[data-back-link]");
+    if (backLink) {
+      backLink.setAttribute("href", `/blog?tag=${encodeURIComponent(tag)}`);
+    }
+
+    const slug = location.pathname.replace(/^\/blog\//, "");
+    const sameTag = postsIndex.filter((p) => p.tags.includes(tag));
+    const idx = sameTag.findIndex((p) => p.id === slug);
+    if (idx === -1) return;
+
+    const prevLink = document.querySelector('[data-nav-link="prev"]');
+    const nextLink = document.querySelector('[data-nav-link="next"]');
+
+    if (idx > 0) {
+      const prev = sameTag[idx - 1];
+      if (prevLink) {
+        prevLink.setAttribute(
+          "href",
+          `/blog/${prev.id}?tag=${encodeURIComponent(tag)}`,
+        );
+        const titleEl = prevLink.querySelector("[data-nav-title]");
+        if (titleEl) titleEl.textContent = prev.title;
+      }
+    } else {
+      const col = prevLink?.closest("[data-nav-col]");
+      if (col) col.innerHTML = '<div class="invisible"></div>';
+    }
+
+    if (idx < sameTag.length - 1) {
+      const next = sameTag[idx + 1];
+      if (nextLink) {
+        nextLink.setAttribute(
+          "href",
+          `/blog/${next.id}?tag=${encodeURIComponent(tag)}`,
+        );
+        const titleEl = nextLink.querySelector("[data-nav-title]");
+        if (titleEl) titleEl.textContent = next.title;
+      }
+    } else {
+      const col = nextLink?.closest("[data-nav-col]");
+      if (col) col.innerHTML = '<div class="invisible"></div>';
+    }
+  }
+
+  initTagNav();
+  document.addEventListener("astro:after-swap", initTagNav);
+
   function setupProgressBar() {
     const bar = document.getElementById("read-progress-bar");
     if (!bar) return;
@@ -210,7 +276,6 @@ const { Content, headings } = await render(post);
     text-wrap: balance;
   }
 
-  /* 阶梯动画 */
   .animate-item {
     opacity: 0;
     transform: translateY(15px);

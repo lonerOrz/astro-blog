@@ -10,6 +10,14 @@ const data = (await getCollection("blog"))
   .filter((post) => !post.data.draft)
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 
+const tagCounts = new Map<string, number>();
+data.forEach((post) => {
+  post.data.tags?.forEach((tag) => {
+    tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+  });
+});
+const sortedTags = [...tagCounts.keys()].sort((a, b) => a.localeCompare(b));
+
 type Acc = {
   [year: string]: CollectionEntry<"blog">[];
 };
@@ -30,16 +38,51 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
       <div class="space-y-10">
         <PageHeader title="Writing." subtitle={`${data.length} articles`} />
 
-        <div class="space-y-10">
+        <div class="animate space-y-3" data-filter-group>
+          <button type="button" class="filter-header" data-filter-toggle>
+            <span
+              class="block pl-1 text-[0.65rem] font-black tracking-[0.15em] text-stone-400 uppercase dark:text-stone-500"
+            >
+              Filter by topic
+            </span>
+            <svg
+              class="filter-chevron"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><polyline points="6 9 12 15 18 9"></polyline></svg
+            >
+          </button>
+          <div class="flex flex-wrap items-center gap-2" data-filter-buttons>
+            <button type="button" class="tag-filter-btn active" data-tag="all">
+              All
+            </button>
+            {
+              sortedTags.map((tag) => (
+                <button type="button" class="tag-filter-btn" data-tag={tag}>
+                  #{tag}
+                  <span class="tag-count">{tagCounts.get(tag)}</span>
+                </button>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="space-y-10" id="post-list">
           {
             years.map((year) => (
-              <section class="animate space-y-4">
+              <section data-year class="animate space-y-4">
                 <div class="font-semibold text-zinc-900 dark:text-zinc-50">
                   {year}
                 </div>
                 <ul class="not-prose flex flex-col gap-4">
                   {posts[year].map((post) => (
-                    <li>
+                    <li data-tags={JSON.stringify(post.data.tags || [])}>
                       <ArrowCard entry={post} />
                     </li>
                   ))}
@@ -52,3 +95,258 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
     </aside>
   </Container>
 </Layout>
+
+<script>
+  function initFilter() {
+    const urlParams = new URLSearchParams(window.location.search);
+    let activeTag = urlParams.get("tag") || "all";
+
+    const buttons =
+      document.querySelectorAll<HTMLButtonElement>(".tag-filter-btn");
+    const sections = document.querySelectorAll<HTMLElement>("[data-year]");
+
+    function filterPosts(tag: string) {
+      activeTag = tag;
+
+      const url =
+        tag === "all"
+          ? window.location.pathname
+          : `?tag=${encodeURIComponent(tag)}`;
+      window.history.replaceState({}, "", url);
+
+      buttons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.tag === tag);
+      });
+
+      sections.forEach((section) => {
+        const items = section.querySelectorAll<HTMLElement>("[data-tags]");
+        let visible = 0;
+        items.forEach((item) => {
+          const tags = JSON.parse(item.dataset.tags || "[]") as string[];
+          const match = tag === "all" || tags.includes(tag);
+          item.style.display = match ? "" : "none";
+          if (match) visible++;
+        });
+        section.style.display = visible > 0 ? "" : "none";
+      });
+
+      rewriteLinks(tag);
+    }
+
+    const filterGroup = document.querySelector<HTMLElement>(
+      "[data-filter-group]",
+    );
+
+    function toggleFilter(expand: boolean) {
+      filterGroup?.classList.toggle("filter-expanded", expand);
+    }
+
+    if (activeTag !== "all") {
+      filterPosts(activeTag);
+      toggleFilter(true);
+    }
+
+    const filterToggle = document.querySelector("[data-filter-toggle]");
+    filterToggle?.addEventListener("click", () => {
+      const isExpanded = filterGroup?.classList.contains("filter-expanded");
+      toggleFilter(!isExpanded);
+    });
+
+    function rewriteLinks(tag: string) {
+      const items = document.querySelectorAll<HTMLElement>("[data-tags]");
+      items.forEach((item) => {
+        const link = item.querySelector("a");
+        if (!link) return;
+        if (!link.dataset.originalHref) {
+          link.dataset.originalHref = link.getAttribute("href") || "";
+        }
+        link.setAttribute(
+          "href",
+          tag === "all"
+            ? link.dataset.originalHref
+            : `${link.dataset.originalHref}?tag=${encodeURIComponent(tag)}`,
+        );
+      });
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.tag) filterPosts(btn.dataset.tag);
+      });
+    });
+  }
+
+  initFilter();
+  document.addEventListener("astro:after-swap", initFilter);
+</script>
+
+<style>
+  .tag-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 9999px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    background: rgba(255, 255, 255, 0.72);
+    color: #0f172a;
+    cursor: pointer;
+    transition:
+      transform 0.24s ease,
+      background-color 0.24s ease,
+      border-color 0.24s ease,
+      color 0.24s ease,
+      box-shadow 0.24s ease;
+  }
+
+  .tag-filter-btn:hover {
+    color: #4f46e5;
+    background: rgba(248, 250, 252, 0.96);
+    border-color: rgba(99, 102, 241, 0.18);
+    transform: translateY(-1px);
+    box-shadow:
+      0 4px 12px rgba(15, 23, 42, 0.04),
+      0 10px 24px rgba(79, 70, 229, 0.06);
+  }
+
+  .tag-filter-btn:active {
+    transform: scale(0.97);
+  }
+
+  .tag-filter-btn.active {
+    color: #fff;
+    background: linear-gradient(180deg, #6366f1, #4f46e5);
+    border-color: #4f46e5;
+    box-shadow:
+      0 6px 20px rgba(79, 70, 229, 0.16),
+      0 16px 40px rgba(79, 70, 229, 0.1);
+  }
+
+  .tag-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.1rem;
+    padding: 0.05rem 0.35rem;
+    font-size: 0.62rem;
+    font-weight: 800;
+    border-radius: 9999px;
+    background: rgba(15, 23, 42, 0.06);
+    color: #64748b;
+    transition:
+      background-color 0.24s ease,
+      color 0.24s ease;
+  }
+
+  .tag-filter-btn:hover .tag-count {
+    background: rgba(99, 102, 241, 0.1);
+    color: #4f46e5;
+  }
+
+  .tag-filter-btn.active .tag-count {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+
+  :global(html.dark) .tag-filter-btn {
+    color: #f8fafc;
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  :global(html.dark) .tag-filter-btn:hover {
+    color: #a5b4fc;
+    background: rgba(30, 41, 59, 0.88);
+    border-color: rgba(129, 140, 248, 0.24);
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.22),
+      0 10px 28px rgba(99, 102, 241, 0.08);
+  }
+
+  :global(html.dark) .tag-filter-btn.active {
+    color: #fff;
+    background: linear-gradient(180deg, #818cf8, #6366f1);
+    border-color: #6366f1;
+    box-shadow:
+      0 8px 24px rgba(129, 140, 248, 0.2),
+      0 18px 40px rgba(129, 140, 248, 0.12);
+  }
+
+  :global(html.dark) .tag-count {
+    background: rgba(255, 255, 255, 0.06);
+    color: #94a3b8;
+  }
+
+  :global(html.dark) .tag-filter-btn:hover .tag-count {
+    background: rgba(129, 140, 248, 0.12);
+    color: #c7d2fe;
+  }
+
+  :global(html.dark) .tag-filter-btn.active .tag-count {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+  }
+
+  [data-filter-group] {
+    border-radius: 0.75rem;
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  [data-filter-group]:hover {
+    border-color: rgba(15, 23, 42, 0.08);
+  }
+
+  :global(html.dark) [data-filter-group]:hover {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .filter-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+  }
+
+  .filter-header:hover {
+    background: rgba(15, 23, 42, 0.04);
+  }
+
+  :global(html.dark) .filter-header:hover {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .filter-chevron {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: #a1a1aa;
+  }
+
+  .filter-expanded .filter-chevron {
+    transform: rotate(180deg);
+  }
+
+  [data-filter-buttons] {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.25s ease,
+      padding 0.3s ease;
+    padding: 0 0.5rem;
+  }
+
+  .filter-expanded [data-filter-buttons] {
+    max-height: 200px;
+    opacity: 1;
+    padding: 0.5rem;
+  }
+</style>
