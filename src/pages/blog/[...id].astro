@@ -56,13 +56,17 @@ const { Content, headings } = await render(post);
   </div>
 
   <Container>
-    <div hidden data-posts-index={JSON.stringify(
-      allPosts.map((p) => ({
-        id: p.id.replace(/\.(md|mdx)$/, ""),
-        title: p.data.title,
-        tags: p.data.tags || [],
-      })),
-    )}></div>
+    <div
+      hidden
+      data-posts-index={JSON.stringify(
+        allPosts.map((p) => ({
+          id: p.id.replace(/\.(md|mdx)$/, ""),
+          title: p.data.title,
+          tags: p.data.tags || [],
+        })),
+      )}
+    >
+    </div>
     <div class="animate mt-8">
       <BackToPrevious href="/blog">Back to articles</BackToPrevious>
     </div>
@@ -108,7 +112,7 @@ const { Content, headings } = await render(post);
               fill="none"
               stroke="currentColor"
               stroke-width="2.5"
-            ><circle cx="12" cy="12" r="10"></circle><polyline
+              ><circle cx="12" cy="12" r="10"></circle><polyline
                 points="12 6 12 12 16 14"></polyline></svg
             >
             {post.body && <span>{readingTime(post.body)}</span>}
@@ -171,10 +175,7 @@ const { Content, headings } = await render(post);
       </div>
 
       <div class="space-y-24">
-        <PostNavigation
-          prevPost={prevPost}
-          nextPost={nextPost}
-        />
+        <PostNavigation prevPost={prevPost} nextPost={nextPost} />
         <div class="rounded-[2.5rem] bg-zinc-50/50 p-1 dark:bg-zinc-900/30">
           <Giscus />
         </div>
@@ -185,7 +186,9 @@ const { Content, headings } = await render(post);
 
 <script is:inline>
   const postsIndex = JSON.parse(
-    document.querySelector("[data-posts-index]").getAttribute("data-posts-index"),
+    document
+      .querySelector("[data-posts-index]")
+      .getAttribute("data-posts-index"),
   );
 
   function initTagNav() {

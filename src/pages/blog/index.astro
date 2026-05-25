@@ -16,9 +16,7 @@ data.forEach((post) => {
     tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
   });
 });
-const sortedTags = [...tagCounts.keys()].sort((a, b) =>
-  a.localeCompare(b),
-);
+const sortedTags = [...tagCounts.keys()].sort((a, b) => a.localeCompare(b));
 
 type Acc = {
   [year: string]: CollectionEntry<"blog">[];
@@ -47,7 +45,18 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
             >
               Filter by topic
             </span>
-            <svg class="filter-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            <svg
+              class="filter-chevron"
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              ><polyline points="6 9 12 15 18 9"></polyline></svg
+            >
           </button>
           <div class="flex flex-wrap items-center gap-2" data-filter-buttons>
             <button type="button" class="tag-filter-btn active" data-tag="all">
@@ -55,11 +64,7 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
             </button>
             {
               sortedTags.map((tag) => (
-                <button
-                  type="button"
-                  class="tag-filter-btn"
-                  data-tag={tag}
-                >
+                <button type="button" class="tag-filter-btn" data-tag={tag}>
                   #{tag}
                   <span class="tag-count">{tagCounts.get(tag)}</span>
                 </button>
@@ -96,9 +101,8 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
     const urlParams = new URLSearchParams(window.location.search);
     let activeTag = urlParams.get("tag") || "all";
 
-    const buttons = document.querySelectorAll<HTMLButtonElement>(
-      ".tag-filter-btn",
-    );
+    const buttons =
+      document.querySelectorAll<HTMLButtonElement>(".tag-filter-btn");
     const sections = document.querySelectorAll<HTMLElement>("[data-year]");
 
     function filterPosts(tag: string) {
@@ -129,7 +133,9 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
       rewriteLinks(tag);
     }
 
-    const filterGroup = document.querySelector<HTMLElement>("[data-filter-group]");
+    const filterGroup = document.querySelector<HTMLElement>(
+      "[data-filter-group]",
+    );
 
     function toggleFilter(expand: boolean) {
       filterGroup?.classList.toggle("filter-expanded", expand);
@@ -229,7 +235,9 @@ const years = Object.keys(posts).sort((a, b) => parseInt(b) - parseInt(a));
     border-radius: 9999px;
     background: rgba(15, 23, 42, 0.06);
     color: #64748b;
-    transition: background-color 0.24s ease, color 0.24s ease;
+    transition:
+      background-color 0.24s ease,
+      color 0.24s ease;
   }
 
   .tag-filter-btn:hover .tag-count {

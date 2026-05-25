@@ -5,10 +5,9 @@ import ArrowIcon from "@components/ArrowIcon.astro";
 type Props = {
   prevPost?: CollectionEntry<"blog"> | null;
   nextPost?: CollectionEntry<"blog"> | null;
-  linkPrefix?: string;
 };
 
-const { prevPost, nextPost, linkPrefix = "/blog" } = Astro.props;
+const { prevPost, nextPost } = Astro.props;
 
 const postSlug = (post: CollectionEntry<"blog">) =>
   post.id.replace(/\.(md|mdx)$/, "");
@@ -19,7 +18,7 @@ const postSlug = (post: CollectionEntry<"blog">) =>
     {
       prevPost?.id ? (
         <a
-          href={`${linkPrefix}/${postSlug(prevPost)}`}
+          href={`/blog/${postSlug(prevPost)}`}
           class="group card-interactive relative flex flex-nowrap rounded-lg border border-zinc-200 px-4 py-3 pl-10 no-underline hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
           data-nav-link="prev"
         >
@@ -28,7 +27,9 @@ const postSlug = (post: CollectionEntry<"blog">) =>
             size={5}
             class="absolute top-1/2 left-2 -translate-y-1/2"
           />
-          <div class="flex items-center text-sm" data-nav-title>{prevPost.data.title}</div>
+          <div class="flex items-center text-sm" data-nav-title>
+            {prevPost.data.title}
+          </div>
         </a>
       ) : (
         <div class="invisible" data-nav-missing="prev" />
@@ -40,7 +41,7 @@ const postSlug = (post: CollectionEntry<"blog">) =>
     {
       nextPost?.id ? (
         <a
-          href={`${linkPrefix}/${postSlug(nextPost)}`}
+          href={`/blog/${postSlug(nextPost)}`}
           class="group card-interactive relative flex grow flex-row-reverse flex-nowrap rounded-lg border border-zinc-200 px-4 py-4 pr-10 no-underline hover:bg-zinc-100 hover:text-zinc-900 focus-visible:bg-zinc-100 focus-visible:text-zinc-900 dark:border-zinc-700 dark:hover:bg-zinc-800/60 dark:hover:text-zinc-50 dark:focus-visible:bg-zinc-800/60 dark:focus-visible:text-zinc-50"
           data-nav-link="next"
         >
@@ -49,7 +50,9 @@ const postSlug = (post: CollectionEntry<"blog">) =>
             size={5}
             class="absolute top-1/2 right-2 -translate-y-1/2"
           />
-          <div class="flex items-center text-sm" data-nav-title>{nextPost.data.title}</div>
+          <div class="flex items-center text-sm" data-nav-title>
+            {nextPost.data.title}
+          </div>
         </a>
       ) : (
         <div class="invisible" data-nav-missing="next" />
@@ -57,5 +60,3 @@ const postSlug = (post: CollectionEntry<"blog">) =>
     }
   </div>
 </div>
-
-

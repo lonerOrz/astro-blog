@@ -60,34 +60,6 @@ export const SOCIALS: Socials = [
   },
 ];
 
-export const TERMINAL = {
-  asciiArt: `
-██╗  ██╗███████╗██╗     ██╗      ██████╗
-██║  ██║██╔════╝██║     ██║     ██╔═══██╗
-███████║█████╗  ██║     ██║     ██║   ██║
-██╔══██║██╔══╝  ██║     ██║     ██║   ██║
-██║  ██║███████╗███████╗███████╗╚██████╔╝
-`,
-  systemInfo: [
-    "SYSTEM STATUS: ONLINE",
-    "VERSION: 1.0.2",
-    "LAST UPDATE: 2024-07-31",
-  ],
-  about: {
-    title: "[ ABOUT ]",
-    content:
-      "Astro-Blog is a multi-purpose, accessible, and SEO-friendly theme for Astro blogs.",
-  },
-  contact: {
-    title: "[ CONTACT ]",
-    links: [
-      { label: "GitHub", url: "https://github.com/lonerOrz" },
-      { label: "Twitter", url: "https://twitter.com/lonerOrz" },
-      { label: "Email", url: "mailto:lonerOrz@qq.com" },
-    ],
-  },
-};
-
 export const FRIENDS: Friends = [
   {
     NAME: "LonerOrz",
