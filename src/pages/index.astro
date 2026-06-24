@@ -155,18 +155,7 @@ const seriesOnHomepage = Array.from(seriesMap.entries())
               documents learning, shares insights, and captures fleeting ideas.
             </p>
 
-            <div
-              class="reveal-item border-l-2 border-emerald-500/30 py-0.5 pl-4 dark:border-emerald-500/20"
-              style="--order: 4;"
-            >
-              <p
-                class="font-mono text-xs tracking-wide text-zinc-400 italic transition-all duration-300 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-              >
-                今こそ、救いの时だ。
-              </p>
-            </div>
-
-            <div class="reveal-item pt-2" style="--order: 5;">
+            <div class="reveal-item pt-2" style="--order: 4;">
               <a
                 href="/blog"
                 class="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-xl border border-zinc-200/80 bg-white/60 px-5 py-3 text-sm font-medium text-zinc-700 shadow-sm backdrop-blur-md transition-all duration-500 ease-out hover:border-zinc-300 hover:text-zinc-900 hover:shadow-[0_12px_24px_rgba(0,0,0,0.04)] active:scale-[0.98] dark:border-zinc-800/80 dark:bg-zinc-950/60 dark:text-zinc-300 dark:hover:border-zinc-700 dark:hover:text-zinc-50 dark:hover:shadow-[0_12px_24px_rgba(0,0,0,0.2)]"
@@ -190,19 +179,30 @@ const seriesOnHomepage = Array.from(seriesMap.entries())
                 </svg>
               </a>
             </div>
+
+            <div
+              class="reveal-item pt-4"
+              style="--order: 5;"
+            >
+              <div class="border-l-2 border-emerald-500/30 py-1 pl-4 dark:border-emerald-500/20">
+                <p class="font-mono text-xs tracking-wide text-zinc-400 transition-all duration-300 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300">
+                  今こそ、救いの时だ。
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <hr
         class="reveal-item border-zinc-200/60 dark:border-zinc-800/60"
-        style="--order: 5;"
+        style="--order: 6;"
       />
 
       <section class="space-y-5 py-14">
         <div
           class="reveal-item flex items-center justify-between"
-          style="--order: 5;"
+          style="--order: 6;"
         >
           <h2
             class="text-xs font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
@@ -262,12 +262,12 @@ const seriesOnHomepage = Array.from(seriesMap.entries())
           <Fragment>
             <hr
               class="reveal-item border-zinc-200/60 dark:border-zinc-800/60"
-              style="--order: 6;"
+              style="--order: 7;"
             />
             <section class="space-y-5 py-14">
               <div
                 class="reveal-item flex items-center justify-between"
-                style="--order: 6;"
+                style="--order: 7;"
               >
                 <h2 class="text-xs font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500">
                   Series
@@ -287,7 +287,7 @@ const seriesOnHomepage = Array.from(seriesMap.entries())
                       href={`/series/${group.name}`}
                       class="group relative flex items-center gap-4 rounded-xl border border-transparent px-3 py-3.5 transition-all duration-500 ease-out hover:border-zinc-200/50 hover:bg-white/50 hover:shadow-[0_4px_16px_rgba(0,0,0,0.02)] hover:-translate-y-[1px] hover:translate-x-[2px] active:scale-[0.995] dark:hover:border-zinc-800/50 dark:hover:bg-zinc-900/20 dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.1)]"
                     >
-                      <span class="absolute left-0 top-[15%] h-[70%] w-[2.5px] origin-center scale-y-0 opacity-0 rounded-r-md bg-cyan-500 transition-all duration-300 ease-out group-hover:scale-y-100 group-hover:opacity-100 group-hover:duration-500 group-hover:cubic-bezier-spring dark:bg-cyan-400"></span>
+                      <span class="absolute left-0 top-[15%] h-[70%] w-[2.5px] origin-center scale-y-0 opacity-0 rounded-r-md bg-emerald-500 transition-all duration-300 ease-out group-hover:scale-y-100 group-hover:opacity-100 group-hover:duration-500 group-hover:cubic-bezier-spring dark:bg-emerald-400"></span>
                       <span class="relative flex h-4 w-4 items-center justify-center font-mono text-xs text-zinc-300 dark:text-zinc-700">
                         <span class="transition-all duration-300 cubic-bezier-spring group-hover:scale-0 group-hover:opacity-0">
                           {String(i + 1).padStart(2, "0")}
@@ -297,7 +297,7 @@ const seriesOnHomepage = Array.from(seriesMap.entries())
                           fill="none"
                           stroke="currentColor"
                           stroke-width="2.5"
-                          class="absolute h-3.5 w-3.5 scale-0 text-cyan-500 opacity-0 transition-all duration-500 cubic-bezier-spring group-hover:scale-100 group-hover:opacity-100 dark:text-cyan-400"
+                          class="absolute h-3.5 w-3.5 scale-0 text-emerald-500 opacity-0 transition-all duration-500 cubic-bezier-spring group-hover:scale-100 group-hover:opacity-100 dark:text-emerald-400"
                         >
                           <path d="M5 12h14M12 5l7 7-7 7" />
                         </svg>
@@ -320,10 +320,10 @@ const seriesOnHomepage = Array.from(seriesMap.entries())
 
       <hr
         class="reveal-item border-zinc-200/60 dark:border-zinc-800/60"
-        style="--order: 7;"
+        style="--order: 8;"
       />
 
-      <section class="reveal-item space-y-5 py-14" style="--order: 7;">
+      <section class="reveal-item space-y-5 py-14" style="--order: 8;">
         <h2
           class="text-xs font-bold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
         >
@@ -388,7 +388,7 @@ const seriesOnHomepage = Array.from(seriesMap.entries())
     }
   }
 
-  .loading-line {
+  html:not([data-client-nav]) .loading-line {
     animation: lineLoading 1.3s cubic-bezier(0.65, 0, 0.35, 1) forwards;
   }
 

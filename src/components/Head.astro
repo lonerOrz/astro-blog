@@ -262,5 +262,8 @@ const { title, description, image = "/astro-micro.jpg" } = Astro.props;
 
   document.addEventListener("DOMContentLoaded", () => init());
   document.addEventListener("astro:after-swap", () => init());
+  document.addEventListener("astro:before-swap", () => {
+    document.documentElement.dataset.clientNav = "";
+  });
   preloadTheme();
 </script>

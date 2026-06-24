@@ -6,7 +6,7 @@
 
 @theme {
   --font-sans:
-    Inter, Geist, Suisse Intl, ui-sans-serif, system-ui, sans-serif,
+    Geist, Inter, Suisse Intl, ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-mono:
     JetBrains Mono, Geist Mono, ui-monospace, SFMono-Regular, Menlo, Monaco,
@@ -32,6 +32,14 @@
 }
 
 @layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   html {
     overflow-y: auto;
     color-scheme: light;

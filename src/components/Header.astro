@@ -8,6 +8,7 @@ import Link from "@components/Link.astro";
   class="sticky top-0 z-[60] border-b border-transparent bg-zinc-50/0 py-4 backdrop-blur-none transition-all duration-300"
   id="site-header"
 >
+  <div id="header-sentinel" class="pointer-events-none absolute top-0 left-0 h-px w-px" aria-hidden="true"></div>
   <Container>
     <div class="flex items-center justify-between gap-6">
       <Link href="/" underline={false} class="group">
@@ -30,7 +31,7 @@ import Link from "@components/Link.astro";
         </div>
       </Link>
 
-      <nav class="flex items-center gap-1.5 text-sm font-medium">
+      <nav class="flex items-center gap-1.5 overflow-x-auto max-lg:gap-0 text-sm font-medium scrollbar-none">
         {
           [
             ["home", "/"],
@@ -104,30 +105,21 @@ import Link from "@components/Link.astro";
     const header = document.getElementById("site-header");
     const navItems = document.querySelectorAll(".nav-item");
 
-    // 滚动效果
-    const updateHeader = () => {
-      if (window.scrollY > 20) {
-        header.classList.add(
-          "bg-white/80",
-          "dark:bg-[#050505]/80",
-          "backdrop-blur-md",
-          "border-zinc-200/50",
-          "dark:border-zinc-800/50",
-          "py-3",
-        );
-        header.classList.remove("bg-zinc-50/0", "py-4", "border-transparent");
-      } else {
-        header.classList.remove(
-          "bg-white/80",
-          "dark:bg-[#050505]/80",
-          "backdrop-blur-md",
-          "border-zinc-200/50",
-          "dark:border-zinc-800/50",
-          "py-3",
-        );
-        header.classList.add("bg-zinc-50/0", "py-4", "border-transparent");
-      }
-    };
+    // 滚动效果 — IntersectionObserver 替代 scroll listener
+    const sentinel = document.getElementById("header-sentinel");
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          header.classList.add("bg-white/80", "dark:bg-[#050505]/80", "backdrop-blur-md", "border-zinc-200/50", "dark:border-zinc-800/50", "py-3");
+          header.classList.remove("bg-zinc-50/0", "py-4", "border-transparent");
+        } else {
+          header.classList.remove("bg-white/80", "dark:bg-[#050505]/80", "backdrop-blur-md", "border-zinc-200/50", "dark:border-zinc-800/50", "py-3");
+          header.classList.add("bg-zinc-50/0", "py-4", "border-transparent");
+        }
+      },
+      { threshold: 0 },
+    );
+    if (sentinel) observer.observe(sentinel);
 
     // 活动项高亮
     const updateActiveLink = () => {
@@ -157,13 +149,16 @@ import Link from "@components/Link.astro";
       });
     };
 
-    window.addEventListener("scroll", updateHeader);
-    updateHeader();
     updateActiveLink();
+
+    return observer;
   }
 
-  initHeader();
-  document.addEventListener("astro:after-swap", initHeader);
+  let headerObserver = initHeader();
+  document.addEventListener("astro:after-swap", () => {
+    headerObserver?.disconnect();
+    headerObserver = initHeader();
+  });
 </script>
 
 <style>
