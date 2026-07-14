@@ -66,7 +66,7 @@ const imageAlt = alt || title || "";
 >
   <div
     class:list={[
-      "relative w-full overflow-hidden transition-all duration-700",
+      "relative w-full overflow-hidden transition-all duration-800",
       // 形状
       isCircle
         ? "aspect-square rounded-full"
@@ -90,7 +90,7 @@ const imageAlt = alt || title || "";
           src={cleanSrc}
           alt={imageAlt}
           class:list={[
-            "h-full w-full object-cover transition-all duration-700 ease-in-out",
+            "h-full w-full object-cover transition-all duration-800",
             !isPolaroid && "group-hover:scale-105",
             isGrayscale && "grayscale hover:grayscale-0",
             isSepia && "sepia hover:sepia-0",
@@ -105,7 +105,7 @@ const imageAlt = alt || title || "";
           loading="lazy"
           decoding="async"
           class:list={[
-            "h-full w-full object-cover transition-all duration-700 ease-in-out",
+            "h-full w-full object-cover transition-all duration-800",
             !isPolaroid && "group-hover:scale-105",
             isGrayscale && "grayscale hover:grayscale-0",
             isSepia && "sepia hover:sepia-0",

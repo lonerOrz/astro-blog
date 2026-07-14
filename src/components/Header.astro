@@ -8,7 +8,12 @@ import Link from "@components/Link.astro";
   class="sticky top-0 z-[60] border-b border-transparent bg-zinc-50/0 py-4 backdrop-blur-none transition-all duration-300"
   id="site-header"
 >
-  <div id="header-sentinel" class="pointer-events-none absolute top-0 left-0 h-px w-px" aria-hidden="true"></div>
+  <div
+    id="header-sentinel"
+    class="pointer-events-none absolute top-0 left-0 h-px w-px"
+    aria-hidden="true"
+  >
+  </div>
   <Container>
     <div class="flex items-center justify-between gap-6">
       <Link href="/" underline={false} class="group">
@@ -18,11 +23,17 @@ import Link from "@components/Link.astro";
           <div
             class="relative size-7 shrink-0 overflow-hidden rounded-lg border border-zinc-200 shadow-sm transition-transform group-hover:scale-110 dark:border-zinc-800"
           >
-            <img
-              src="/site/adorable.png"
-              alt="logo"
-              class="size-full object-cover"
-            />
+            <picture>
+              <source srcset="/site/adorable.webp" type="image/webp" />
+              <img
+                src="/site/adorable.png"
+                alt="logo"
+                class="size-full object-cover"
+                width="28"
+                height="28"
+                decoding="async"
+              />
+            </picture>
           </div>
           <span
             class="transition-colors group-hover:text-zinc-600 dark:group-hover:text-zinc-400"
@@ -31,7 +42,9 @@ import Link from "@components/Link.astro";
         </div>
       </Link>
 
-      <nav class="flex items-center gap-1.5 overflow-x-auto max-lg:gap-0 text-sm font-medium scrollbar-none">
+      <nav
+        class="flex scrollbar-none items-center gap-1.5 overflow-x-auto text-sm font-medium max-lg:gap-0"
+      >
         {
           [
             ["home", "/"],
@@ -110,10 +123,24 @@ import Link from "@components/Link.astro";
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
-          header.classList.add("bg-white/80", "dark:bg-[#050505]/80", "backdrop-blur-md", "border-zinc-200/50", "dark:border-zinc-800/50", "py-3");
+          header.classList.add(
+            "bg-white/80",
+            "dark:bg-[#050505]/80",
+            "backdrop-blur-md",
+            "border-zinc-200/50",
+            "dark:border-zinc-800/50",
+            "py-3",
+          );
           header.classList.remove("bg-zinc-50/0", "py-4", "border-transparent");
         } else {
-          header.classList.remove("bg-white/80", "dark:bg-[#050505]/80", "backdrop-blur-md", "border-zinc-200/50", "dark:border-zinc-800/50", "py-3");
+          header.classList.remove(
+            "bg-white/80",
+            "dark:bg-[#050505]/80",
+            "backdrop-blur-md",
+            "border-zinc-200/50",
+            "dark:border-zinc-800/50",
+            "py-3",
+          );
           header.classList.add("bg-zinc-50/0", "py-4", "border-transparent");
         }
       },

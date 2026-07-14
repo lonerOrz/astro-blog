@@ -6,6 +6,19 @@ import Link from "@components/Link.astro";
 import ArrowIcon from "@components/ArrowIcon.astro";
 
 const GITHUB_USERNAME = "lonerOrz";
+const ghToken = process.env.GITHUB_TOKEN;
+const authHeader: Record<string, string> = ghToken
+  ? { Authorization: `Bearer ${ghToken}` }
+  : {};
+const [ghUser, ghRepos] = await Promise.all([
+  fetch(`https://api.github.com/users/${GITHUB_USERNAME}`, {
+    headers: authHeader,
+  }).then((r) => r.json()),
+  fetch(
+    `https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=100`,
+    { headers: authHeader },
+  ).then((r) => r.json()),
+]);
 ---
 
 <Layout
@@ -27,6 +40,8 @@ const GITHUB_USERNAME = "lonerOrz";
     <div
       class="mx-auto max-w-6xl space-y-12 pb-24"
       data-github-user={GITHUB_USERNAME}
+      data-gh-user={JSON.stringify(ghUser)}
+      data-gh-repos={JSON.stringify(ghRepos)}
     >
       <!-- Header -->
       <div
@@ -246,13 +261,13 @@ const GITHUB_USERNAME = "lonerOrz";
 
         <div class="group scrollbar-hide relative overflow-x-auto pb-4">
           <div
-            class="min-w-[800px] origin-left transition-all duration-700 group-hover:scale-[1.005]"
+            class="min-w-[800px] origin-left transition-all duration-800 group-hover:scale-[1.005]"
           >
             <img
               id="heatmap-img"
               src={`https://ghchart.rshah.org/3b82f6/${GITHUB_USERNAME}`}
               alt="Heatmap"
-              class="gh-chart w-full opacity-0 transition-opacity duration-1000"
+              class="gh-chart w-full opacity-0 transition-opacity duration-900"
               onload="this.classList.add('opacity-100')"
             />
           </div>
@@ -289,20 +304,16 @@ const GITHUB_USERNAME = "lonerOrz";
 </Layout>
 
 <script is:inline>
-  async function initGitHub() {
+  function initGitHub() {
     const root = document.querySelector("[data-github-user]");
     const username = root?.getAttribute("data-github-user");
     if (!username) return;
 
     try {
-      const [user, repos] = await Promise.all([
-        fetch(`https://api.github.com/users/${username}`).then((r) => r.json()),
-        fetch(
-          `https://api.github.com/users/${username}/repos?sort=updated&per_page=100`,
-        ).then((r) => r.json()),
-      ]);
+      const user = JSON.parse(root.getAttribute("data-gh-user") || "{}");
+      const repos = JSON.parse(root.getAttribute("data-gh-repos") || "[]");
+      if (!user.login) return;
 
-      // 1. Data Injection
       document.getElementById("gh-name").textContent = user.name || username;
       document.getElementById("gh-bio").textContent =
         user.bio || "Crafting digital experiences through elegant code.";
@@ -357,7 +368,7 @@ const GITHUB_USERNAME = "lonerOrz";
             <span>${Math.round((count / 15) * 100)}%</span>
           </div>
           <div class="h-1 w-full bg-zinc-100 dark:bg-white/5 rounded-full overflow-hidden">
-            <div class="h-full bg-zinc-900 dark:bg-blue-500 transition-all duration-1000" style="width: ${(count / 15) * 100}%"></div>
+            <div class="h-full bg-zinc-900 dark:bg-blue-500 transition-all duration-900 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)]" style="width: ${(count / 15) * 100}%"></div>
           </div>
         </div>
       `,

@@ -455,9 +455,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     pointer-events: none;
   }
   #an_music_bg {
-    inset: -5vh;
-    width: 110vw;
-    height: 110vh;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
     background-image: var(
       --music-cover,
       radial-gradient(
@@ -478,10 +478,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     );
     background-position: center;
     background-size: cover;
-    filter: blur(28px) saturate(1.62) brightness(1.16);
+    filter: blur(20px) saturate(1.5) brightness(1.12);
     opacity: 1;
-    scale: 1.015;
-    transform-origin: center;
+    will-change: filter, opacity;
     transition:
       opacity 1.5s ease-in-out,
       filter 1.5s ease-in-out !important;
@@ -508,13 +507,13 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
   #anMusic-page {
     position: relative;
     z-index: 1;
-    min-height: calc(100vh - 144px);
+    min-height: calc(100dvh - 144px);
   }
   .music-loading-shell {
     position: relative;
     z-index: 1;
     display: grid;
-    min-height: 52vh;
+    min-height: 52dvh;
     place-items: center;
     gap: 24px;
     text-align: center;
@@ -604,8 +603,10 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    height: 75vh !important;
+    height: calc(75dvh - 100px) !important;
     margin: 0 !important;
+    padding-bottom: 100px !important; /* reserve space for fixed controller */
+    box-sizing: border-box !important;
   }
   #anMusic-page .aplayer * {
     border: none !important;
@@ -616,7 +617,9 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     height: 100% !important;
     max-height: none !important;
     padding-right: 5px !important;
-    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    transition:
+      width 0.5s cubic-bezier(0.25, 1, 0.5, 1),
+      opacity 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
     overflow: hidden !important;
     opacity: 1 !important;
   }
@@ -632,7 +635,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     display: flex !important;
     padding-left: 30px !important;
     box-sizing: border-box !important;
-    transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
   }
   #anMusic-page .aplayer-list.aplayer-list-hide + .aplayer-body {
     width: 100% !important;
@@ -716,7 +719,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
   }
   #anMusic-page .aplayer-lrc {
-    height: 300px !important;
+    height: min(300px, 35dvh) !important;
     --lrc-line-height: 40px;
     mask-image: linear-gradient(
       to bottom,
@@ -737,6 +740,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
   }
   #anMusic-page .aplayer-lrc-contents {
     padding-top: 100px !important;
+    will-change: transform;
   }
   #anMusic-page .aplayer-lrc:before,
   #anMusic-page .aplayer-lrc:after {
@@ -751,10 +755,8 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     margin: 0 !important;
     padding: 0 !important;
     transition:
-      color 0.5s ease-out,
-      font-size 0.5s ease-out,
-      font-weight 0.5s ease-out,
-      height 0.5s ease-out !important;
+      opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+      color 0.4s cubic-bezier(0.23, 1, 0.32, 1) !important;
   }
   #anMusic-page .aplayer-lrc p.aplayer-lrc-current {
     color: #fff !important;
@@ -774,6 +776,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: blur(20px) !important;
     -webkit-backdrop-filter: blur(20px) !important;
+    will-change: backdrop-filter;
     padding: 10px 20px !important;
     border-radius: 50px !important;
     display: flex !important;
@@ -821,8 +824,7 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     position: absolute !important;
     bottom: 100% !important;
     left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin-bottom: 10px !important;
+    transform: translateX(-50%) translateY(8px) !important;
     width: 32px !important;
     height: 110px !important;
     z-index: 101 !important;
@@ -839,14 +841,14 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     transition:
       opacity 0.2s ease,
       visibility 0.2s ease,
-      margin-bottom 0.2s ease !important;
+      transform 0.2s ease !important;
   }
   #anMusic-page .aplayer-volume-wrap:hover .aplayer-volume-bar-wrap,
   #anMusic-page .aplayer-volume-bar-wrap.aplayer-volume-bar-wrap-active {
     opacity: 1 !important;
     visibility: visible !important;
     pointer-events: auto !important;
-    margin-bottom: 16px !important;
+    transform: translateX(-50%) translateY(0) !important;
   }
   #anMusic-page .aplayer-volume-bar-wrap::after {
     content: "" !important;
