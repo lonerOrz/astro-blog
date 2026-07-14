@@ -261,13 +261,13 @@ const [ghUser, ghRepos] = await Promise.all([
 
         <div class="group scrollbar-hide relative overflow-x-auto pb-4">
           <div
-            class="min-w-[800px] origin-left transition-all duration-700 group-hover:scale-[1.005]"
+            class="min-w-[800px] origin-left transition-all duration-800 group-hover:scale-[1.005]"
           >
             <img
               id="heatmap-img"
               src={`https://ghchart.rshah.org/3b82f6/${GITHUB_USERNAME}`}
               alt="Heatmap"
-              class="gh-chart w-full opacity-0 transition-opacity duration-1000"
+              class="gh-chart w-full opacity-0 transition-opacity duration-900"
               onload="this.classList.add('opacity-100')"
             />
           </div>
@@ -368,7 +368,7 @@ const [ghUser, ghRepos] = await Promise.all([
             <span>${Math.round((count / 15) * 100)}%</span>
           </div>
           <div class="h-1 w-full bg-zinc-100 dark:bg-white/5 rounded-full overflow-hidden">
-            <div class="h-full bg-zinc-900 dark:bg-blue-500 transition-all duration-1000" style="width: ${(count / 15) * 100}%"></div>
+            <div class="h-full bg-zinc-900 dark:bg-blue-500 transition-all duration-900 [transition-timing-function:cubic-bezier(0.23,1,0.32,1)]" style="width: ${(count / 15) * 100}%"></div>
           </div>
         </div>
       `,

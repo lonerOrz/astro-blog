@@ -755,8 +755,8 @@ const DEFAULT_PLAYLIST = PLAYLISTS[0].id;
     margin: 0 !important;
     padding: 0 !important;
     transition:
-      opacity 0.4s ease-out,
-      color 0.4s ease-out !important;
+      opacity 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+      color 0.4s cubic-bezier(0.23, 1, 0.32, 1) !important;
   }
   #anMusic-page .aplayer-lrc p.aplayer-lrc-current {
     color: #fff !important;

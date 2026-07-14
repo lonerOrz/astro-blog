@@ -61,7 +61,7 @@ const { title, description, image = "/astro-micro.jpg" } = Astro.props;
 <!-- PageFind: lazy-loaded on first search open -->
 <script is:inline>
   window.__pagefindLoaded = false;
-  function loadPagefind() {
+  window.loadPagefind = function () {
     if (window.__pagefindLoaded) return;
     window.__pagefindLoaded = true;
     const css = document.createElement("link");
@@ -71,7 +71,7 @@ const { title, description, image = "/astro-micro.jpg" } = Astro.props;
     const js = document.createElement("script");
     js.src = "/pagefind/pagefind-ui.js";
     document.head.appendChild(js);
-  }
+  };
 </script>
 
 <ClientRouter />
