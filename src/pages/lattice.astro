@@ -252,21 +252,38 @@ import Container from "../components/Container.astro";
       this.t = 0;
       this.lastTime = 0;
       this.isDestroyed = false;
+      this._resizeHandler = () => this.resize();
+      this._visibilityHandler = () => this._onVisibility();
+      this._swapHandler = () => this.destroy();
       this.init();
     }
 
     init() {
       this.resize();
-      window.addEventListener("resize", () => this.resize());
+      if (this.width === 0 || this.height === 0) return;
+      window.addEventListener("resize", this._resizeHandler);
+      document.addEventListener("visibilitychange", this._visibilityHandler);
+      document.addEventListener("astro:before-swap", this._swapHandler);
       this.animate();
+    }
+
+    _onVisibility() {
+      if (document.hidden) {
+        cancelAnimationFrame(this.frameReq);
+      } else {
+        this.lastTime = performance.now();
+        this.animate(this.lastTime);
+      }
     }
 
     resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       this.width = this.canvas.offsetWidth;
       this.height = this.canvas.offsetHeight;
+      if (this.width === 0 || this.height === 0) return;
       this.canvas.width = this.width * dpr;
       this.canvas.height = this.height * dpr;
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.scale(dpr, dpr);
       this.scale = Math.min(this.width, this.height) * 0.18;
     }
@@ -350,7 +367,7 @@ import Container from "../components/Container.astro";
 
           // Torus Knot 参数方程
           const x = (R + tr * Math.cos(q * theta)) * Math.cos(p * theta);
-          const y = (R + tr * Math.cos(q * theta)) * sin(p * theta);
+          const y = (R + tr * Math.cos(q * theta)) * Math.sin(p * theta);
           const z = tr * Math.sin(q * theta);
 
           const pt = this.project(x, y, z, rotX, rotY);
@@ -389,23 +406,11 @@ import Container from "../components/Container.astro";
     destroy() {
       this.isDestroyed = true;
       cancelAnimationFrame(this.frameReq);
+      window.removeEventListener("resize", this._resizeHandler);
+      document.removeEventListener("visibilitychange", this._visibilityHandler);
+      document.removeEventListener("astro:before-swap", this._swapHandler);
     }
   }
 
-  // 这里的 data-astro-rerun 会确保每次页面加载时脚本都会重新执行
   let visualizer = new TorusVisualizer();
-
-  // 清理 SPA 路由切换残留
-  document.addEventListener(
-    "astro:before-swap",
-    () => {
-      if (visualizer) visualizer.destroy();
-    },
-    { once: true },
-  );
-
-  // 内部辅助函数
-  function sin(v) {
-    return Math.sin(v);
-  }
 </script>
