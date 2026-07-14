@@ -17,16 +17,12 @@ export type Social = {
   HREF: string;
 };
 
-export type Socials = Social[];
-
 export type Friend = {
   NAME: string;
   HREF: string;
   GITHUB: string;
   DESCRIPTION: string;
 };
-
-export type Friends = Friend[];
 
 export type Heading = {
   depth: number;

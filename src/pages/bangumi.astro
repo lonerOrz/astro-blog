@@ -40,9 +40,7 @@ const groups = [
               data-target={group.id}
               class:list={[
                 "bangumi-tab shrink-0 rounded-full border px-6 py-2 text-[10px] font-bold tracking-[0.2em] uppercase transition-all duration-300",
-                i === 0
-                  ? "active-tab border-zinc-900 bg-zinc-900 text-white shadow-lg shadow-zinc-200 dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950 dark:shadow-none"
-                  : "border-zinc-200 text-zinc-400 hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-500 dark:hover:border-zinc-100 dark:hover:text-zinc-100",
+                i === 0 && "active-tab",
               ]}
             >
               {group.label}{" "}
@@ -88,45 +86,8 @@ const groups = [
       tab.addEventListener("click", () => {
         const targetId = tab.getAttribute("data-target");
 
-        tabs.forEach((t) => {
-          t.classList.remove(
-            "active-tab",
-            "border-zinc-900",
-            "bg-zinc-900",
-            "text-white",
-            "shadow-lg",
-            "shadow-zinc-200",
-            "dark:border-zinc-100",
-            "dark:bg-zinc-100",
-            "dark:text-zinc-950",
-            "dark:shadow-none",
-          );
-          t.classList.add(
-            "border-zinc-200",
-            "text-zinc-400",
-            "dark:border-zinc-800",
-            "dark:text-zinc-500",
-          );
-        });
-
-        tab.classList.add(
-          "active-tab",
-          "border-zinc-900",
-          "bg-zinc-900",
-          "text-white",
-          "shadow-lg",
-          "shadow-zinc-200",
-          "dark:border-zinc-100",
-          "dark:bg-zinc-100",
-          "dark:text-zinc-950",
-          "dark:shadow-none",
-        );
-        tab.classList.remove(
-          "border-zinc-200",
-          "text-zinc-400",
-          "dark:border-zinc-800",
-          "dark:text-zinc-500",
-        );
+        tabs.forEach((t) => t.classList.remove("active-tab"));
+        tab.classList.add("active-tab");
 
         contents.forEach((content) => {
           content.id === targetId
@@ -148,5 +109,36 @@ const groups = [
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  .bangumi-tab {
+    border-color: #e4e4e7;
+    color: #a1a1aa;
+    transition: all 300ms;
+  }
+  .bangumi-tab:hover {
+    border-color: #18181b;
+    color: #18181b;
+  }
+  .dark .bangumi-tab {
+    border-color: #27272a;
+    color: #737373;
+  }
+  .dark .bangumi-tab:hover {
+    border-color: #f4f4f5;
+    color: #f4f4f5;
+  }
+  .bangumi-tab.active-tab {
+    border-color: #18181b;
+    background-color: #18181b;
+    color: white;
+    box-shadow:
+      0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  }
+  .dark .bangumi-tab.active-tab {
+    border-color: #f4f4f5;
+    background-color: #f4f4f5;
+    color: #18181b;
+    box-shadow: none;
   }
 </style>

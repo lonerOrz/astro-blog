@@ -1,4 +1,4 @@
-import type { Metadata, Site, Socials, Friends } from "@types";
+import type { Metadata, Site, Social, Friend } from "@types";
 
 export const SITE: Site = {
   TITLE: "lonerOrz's website",
@@ -45,7 +45,7 @@ export const FRIENDS_PAGE: Metadata = {
   DESCRIPTION: "A collection of links to my friends and other cool websites.",
 };
 
-export const SOCIALS: Socials = [
+export const SOCIALS: Social[] = [
   {
     NAME: "X (formerly Twitter)",
     HREF: "https://twitter.com/lonerOrz",
@@ -60,7 +60,7 @@ export const SOCIALS: Socials = [
   },
 ];
 
-export const FRIENDS: Friends = [
+export const FRIENDS: Friend[] = [
   {
     NAME: "LonerOrz",
     HREF: "https://astro-blog-rosy.vercel.app",
