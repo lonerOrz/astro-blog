@@ -260,7 +260,12 @@ import Container from "../components/Container.astro";
 
     init() {
       this.resize();
-      if (this.width === 0 || this.height === 0) return;
+      if (this.width === 0 || this.height === 0) {
+        // 延迟重试：等待 layout 稳定
+        this._retryTimer = setTimeout(() => this.init(), 50);
+        return;
+      }
+      clearTimeout(this._retryTimer);
       window.addEventListener("resize", this._resizeHandler);
       document.addEventListener("visibilitychange", this._visibilityHandler);
       document.addEventListener("astro:before-swap", this._swapHandler);
@@ -405,6 +410,7 @@ import Container from "../components/Container.astro";
 
     destroy() {
       this.isDestroyed = true;
+      clearTimeout(this._retryTimer);
       cancelAnimationFrame(this.frameReq);
       window.removeEventListener("resize", this._resizeHandler);
       document.removeEventListener("visibilitychange", this._visibilityHandler);
