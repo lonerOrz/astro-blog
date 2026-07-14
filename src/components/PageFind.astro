@@ -59,6 +59,7 @@ import Search from "astro-pagefind/components/Search";
   const backdrop = document.getElementById("backdrop");
 
   function openPagefind() {
+    if (typeof loadPagefind === "function") loadPagefind();
     const searchDiv = document.getElementById("search");
     const search = searchDiv.querySelector("input");
     setTimeout(() => {
