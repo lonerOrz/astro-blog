@@ -1,0 +1,94 @@
+---
+
+title: "Guile 3 + Fish + XDG"
+description: "让 Guile 在 Fish 中使用 XDG 目录，并自动加载个人 REPL 配置。"
+date: "2026-09-29"
+tags:
+
+- guile
+- scheme
+- fish
+- xdg
+
+---
+
+Guile 默认使用 `~/.guile` 作为个人 REPL 配置。
+
+这里改成 XDG 目录：
+
+```text id="6o5w3c"
+~/.config/guile/        # 配置
+~/.local/share/guile/   # 用户级 Scheme 包
+~/.local/state/guile/   # 历史记录
+~/.cache/guile/         # 编译缓存
+```
+
+## 安装 colorized
+
+```fish id="1l8x0k"
+mkdir -p "$XDG_DATA_HOME/guile/site/3.0/ice-9"
+
+git clone --depth=1 \
+  https://gitlab.com/NalaGinrut/guile-colorized.git \
+  /tmp/guile-colorized
+
+cp /tmp/guile-colorized/ice-9/colorized.scm \
+  "$XDG_DATA_HOME/guile/site/3.0/ice-9/"
+```
+
+## 配置 Fish
+
+在 `~/.config/fish/config.fish` 中加入：
+
+```fish id="0gfrlu"
+set -gx GUILE_LOAD_PATH \
+  "$XDG_DATA_HOME/guile/site/3.0" ...
+
+set -gx GUILE_HISTORY \
+  "$XDG_STATE_HOME/guile/history"
+
+function guile
+  if test (count $argv) -eq 0
+    command guile -q \
+      -l "$XDG_CONFIG_HOME/guile/interactive.scm"
+  else
+    command guile $argv
+  end
+end
+```
+
+然后：
+
+```fish id="n2n2bs"
+source ~/.config/fish/config.fish
+```
+
+## 配置 REPL
+
+创建 `~/.config/guile/interactive.scm`：
+
+```scheme id="nm4q0r"
+(use-modules
+  (ice-9 readline)
+  (ice-9 colorized))
+
+(activate-readline)
+(activate-colorized)
+```
+
+现在直接运行：
+
+```fish id="o89ybn"
+guile
+```
+
+即可获得 Readline、Tab 补全和 Colorized。
+
+最终目录：
+
+```text id="uo9s9r"
+~/.config/guile/interactive.scm
+~/.local/share/guile/site/3.0/ice-9/colorized.scm
+~/.local/state/guile/history
+~/.cache/guile/ccache/
+```
